@@ -1,0 +1,169 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\xampp\\htdocs\\hris-system\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\xampp\\htdocs\\hris-system\\routes\\web.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:routes\\web.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\xampp\\htdocs\\hris-system\\app\\Http\\Controllers\\Auth\\DashboardController.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\Http\\Controllers\\Auth\\DashboardController.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\xampp\\htdocs\\hris-system\\app\\Http\\Controllers\\TimeRecord.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\Http\\Controllers\\TimeRecord.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\xampp\\htdocs\\hris-system\\resources\\views\\dashboard.blade.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:resources\\views\\dashboard.blade.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\xampp\\htdocs\\hris-system\\database\\migrations\\2025_04_22_121321_create_time_records_table.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:database\\migrations\\2025_04_22_121321_create_time_records_table.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\xampp\\htdocs\\hris-system\\database\\migrations\\2025_04_24_222023_create_time_transactions_table.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:database\\migrations\\2025_04_24_222023_create_time_transactions_table.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\xampp\\htdocs\\hris-system\\resources\\views\\employees\\bulk-upload.blade.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:resources\\views\\employees\\bulk-upload.blade.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\xampp\\htdocs\\hris-system\\app\\Http\\Controllers\\EmployeeController.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:app\\Http\\Controllers\\EmployeeController.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\xampp\\htdocs\\hris-system\\resources\\views\\layouts\\sidebar.blade.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:resources\\views\\layouts\\sidebar.blade.php||{3D2461EC-8045-4AA9-ABFB-812292AE795D}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 1,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedHeight": 262,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "sidebar.blade.php",
+              "DocumentMoniker": "C:\\xampp\\htdocs\\hris-system\\resources\\views\\layouts\\sidebar.blade.php",
+              "RelativeDocumentMoniker": "resources\\views\\layouts\\sidebar.blade.php",
+              "ToolTip": "C:\\xampp\\htdocs\\hris-system\\resources\\views\\layouts\\sidebar.blade.php",
+              "RelativeToolTip": "resources\\views\\layouts\\sidebar.blade.php",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAAAAAAAAAAAAA==",
+              "Icon": "89320d42-7831-4f47-839a-c227d3a60919.000001|",
+              "WhenOpened": "2025-04-13T16:38:04.65Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "web.php",
+              "DocumentMoniker": "C:\\xampp\\htdocs\\hris-system\\routes\\web.php",
+              "RelativeDocumentMoniker": "routes\\web.php",
+              "ToolTip": "C:\\xampp\\htdocs\\hris-system\\routes\\web.php",
+              "RelativeToolTip": "routes\\web.php",
+              "ViewState": "AgIAAEsAAAAAAAAAAAAAAFYAAABtAAAAAAAAAA==",
+              "Icon": "89320d42-7831-4f47-839a-c227d3a60919.000001|",
+              "WhenOpened": "2025-04-14T05:46:09.7Z",
+              "IsPinned": true,
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "TimeRecord.php",
+              "DocumentMoniker": "C:\\xampp\\htdocs\\hris-system\\app\\Http\\Controllers\\TimeRecord.php",
+              "RelativeDocumentMoniker": "app\\Http\\Controllers\\TimeRecord.php",
+              "ToolTip": "C:\\xampp\\htdocs\\hris-system\\app\\Http\\Controllers\\TimeRecord.php",
+              "RelativeToolTip": "app\\Http\\Controllers\\TimeRecord.php",
+              "Icon": "89320d42-7831-4f47-839a-c227d3a60919.000001|",
+              "WhenOpened": "2025-04-24T22:27:23.558Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "2025_04_22_121321_create_time_records_table.php",
+              "DocumentMoniker": "C:\\xampp\\htdocs\\hris-system\\database\\migrations\\2025_04_22_121321_create_time_records_table.php",
+              "RelativeDocumentMoniker": "database\\migrations\\2025_04_22_121321_create_time_records_table.php",
+              "ToolTip": "C:\\xampp\\htdocs\\hris-system\\database\\migrations\\2025_04_22_121321_create_time_records_table.php",
+              "RelativeToolTip": "database\\migrations\\2025_04_22_121321_create_time_records_table.php",
+              "Icon": "89320d42-7831-4f47-839a-c227d3a60919.000001|",
+              "WhenOpened": "2025-04-24T22:25:47.679Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "2025_04_24_222023_create_time_transactions_table.php",
+              "DocumentMoniker": "C:\\xampp\\htdocs\\hris-system\\database\\migrations\\2025_04_24_222023_create_time_transactions_table.php",
+              "RelativeDocumentMoniker": "database\\migrations\\2025_04_24_222023_create_time_transactions_table.php",
+              "ToolTip": "C:\\xampp\\htdocs\\hris-system\\database\\migrations\\2025_04_24_222023_create_time_transactions_table.php",
+              "RelativeToolTip": "database\\migrations\\2025_04_24_222023_create_time_transactions_table.php",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAHAAAAAAAAAA==",
+              "Icon": "89320d42-7831-4f47-839a-c227d3a60919.000001|",
+              "WhenOpened": "2025-04-24T22:20:31.584Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "DashboardController.php",
+              "DocumentMoniker": "C:\\xampp\\htdocs\\hris-system\\app\\Http\\Controllers\\Auth\\DashboardController.php",
+              "RelativeDocumentMoniker": "app\\Http\\Controllers\\Auth\\DashboardController.php",
+              "ToolTip": "C:\\xampp\\htdocs\\hris-system\\app\\Http\\Controllers\\Auth\\DashboardController.php",
+              "RelativeToolTip": "app\\Http\\Controllers\\Auth\\DashboardController.php",
+              "Icon": "89320d42-7831-4f47-839a-c227d3a60919.000001|",
+              "WhenOpened": "2025-04-24T22:19:14.719Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "dashboard.blade.php",
+              "DocumentMoniker": "C:\\xampp\\htdocs\\hris-system\\resources\\views\\dashboard.blade.php",
+              "RelativeDocumentMoniker": "resources\\views\\dashboard.blade.php",
+              "ToolTip": "C:\\xampp\\htdocs\\hris-system\\resources\\views\\dashboard.blade.php",
+              "RelativeToolTip": "resources\\views\\dashboard.blade.php",
+              "ViewState": "AgIAAHYAAAAAAAAAAAAowIAAAAAAAAAAAAAAAA==",
+              "Icon": "89320d42-7831-4f47-839a-c227d3a60919.000001|",
+              "WhenOpened": "2025-04-24T16:06:59.527Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "EmployeeController.php",
+              "DocumentMoniker": "C:\\xampp\\htdocs\\hris-system\\app\\Http\\Controllers\\EmployeeController.php",
+              "RelativeDocumentMoniker": "app\\Http\\Controllers\\EmployeeController.php",
+              "ToolTip": "C:\\xampp\\htdocs\\hris-system\\app\\Http\\Controllers\\EmployeeController.php",
+              "RelativeToolTip": "app\\Http\\Controllers\\EmployeeController.php",
+              "ViewState": "AgIAABgAAAAAAAAAAAAuwDEAAAAFAAAAAAAAAA==",
+              "Icon": "89320d42-7831-4f47-839a-c227d3a60919.000001|",
+              "WhenOpened": "2025-04-24T15:57:24.9Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "bulk-upload.blade.php",
+              "DocumentMoniker": "C:\\xampp\\htdocs\\hris-system\\resources\\views\\employees\\bulk-upload.blade.php",
+              "RelativeDocumentMoniker": "resources\\views\\employees\\bulk-upload.blade.php",
+              "ToolTip": "C:\\xampp\\htdocs\\hris-system\\resources\\views\\employees\\bulk-upload.blade.php",
+              "RelativeToolTip": "resources\\views\\employees\\bulk-upload.blade.php",
+              "ViewState": "AgIAAIoAAAAAAAAAAAAAAK4AAAAAAAAAAAAAAA==",
+              "Icon": "89320d42-7831-4f47-839a-c227d3a60919.000001|",
+              "WhenOpened": "2025-04-24T15:41:23.057Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

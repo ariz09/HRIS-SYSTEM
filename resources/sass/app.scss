@@ -1,0 +1,20 @@
+// Font Awesome
+@import '~font-awesome/scss/font-awesome';
+
+// AdminLTE
+@import '~admin-lte/dist/css/adminlte.min.css';
+
+// Additional custom styles
+.navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.8);
+
+    &:hover {
+        color: rgba(255, 255, 255, 1);
+    }
+}
+
+.user-panel {
+    .info {
+        color: #fff;
+    }
+}

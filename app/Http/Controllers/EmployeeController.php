@@ -24,13 +24,26 @@ class EmployeeController extends Controller
 
     public function create()
     {
+        $formOptions = [
+            'relationships' => [
+                'Spouse', 'Parent', 'Child', 'Sibling',
+                'Friend', 'Relative', 'Colleague', 'Other'
+            ],
+            'dependentRelationships' => [
+                'Spouse', 'Child', 'Parent', 'Sibling',
+                'Grandchild', 'Other Family', 'Other'
+            ],
+            'years' => range(1950, date('Y') + 5)
+        ];
+
         return view('employees.create-edit', [
             'agencies' => Agency::all(),
             'departments' => Department::all(),
             'cdmLevels' => CDMLevel::all(),
             'positions' => Position::all(),
             'employmentStatuses' => EmploymentStatus::all(),
-            'formattedEmployeeNumber' => Employee::getFormattedNextNumber()
+            'formattedEmployeeNumber' => Employee::getFormattedNextNumber(),
+            'formOptions' => $formOptions
         ]);
     }
 
@@ -46,25 +59,30 @@ class EmployeeController extends Controller
 
     public function edit(Employee $employee)
     {
-        $agencies = Agency::all();
-        $departments = Department::all();
-        $cdmLevels = CDMLevel::all();
-        $positions = Position::all();
-        $employmentStatuses = EmploymentStatus::all();
-        $employeeNumber = $employee->employee_number;
-
-        // Load relationships for editing
+        $formOptions = [
+            'relationships' => [
+                'Spouse', 'Parent', 'Child', 'Sibling',
+                'Friend', 'Relative', 'Colleague', 'Other'
+            ],
+            'dependentRelationships' => [
+                'Spouse', 'Child', 'Parent', 'Sibling',
+                'Grandchild', 'Other Family', 'Other'
+            ],
+            'years' => range(1950, date('Y') + 5)
+        ];
+    
         $employee->load('dependents', 'educations', 'emergencyContacts', 'employmentHistories');
-
-        return view('employees.create-edit', compact(
-            'employee',
-            'agencies',
-            'departments',
-            'cdmLevels',
-            'positions',
-            'employmentStatuses',
-            'employeeNumber'
-        ));
+    
+        return view('employees.create-edit', [
+            'employee' => $employee,
+            'agencies' => Agency::all(),
+            'departments' => Department::all(),
+            'cdmLevels' => CDMLevel::all(),
+            'positions' => Position::all(),
+            'employmentStatuses' => EmploymentStatus::all(),
+            'employeeNumber' => $employee->employee_number,
+            'formOptions' => $formOptions // Add this line
+        ]);
     }
 
     public function update(Request $request, Employee $employee)

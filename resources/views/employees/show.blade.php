@@ -32,343 +32,373 @@
             </div>
         </div>
         
-        <!-- Personal Information -->
         <div class="card-body">
-            <h5 class="mb-3">{{ $employee->last_name }}, {{ $employee->first_name }} {{ $employee->middle_name }} {{ $employee->name_suffix }}</h5>
+            <h5 class="mb-3">
+                {{ $employee->last_name }}, {{ $employee->first_name }} 
+                {{ $employee->middle_name ? $employee->middle_name . ' ' : '' }}
+                {{ $employee->name_suffix ?? '' }}
+            </h5>
             <p class="text-muted mb-4">{{ optional($employee->position)->name ?? 'N/A' }}</p>
             
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Employee Number</label>
-                            <p class="form-control-plaintext">{{ $employee->employee_number }}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Alias</label>
-                            <p class="form-control-plaintext">{{ $employee->alias ?? 'N/A' }}</p>
-                        </div>
-                    </div>
-                    
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Birthday</label>
-                            <p class="form-control-plaintext">{{ optional($employee->birthday)->format('F d, Y') ?? 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Gender</label>
-                            <p class="form-control-plaintext">{{ $employee->gender ?? 'N/A' }}</p>
-                        </div>
-                    </div>
+            <!-- Tab Navigation -->
+            <ul class="nav nav-tabs mb-4" id="employeeTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#personal" type="button">Personal Info</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#government" type="button">Government IDs</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#employment" type="button">Employment</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#contact" type="button">Contact</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#compensation" type="button">Compensation</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#education" type="button">Education</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#dependents" type="button">Dependents</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#emergency" type="button">Emergency</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#history" type="button">History</button>
+                </li>
+                @if($employee->user)
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" data-bs-toggle="tab" data-bs-target="#account" type="button">User Account</button>
+                </li>
+                @endif
+            </ul>
 
+            <!-- Tab Content -->
+            <div class="tab-content" id="employeeTabContent">
+                <!-- Personal Info Tab -->
+                <div class="tab-pane fade show active" id="personal" role="tabpanel">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Civil Status</label>
-                            <p class="form-control-plaintext">{{ $employee->civil_status ?? 'N/A' }}</p>
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Contact Number</label>
-                            <p class="form-control-plaintext">{{ $employee->phone_number ?? 'N/A' }}</p>
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Employee Number</label>
+                                    <p class="form-control-plaintext">{{ $employee->employee_number }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Alias</label>
+                                    <p class="form-control-plaintext">{{ $employee->alias ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Birthday</label>
+                                    <p class="form-control-plaintext">{{ optional($employee->birthday)->format('F d, Y') ?? 'N/A' }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Gender</label>
+                                    <p class="form-control-plaintext">{{ ucfirst($employee->gender) ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Civil Status</label>
+                                    <p class="form-control-plaintext">{{ ucfirst($employee->civil_status) ?? 'N/A' }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Name Suffix</label>
+                                    <p class="form-control-plaintext">{{ $employee->name_suffix ?? 'N/A' }}</p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-                
-                <div class="col-md-6">
+
+                <!-- Government IDs Tab -->
+                <div class="tab-pane fade" id="government" role="tabpanel">
                     <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">Department</label>
-                            <p class="form-control-plaintext">{{ optional($employee->department)->name ?? 'N/A' }}</p>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">SSS Number</label>
+                            <p class="form-control-plaintext">{{ $employee->sss_number ?? 'N/A' }}</p>
                         </div>
-                        <div class="col-md-6 mb-3">
-                            <label class="form-label">CDM Level</label>
-                            <p class="form-control-plaintext">{{ optional($employee->cdmLevel)->name ?? 'N/A' }}</p>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Philhealth</label>
+                            <p class="form-control-plaintext">{{ $employee->philhealth_number ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Pag-Ibig</label>
+                            <p class="form-control-plaintext">{{ $employee->pag_ibig_number ?? 'N/A' }}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">TIN</label>
+                            <p class="form-control-plaintext">{{ $employee->tin ?? 'N/A' }}</p>
                         </div>
                     </div>
                     
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Employment Type</label>
-                            <p class="form-control-plaintext">{{ optional($employee->employmentType)->name ?? 'N/A' }}</p>
+                            <label class="form-label">ATM Account</label>
+                            <p class="form-control-plaintext">{{ $employee->atm_account_number ?? 'N/A' }}</p>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Status</label>
-                            <p class="form-control-plaintext">
-                                <span class="badge bg-{{ optional($employee->employmentStatus)->name == 'Active' ? 'success' : 'warning' }}">
-                                    {{ optional($employee->employmentStatus)->name ?? 'N/A' }}
-                                </span>
-                            </p>
+                            <label class="form-label">Bank</label>
+                            <p class="form-control-plaintext">{{ $employee->bank ?? 'N/A' }}</p>
                         </div>
                     </div>
+                </div>
 
+                <!-- Employment Tab -->
+                <div class="tab-pane fade" id="employment" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Department</label>
+                                    <p class="form-control-plaintext">{{ optional($employee->department)->name ?? 'N/A' }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">CDM Level</label>
+                                    <p class="form-control-plaintext">{{ optional($employee->cdmLevel)->name ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Employment Type</label>
+                                    <p class="form-control-plaintext">{{ optional($employee->employmentType)->name ?? 'N/A' }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Status</label>
+                                    <p class="form-control-plaintext">
+                                        <span class="badge bg-{{ optional($employee->employmentStatus)->name == 'Active' ? 'success' : 'warning' }}">
+                                            {{ optional($employee->employmentStatus)->name ?? 'N/A' }}
+                                        </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Hiring Date</label>
+                                    <p class="form-control-plaintext">{{ optional($employee->hiring_date)->format('F d, Y') ?? 'N/A' }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Last Day</label>
+                                    <p class="form-control-plaintext">{{ optional($employee->last_day)->format('F d, Y') ?? 'N/A' }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Tab -->
+                <div class="tab-pane fade" id="contact" role="tabpanel">
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Email</label>
                             <p class="form-control-plaintext">{{ $employee->email ?? 'N/A' }}</p>
                         </div>
                         <div class="col-md-6 mb-3">
+                            <label class="form-label">Contact Number</label>
+                            <p class="form-control-plaintext">{{ $employee->phone_number ?? 'N/A' }}</p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 mb-3">
                             <label class="form-label">Address</label>
                             <p class="form-control-plaintext">{{ $employee->address ?? 'N/A' }}</p>
                         </div>
                     </div>
                 </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Hiring Date</label>
-                    <p class="form-control-plaintext">{{ optional($employee->hiring_date)->format('F d, Y') ?? 'N/A' }}</p>
-                </div>
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">Last Day</label>
-                    <p class="form-control-plaintext">{{ optional($employee->last_day)->format('F d, Y') ?? 'N/A' }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Compensation -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-money-bill-wave me-1"></i> Compensation
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Basic Pay</label>
-                    <p class="form-control-plaintext">₱{{ number_format($employee->basic_pay, 2) }}</p>
+                <!-- Compensation Tab -->
+                <div class="tab-pane fade" id="compensation" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Basic Pay</label>
+                            <p class="form-control-plaintext">₱{{ number_format($employee->basic_pay, 2) }}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">RATA</label>
+                            <p class="form-control-plaintext">₱{{ number_format($employee->rata, 2) }}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Comm Allowance</label>
+                            <p class="form-control-plaintext">₱{{ number_format($employee->comm_allowance, 2) }}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Transpo Allowance</label>
+                            <p class="form-control-plaintext">₱{{ number_format($employee->transpo_allowance, 2) }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Parking/Toll</label>
+                            <p class="form-control-plaintext">₱{{ number_format($employee->parking_toll_allowance, 2) }}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Clothing Allowance</label>
+                            <p class="form-control-plaintext">₱{{ number_format($employee->clothing_allowance, 2) }}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Other Allowance</label>
+                            <p class="form-control-plaintext">₱{{ number_format($employee->other_allowance, 2) }}</p>
+                        </div>
+                        <div class="col-md-3 mb-3">
+                            <label class="form-label">Total Package</label>
+                            <p class="form-control-plaintext fw-bold">₱{{ number_format($employee->total_package, 2) }}</p>
+                        </div>
+                    </div>
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">RATA</label>
-                    <p class="form-control-plaintext">₱{{ number_format($employee->rata, 2) }}</p>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Comm Allowance</label>
-                    <p class="form-control-plaintext">₱{{ number_format($employee->comm_allowance, 2) }}</p>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Transpo Allowance</label>
-                    <p class="form-control-plaintext">₱{{ number_format($employee->transpo_allowance, 2) }}</p>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Parking/Toll</label>
-                    <p class="form-control-plaintext">₱{{ number_format($employee->parking_toll_allowance, 2) }}</p>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Clothing Allowance</label>
-                    <p class="form-control-plaintext">₱{{ number_format($employee->clothing_allowance, 2) }}</p>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Other Allowance</label>
-                    <p class="form-control-plaintext">₱{{ number_format($employee->other_allowance, 2) }}</p>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Total Package</label>
-                    <p class="form-control-plaintext fw-bold">₱{{ number_format($employee->total_package, 2) }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Government IDs -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-id-card me-1"></i> Government IDs
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">SSS Number</label>
-                    <p class="form-control-plaintext">{{ $employee->sss_number ?? 'N/A' }}</p>
+                <!-- Education Tab -->
+                <div class="tab-pane fade" id="education" role="tabpanel">
+                    @if($employee->educations->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Degree</th>
+                                        <th>School</th>
+                                        <th>Year Completed</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($employee->educations as $education)
+                                    <tr>
+                                        <td>{{ $education->degree ?? 'N/A' }}</td>
+                                        <td>{{ $education->school ?? 'N/A' }}</td>
+                                        <td>{{ $education->year_completed ?? 'N/A' }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <p class="text-muted">No education records found.</p>
+                    @endif
                 </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Philhealth</label>
-                    <p class="form-control-plaintext">{{ $employee->philhealth_number ?? 'N/A' }}</p>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">Pag-Ibig</label>
-                    <p class="form-control-plaintext">{{ $employee->pag_ibig_number ?? 'N/A' }}</p>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">TIN</label>
-                    <p class="form-control-plaintext">{{ $employee->tin ?? 'N/A' }}</p>
-                </div>
-            </div>
-            
-            <div class="row">
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">ATM Account</label>
-                    <p class="form-control-plaintext">{{ $employee->atm_account_number ?? 'N/A' }}</p>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Education Background -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-graduation-cap me-1"></i> Education Background
-        </div>
-        <div class="card-body">
-            @if($employee->educations->count() > 0)
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Degree</th>
-                                <th>School</th>
-                                <th>Year Completed</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($employee->educations as $education)
-                            <tr>
-                                <td>{{ $education->degree ?? 'N/A' }}</td>
-                                <td>{{ $education->school ?? 'N/A' }}</td>
-                                <td>{{ $education->year_completed ?? 'N/A' }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                <!-- Dependents Tab -->
+                <div class="tab-pane fade" id="dependents" role="tabpanel">
+                    @if($employee->dependents->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Relationship</th>
+                                        <th>Birthdate</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($employee->dependents as $dependent)
+                                    <tr>
+                                        <td>{{ $dependent->name ?? 'N/A' }}</td>
+                                        <td>{{ $dependent->relationship ?? 'N/A' }}</td>
+                                        <td>{{ optional($dependent->birthdate)->format('F d, Y') ?? 'N/A' }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <p class="text-muted">No dependent records found.</p>
+                    @endif
                 </div>
-            @else
-                <p class="text-muted">No education records found.</p>
-            @endif
-        </div>
-    </div>
 
-    <!-- Dependents -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-users me-1"></i> Dependents
-        </div>
-        <div class="card-body">
-            @if($employee->dependents->count() > 0)
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Relationship</th>
-                                <th>Birthdate</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($employee->dependents as $dependent)
-                            <tr>
-                                <td>{{ $dependent->name ?? 'N/A' }}</td>
-                                <td>{{ $dependent->relationship ?? 'N/A' }}</td>
-                                <td>{{ optional($dependent->birthdate)->format('F d, Y') ?? 'N/A' }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                <!-- Emergency Contacts Tab -->
+                <div class="tab-pane fade" id="emergency" role="tabpanel">
+                    @if($employee->emergencyContacts->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Relationship</th>
+                                        <th>Contact Number</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($employee->emergencyContacts as $contact)
+                                    <tr>
+                                        <td>{{ $contact->name ?? 'N/A' }}</td>
+                                        <td>{{ $contact->relationship ?? 'N/A' }}</td>
+                                        <td>{{ $contact->phone ?? 'N/A' }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <p class="text-muted">No emergency contact records found.</p>
+                    @endif
                 </div>
-            @else
-                <p class="text-muted">No dependent records found.</p>
-            @endif
-        </div>
-    </div>
 
-    <!-- Emergency Contacts -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-phone-alt me-1"></i> Emergency Contacts
-        </div>
-        <div class="card-body">
-            @if($employee->emergencyContacts->count() > 0)
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Relationship</th>
-                                <th>Contact Number</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($employee->emergencyContacts as $contact)
-                            <tr>
-                                <td>{{ $contact->name ?? 'N/A' }}</td>
-                                <td>{{ $contact->relationship ?? 'N/A' }}</td>
-                                <td>{{ $contact->phone ?? 'N/A' }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                <!-- Employment History Tab -->
+                <div class="tab-pane fade" id="history" role="tabpanel">
+                    @if($employee->employmentHistories->count() > 0)
+                        <div class="table-responsive">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr>
+                                        <th>Company</th>
+                                        <th>Position</th>
+                                        <th>Start Date</th>
+                                        <th>End Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($employee->employmentHistories as $history)
+                                    <tr>
+                                        <td>{{ $history->company_name ?? 'N/A' }}</td>
+                                        <td>{{ $history->position ?? 'N/A' }}</td>
+                                        <td>{{ optional($history->start_date)->format('F d, Y') ?? 'N/A' }}</td>
+                                        <td>{{ optional($history->end_date)->format('F d, Y') ?? 'Present' }}</td>
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    @else
+                        <p class="text-muted">No employment history records found.</p>
+                    @endif
                 </div>
-            @else
-                <p class="text-muted">No emergency contact records found.</p>
-            @endif
-        </div>
-    </div>
 
-    <!-- Employment History -->
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-briefcase me-1"></i> Employment History
-        </div>
-        <div class="card-body">
-            @if($employee->employmentHistories->count() > 0)
-                <div class="table-responsive">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr>
-                                <th>Company</th>
-                                <th>Position</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($employee->employmentHistories as $history)
-                            <tr>
-                                <td>{{ $history->company_name ?? 'N/A' }}</td>
-                                <td>{{ $history->position ?? 'N/A' }}</td>
-                                <td>{{ optional($history->start_date)->format('F d, Y') ?? 'N/A' }}</td>
-                                <td>{{ optional($history->end_date)->format('F d, Y') ?? 'Present' }}</td>
-                            </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
+                <!-- User Account Tab -->
+                @if($employee->user)
+                <div class="tab-pane fade" id="account" role="tabpanel">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Username</label>
+                            <p class="form-control-plaintext">{{ $employee->user->name }}</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Email</label>
+                            <p class="form-control-plaintext">{{ $employee->user->email }}</p>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <label class="form-label">Status</label>
+                            <p class="form-control-plaintext">
+                                @if($employee->user->password_changed)
+                                    <span class="badge bg-success">Active</span>
+                                @else
+                                    <span class="badge bg-warning">Pending Activation</span>
+                                @endif
+                            </p>
+                        </div>
+                    </div>
                 </div>
-            @else
-                <p class="text-muted">No employment history records found.</p>
-            @endif
-        </div>
-    </div>
-
-    <!-- User Account -->
-    @if($employee->user)
-    <div class="card mb-4">
-        <div class="card-header">
-            <i class="fas fa-user-circle me-1"></i> User Account
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Username</label>
-                    <p class="form-control-plaintext">{{ $employee->user->name }}</p>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Email</label>
-                    <p class="form-control-plaintext">{{ $employee->user->email }}</p>
-                </div>
-                <div class="col-md-4 mb-3">
-                    <label class="form-label">Status</label>
-                    <p class="form-control-plaintext">
-                        @if($employee->user->password_changed)
-                            <span class="badge bg-success">Active</span>
-                        @else
-                            <span class="badge bg-warning">Pending Activation</span>
-                        @endif
-                    </p>
-                </div>
+                @endif
             </div>
         </div>
     </div>
-    @endif
 </div>
 @endsection

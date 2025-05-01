@@ -1,49 +1,58 @@
 @extends('layouts.guest')
+
 @section('content')
-<main>
-    <div class="container-fluid d-flex justify-content-center align-items-center" style="height: 100vh;">
-        <div class="card shadow border-0 rounded-3 mb-5 w-100" style="max-width: 450px;">
+<main class="min-h-screen flex items-center justify-center bg-gray-100 px-4 sm:px-6 lg:px-8">
+    <div class="w-full max-w-sm sm:max-w-md bg-white shadow-xl rounded-2xl min-h-[600px] p-6 sm:p-8 flex flex-col justify-between space-y-6">
 
-            <!-- Logo -->
-            <div class="d-flex justify-content-center align-items-center my-4 py-4">
-                <img src="{{ asset('images/logo2.png') }}" alt="logo" class="img-fluid" style="max-height: 96px;">
-            </div>
+        <!-- Logo -->
+        <div class="flex justify-center mt-4 mb-2">
+            <img class="h-[4.5rem] sm:h-[5.25rem] md:h-[6rem] w-auto" src="{{ asset('images/logo2.png') }}" alt="logo">
+        </div>
 
-            <!-- Form Section -->
-            <div class="card-body">
-                <form action="{{ route('login') }}" method="post">
-                    @csrf
+        <!-- Form Section -->
+        <div class="flex-1 flex flex-col justify-center">
+            <form action="{{ route('login') }}" method="post" class="space-y-6">
+                @csrf
 
-                    <!-- Email Input -->
-                    <div class="form-floating mb-3">
-                        <input class="form-control" id="email" name="email" type="email" placeholder="name@example.com" required autofocus />
-                        <label for="email">Email</label>
+                <!-- Email Input -->
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
+                    <input id="email" name="email" type="email" required autofocus
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                </div>
+
+                <!-- Password Input -->
+                <div>
+                    <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" name="password" id="password" required
+                        class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    <div class="text-right mt-2">
+                        <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:underline">Forgot password?</a>
                     </div>
+                </div>
 
-                    <!-- Password Input -->
-                    <div class="form-floating mb-3">
-                        <input type="password" name="password" id="password" class="form-control" placeholder="Password" required />
-                        <label for="password">Password</label>
-                    </div>
+                <!-- Remember Me -->
+                <div class="flex items-center">
+                    <input id="inputRememberPassword" type="checkbox" name="remember"
+                        class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                    <label for="inputRememberPassword" class="ml-2 block text-sm text-gray-700">Remember Password</label>
+                </div>
 
-                    <!-- Remember Password Checkbox -->
-                    <div class="form-check mb-3">
-                        <input class="form-check-input" id="inputRememberPassword" type="checkbox" value="" />
-                        <label class="form-check-label" for="inputRememberPassword">Remember Password</label>
-                    </div>
+                <!-- Submit Button -->
+                <div>
+                    <button type="submit"
+                        class="w-full flex justify-center py-2 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-500 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                        Sign In
+                    </button>
+                </div>
+            </form>
+        </div>
 
-                    <!-- Forgot Password Link and Submit Button -->
-                    <div class="d-flex align-items-center justify-content-between mt-4 mb-0">
-                        <a href="{{ route('password.request') }}" class="text-muted">Forgot password?</a>
-                        <button type="submit" class="btn btn-primary btn-block">Sign In</button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Footer Section -->
-            <div class="card-footer text-center py-3">
-                <div class="small"><a href="{{ route('register') }}">Need an account? Sign up!</a></div>
-            </div>
+        <!-- Footer -->
+        <div class="text-center">
+            <a href="{{ route('register') }}" class="text-sm text-gray-600 hover:text-blue-600 hover:underline">
+                Need an account? Sign up!
+            </a>
         </div>
     </div>
 </main>

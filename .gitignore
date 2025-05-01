@@ -1,3 +1,24 @@
+# Laravel
+/vendor/
+/node_modules/
+/public/storage
+/storage/*.key
+.env
+.env.*
+*.log
+*.sqlite
+*.db
+
+# IDE/Editor
+.vscode/
+.vs/
+.idea/
+*.suo
+*.user
+*.vsidx
+*.wsuo
+*.backup.json
+
 /.phpunit.cache
 /node_modules
 /public/build

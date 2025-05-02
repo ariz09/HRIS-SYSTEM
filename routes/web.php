@@ -16,7 +16,8 @@ use App\Http\Controllers\{
     EmploymentTypeController,
     HolidayController,
     RoleController,
-    RolePermissionController
+    RolePermissionController,
+    AdminController
 };
 
 use App\Http\Controllers\EmployeePersonalInfoController;
@@ -126,6 +127,7 @@ Route::middleware(['auth'])->group(function () {
 // Admin Routes
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     // Add admin-only routes here
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 });
 
 require __DIR__ . '/auth.php';

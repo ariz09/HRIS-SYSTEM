@@ -15,6 +15,7 @@ class CreateHolidaysTable extends Migration
             $table->date('date');
             $table->text('description')->nullable();
             $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->enum('type', ['regular', 'special'])->default('regular');
             $table->timestamps();
         });
     }

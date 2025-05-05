@@ -10,7 +10,7 @@ return new class extends Migration {
         Schema::create('positions', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->foreignId('cdm_level_id')->constrained();
+            $table->foreignId('cdm_level_id')->nullable()->constrained();
             $table->string('code')->unique()->nullable(); // Add the 'code' column
             $table->boolean('status')->default(1); // Add the 'status' column, defaulting to 1 (Active)
             $table->timestamps();

@@ -125,6 +125,24 @@
                     <!-- Employment Info Tab -->
                     <div class="tab-pane fade" id="employment" role="tabpanel">
                         <div class="row">
+
+                            <div class="col-md-6 mb-3">
+                                <label for="agency_id" class="form-label">Agency *</label>
+                                <select class="form-select @error('agency_id') is-invalid @enderror"
+                                    id="agency_id" name="agency_id" required>
+                                    <option value="">Select Agency</option>
+                                    @foreach($agencies as $agency)
+                                    <option value="{{ $agency->id }}"
+                                        {{ old('agency_id', $employee->agency_id ?? '') == $agency->id ? 'selected' : '' }}>
+                                        {{ $agency->name }}
+                                    </option>
+                                    @endforeach
+                                </select>
+                                @error('agency_id')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
                             <div class="col-md-6 mb-3">
                                 <label for="department_id" class="form-label">Department *</label>
                                 <select class="form-select @error('department_id') is-invalid @enderror"
@@ -334,14 +352,14 @@
                                     <button type="button" class="btn-close float-end remove-item" aria-label="Close"></button>
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Degree</label>
-                                            <input type="text" name="educations[{{ $index }}][degree]"
-                                                class="form-control" value="{{ $education->degree }}" required>
+                                            <label class="form-label">Degree *</label>
+                                            <input type="text" name="educations[{{ $index }}][degree]" 
+                                            class="form-control" value="{{ $education->degree ?? '' }}" required>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">School</label>
-                                            <input type="text" name="educations[{{ $index }}][school]"
-                                                class="form-control" value="{{ $education->school }}" required>
+                                            <label class="form-label">School Name *</label>
+                                            <input type="text" name="educations[{{ $index }}][school_name]" 
+                                            class="form-control" value="{{ $education->school_name ?? '' }}" required>
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Year Completed</label>
@@ -457,66 +475,54 @@
 
                     <!-- Emergency Contacts Tab -->
                     <div class="tab-pane fade" id="emergency" role="tabpanel">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i> Please provide exactly 2 emergency contacts
+                        </div>
+                        
                         <div id="emergency-container">
-                            @if(isset($employee) && $employee->emergencyContacts->count() > 0)
-                            @foreach($employee->emergencyContacts as $index => $contact)
+                            @php
+                                $emergencyContacts = isset($employee) && $employee->emergencyContacts->count() > 0 
+                                    ? $employee->emergencyContacts 
+                                    : [null, null]; // Initialize with 2 empty contacts
+                            @endphp
+                            
+                            @foreach($emergencyContacts as $index => $contact)
                             <div class="emergency-item card mb-3">
                                 <div class="card-body">
+                                    @if($index >= 2) {{-- Only show remove button for extra contacts --}}
                                     <button type="button" class="btn-close float-end remove-item" aria-label="Close"></button>
+                                    @endif
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Name</label>
+                                            <label class="form-label">Name *</label>
                                             <input type="text" name="emergency_contacts[{{ $index }}][name]"
-                                                class="form-control" value="{{ $contact->name }}">
+                                                class="form-control" value="{{ $contact->name ?? '' }}" required>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Relationship</label>
-                                            <select name="emergency_contacts[{{ $index }}][relationship]" class="form-select">
+                                            <label class="form-label">Relationship *</label>
+                                            <select name="emergency_contacts[{{ $index }}][relationship]" class="form-select" required>
                                                 <option value="">Select Relationship</option>
                                                 @foreach($formOptions['relationships'] as $relationship)
-                                                <option value="{{ $relationship }}" {{ $contact->relationship == $relationship ? 'selected' : '' }}>
+                                                <option value="{{ $relationship }}" 
+                                                    {{ (isset($contact) && $contact->relationship == $relationship) ? 'selected' : '' }}>
                                                     {{ $relationship }}
                                                 </option>
                                                 @endforeach
                                             </select>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Phone</label>
+                                            <label class="form-label">Phone *</label>
                                             <input type="text" name="emergency_contacts[{{ $index }}][phone]"
-                                                class="form-control" value="{{ $contact->phone }}">
+                                                class="form-control" value="{{ $contact->phone ?? '' }}" required>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             @endforeach
-                            @else
-                            <div class="emergency-item card mb-3">
-                                <div class="card-body">
-                                    <div class="row">
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Name</label>
-                                            <input type="text" name="emergency_contacts[0][name]" class="form-control">
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Relationship</label>
-                                            <select name="emergency_contacts[0][relationship]" class="form-select">
-                                                <option value="">Select Relationship</option>
-                                                @foreach($formOptions['relationships'] as $relationship)
-                                                <option value="{{ $relationship }}">{{ $relationship }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
-                                        <div class="col-md-6 mb-3">
-                                            <label class="form-label">Phone</label>
-                                            <input type="text" name="emergency_contacts[0][phone]" class="form-control">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            @endif
                         </div>
+                        
                         <button type="button" class="btn btn-sm btn-info mb-3" id="add-emergency">
-                            <i class="fas fa-plus"></i> Add Contact
+                            <i class="fas fa-plus"></i> Add Additional Contact
                         </button>
                     </div>
 
@@ -747,43 +753,63 @@ $(document).ready(function() {
         dependentIndex++;
     });
 
-    // 4. Emergency Contacts Fields ===================================
-    let emergencyIndex = {{ isset($employee) && $employee->emergencyContacts ? $employee->emergencyContacts->count() : 1 }};
+        // 4. Emergency Contacts Fields ===================================
+        let emergencyIndex = {{ isset($employee) && $employee->emergencyContacts ? $employee->emergencyContacts->count() : 2 }};
 
-    $('#add-emergency').on('click', function() {
-        const relationships = @json($formOptions['relationships']);
-        let relationshipOptions = '';
+        $('#add-emergency').on('click', function() {
+            const relationships = @json($formOptions['relationships']);
+            let relationshipOptions = '';
 
-        relationships.forEach(relationship => {
-            relationshipOptions += `<option value="${relationship}">${relationship}</option>`;
-        });
+            relationships.forEach(relationship => {
+                relationshipOptions += `<option value="${relationship}">${relationship}</option>`;
+            });
 
-        const html = `
-        <div class="emergency-item card mb-3">
-            <div class="card-body">
-                <button type="button" class="btn-close float-end remove-item" aria-label="Close"></button>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Name</label>
-                        <input type="text" name="emergency_contacts[${emergencyIndex}][name]" class="form-control">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Relationship</label>
-                        <select name="emergency_contacts[${emergencyIndex}][relationship]" class="form-select">
-                            <option value="">Select Relationship</option>
-                            ${relationshipOptions}
-                        </select>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Phone</label>
-                        <input type="text" name="emergency_contacts[${emergencyIndex}][phone]" class="form-control">
+            const html = `
+            <div class="emergency-item card mb-3">
+                <div class="card-body">
+                    <button type="button" class="btn-close float-end remove-item" aria-label="Close"></button>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Name *</label>
+                            <input type="text" name="emergency_contacts[${emergencyIndex}][name]" class="form-control" required>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Relationship *</label>
+                            <select name="emergency_contacts[${emergencyIndex}][relationship]" class="form-select" required>
+                                <option value="">Select Relationship</option>
+                                ${relationshipOptions}
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Phone *</label>
+                            <input type="text" name="emergency_contacts[${emergencyIndex}][phone]" class="form-control" required>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>`;
-        $('#emergency-container').append(html);
-        emergencyIndex++;
-    });
+            </div>`;
+            $('#emergency-container').append(html);
+            emergencyIndex++;
+        });
+
+        // Form submission validation
+        $('form').on('submit', function(e) {
+            const emergencyContacts = $('#emergency-container .emergency-item').length;
+            if (emergencyContacts < 2) {
+                e.preventDefault();
+                alert('Please provide at least 2 emergency contacts');
+                $('#emergency-tab').click(); // Switch to emergency tab
+            }
+        });
+
+        // Form submission validation
+        $('form').on('submit', function(e) {
+            const emergencyContacts = $('#emergency-container .emergency-item').length;
+            if (emergencyContacts < 2) {
+                e.preventDefault();
+                alert('Please provide at least 2 emergency contacts');
+                $('#emergency-tab').click(); // Switch to emergency tab
+            }
+        });
 
     // 5. Employment History Fields ===================================
     let historyIndex = {{ isset($employee) && $employee->employmentHistories ? $employee->employmentHistories->count() : 1 }};

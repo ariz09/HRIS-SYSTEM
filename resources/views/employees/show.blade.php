@@ -186,6 +186,11 @@
                                 <div class="col-md-6">
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
+                                            <label class="form-label fw-bold">Agency</label>
+                                            <p class="form-control-plaintext">{{ optional($employee->agency)->name ?? 'N/A' }}</p>
+                                        </div>
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
                                             <label class="form-label fw-bold">Department</label>
                                             <p class="form-control-plaintext">{{ optional($employee->department)->name ?? 'N/A' }}</p>
                                         </div>

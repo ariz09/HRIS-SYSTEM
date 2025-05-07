@@ -24,6 +24,9 @@
                         <a class="nav-link" href="{{ route('employees.bulk-upload') }}">Bulk-upload</a>
                     </nav>
                     <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link" href="{{ route('leaves.index') }}">Leave Application</a>
+                    </nav>
+                    <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="{{ route('leave_types.index') }}">Leave Types</a>
                     </nav>
                     <nav class="sb-sidenav-menu-nested nav">
@@ -40,30 +43,30 @@
                     </nav>
                     <nav class="sb-sidenav-menu-nested nav">
                          <a class="nav-link" href="{{ route('holidays.index') }}">Holiday Management</a>
-                    </nav>       
+                    </nav>
                     <nav class="sb-sidenav-menu-nested nav">
                          <a class="nav-link" href="{{ route('roles.index') }}">Roles Management</a>
-                    </nav>                 
+                    </nav>
                     <nav class="sb-sidenav-menu-nested nav">
                          <a class="nav-link" href="{{ route('role_permissions.index') }}">Roles & Access Management</a>
-                    </nav>                         
+                    </nav>
                     <nav class="sb-sidenav-menu-nested nav">
                          <a class="nav-link" href="{{ route('cdmlevels.index') }}">CDM Management</a>
-                    </nav>                               
+                    </nav>
                     <nav class="sb-sidenav-menu-nested nav">
                          <a class="nav-link" href="{{ route('employment_types.index') }}">Employment Type Management</a>
-                    </nav>        
+                    </nav>
 
-                    
+
 
                      <!--End Employees -->
-                 
+
                 </nav>  <!--End nav main -->
             </div>
-        
+
         </div>
     </div>
-        
-            
+
+
 </nav>
 

@@ -49,7 +49,7 @@
                             <td>{{ $assign->leave_count }}</td>
                             <td>{{ $assign->notes ?? 'N/A' }}</td>
                             <td>
-                                <button class="btn btn-warning btn-sm edit-btn" 
+                                <button class="btn btn-warning btn-sm edit-btn"
                                         data-id="{{ $assign->id }}"
                                         data-cdm-level="{{ $assign->cdm_level_id }}"
                                         data-leave="{{ $assign->leave_count }}"

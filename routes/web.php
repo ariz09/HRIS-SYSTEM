@@ -17,7 +17,8 @@ use App\Http\Controllers\{
     HolidayController,
     RoleController,
     RolePermissionController,
-    AdminController
+    AdminController,
+    LeaveApplicationController
 };
 
 use App\Http\Controllers\EmployeePersonalInfoController;

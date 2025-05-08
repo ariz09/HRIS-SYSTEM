@@ -3,7 +3,7 @@
     <div class="sb-sidenav-menu">
         <div class="nav">
             <div class="sb-sidenav-menu-heading">HRIS SYSTEM</div>
-                 <a class="nav-link" href="{{ route('dashboard') }}">
+                 <a class="nav-link" href="{{ route('admin.dashboard') }}">
             <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                  Dashboard
             </a>
@@ -18,46 +18,44 @@
 
                      <!--Employees -->
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{ route('employees.index') }}">Employees</a>
+                        <a class="nav-link" href="{{ route('admin.employees.index') }}">Employees</a>
                     </nav>
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{ route('employees.bulk-upload') }}">Bulk-upload</a>
+                        <a class="nav-link" href="{{ route('admin.employees.bulk-upload') }}">Bulk-upload</a>
                     </nav>
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{ route('leaves.index') }}">Leave Application</a>
+                        <a class="nav-link" href="{{ route('admin.leaves.index') }}">Leave Application</a>
                     </nav>
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{ route('leave_types.index') }}">Leave Types</a>
+                        <a class="nav-link" href="{{ route('admin.leave_types.index') }}">Leave Types</a>
                     </nav>
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{ route('assign_leaves.index') }}">Assign Leaves</a>
+                        <a class="nav-link" href="{{ route('admin.assign_leaves.index') }}">Assign Leaves</a>
                     </nav>
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{ route('positions.index') }}">Positions</a>
+                        <a class="nav-link" href="{{ route('admin.positions.index') }}">Positions</a>
                     </nav>
                     <nav class="sb-sidenav-menu-nested nav">
-                          <a class="nav-link" href="{{ route('agencies.index') }}">Agencies</a>
+                          <a class="nav-link" href="{{ route('admin.agencies.index') }}">Agencies</a>
                     </nav>
                     <nav class="sb-sidenav-menu-nested nav">
-                         <a class="nav-link" href="{{ route('departments.index') }}">Departments</a>
+                         <a class="nav-link" href="{{ route('admin.departments.index') }}">Departments</a>
                     </nav>
                     <nav class="sb-sidenav-menu-nested nav">
-                         <a class="nav-link" href="{{ route('holidays.index') }}">Holiday Management</a>
+                         <a class="nav-link" href="{{ route('admin.holidays.index') }}">Holiday Management</a>
                     </nav>
                     <nav class="sb-sidenav-menu-nested nav">
-                         <a class="nav-link" href="{{ route('roles.index') }}">Roles Management</a>
+                         <a class="nav-link" href="{{ route('admin.roles.index') }}">Roles Management</a>
                     </nav>
                     <nav class="sb-sidenav-menu-nested nav">
-                         <a class="nav-link" href="{{ route('role_permissions.index') }}">Roles & Access Management</a>
+                         <a class="nav-link" href="{{ route('admin.role_permissions.index') }}">Roles & Access Management</a>
                     </nav>
                     <nav class="sb-sidenav-menu-nested nav">
-                         <a class="nav-link" href="{{ route('cdmlevels.index') }}">CDM Management</a>
+                         <a class="nav-link" href="{{ route('admin.cdmlevels.index') }}">CDM Management</a>
                     </nav>
                     <nav class="sb-sidenav-menu-nested nav">
-                         <a class="nav-link" href="{{ route('employment_types.index') }}">Employment Type Management</a>
+                         <a class="nav-link" href="{{ route('admin.employment_types.index') }}">Employment Type Management</a>
                     </nav>
-
-
 
                      <!--End Employees -->
 

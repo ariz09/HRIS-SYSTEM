@@ -9,10 +9,21 @@
         <i class="fas fa-bars"></i>
     </button>
 
+    <!-- Navbar Right Items -->
+    <ul class="navbar-nav ms-auto align-items-center">
+        <!-- Notification Button -->
+        <li class="nav-item me-3">
+            <a class="nav-link" href="#">
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-bell" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+                    <path d="M5 17h14" />
+                    <path d="M17 17v-6a5 5 0 0 0 -10 0v6" />
+                    <path d="M9 21h6" />
+                </svg>
+            </a>
+        </li>
 
-
-    <!-- Navbar User Menu - Now properly aligned to the right -->
-    <ul class="navbar-nav ms-auto">
+        <!-- User Dropdown -->
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
                data-bs-toggle="dropdown" aria-expanded="false">

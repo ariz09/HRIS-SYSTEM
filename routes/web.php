@@ -16,7 +16,8 @@ use App\Http\Controllers\{
     EmploymentTypeController,
     HolidayController,
     RoleController,
-    RolePermissionController
+    RolePermissionController,
+    AdminController
 };
 
 use App\Http\Controllers\EmployeePersonalInfoController;
@@ -80,7 +81,7 @@ Route::middleware(['auth'])->group(function () {
         Route::get('{employee}/edit', [EmployeeController::class, 'edit'])->name('edit');
         Route::put('{employee}', [EmployeeController::class, 'update'])->name('update');
         Route::delete('{employee}', [EmployeeController::class, 'destroy'])->name('destroy');
-    
+
         Route::put('{employee}/personal-info', [EmployeePersonalInfoController::class, 'update'])->name('personal-info.update');
         Route::resource('emergency-contact', EmployeeEmergencyContactController::class)->except(['show']);
         Route::resource('dependent', EmployeeDependentController::class)->except(['show']);
@@ -101,7 +102,7 @@ Route::middleware(['auth'])->group(function () {
         ->names('leave_types');
     Route::resource('assign_leaves', AssignLeaveController::class)
         ->parameters(['assign_leaves' => 'assignLeave']);
-    
+
     Route::resource('departments', DepartmentController::class)
         ->parameters(['assign_leaves' => 'assignLeave']);
 
@@ -126,6 +127,7 @@ Route::middleware(['auth'])->group(function () {
 // Admin Routes
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     // Add admin-only routes here
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 });
 
 require __DIR__ . '/auth.php';

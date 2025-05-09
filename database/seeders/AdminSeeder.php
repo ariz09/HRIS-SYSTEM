@@ -15,47 +15,44 @@ class AdminSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('admins')->insert([
+        $admins = [
             [
                 'name' => 'John Doe',
                 'email' => 'john.doe@example.com',
                 'password' => Hash::make('password123'),
                 'is_active' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'name' => 'Jane Smith',
                 'email' => 'jane.smith@example.com',
                 'password' => Hash::make('password123'),
                 'is_active' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'name' => 'Mike Johnson',
                 'email' => 'mike.johnson@example.com',
                 'password' => Hash::make('password123'),
                 'is_active' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'name' => 'Alice Williams',
                 'email' => 'alice.williams@example.com',
                 'password' => Hash::make('password123'),
                 'is_active' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
             [
                 'name' => 'kyle',
                 'email' => 'clffrdkyl@gmail.com',
                 'password' => Hash::make('password123'),
                 'is_active' => 1,
-                'created_at' => now(),
-                'updated_at' => now(),
             ],
-        ]);
+        ];
+
+        foreach ($admins as $admin) {
+            DB::table('admins')->updateOrInsert(
+                ['email' => $admin['email']],
+                $admin
+            );
+        }
     }
 }

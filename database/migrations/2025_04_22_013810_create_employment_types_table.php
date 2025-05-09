@@ -15,8 +15,8 @@ return new class extends Migration {
             $table->timestamps();
         });
 
-        // Insert default employment types
-        DB::table('employment_types')->insert([
+        // Insert default employment types using insertOrIgnore
+        DB::table('employment_types')->insertOrIgnore([
             [
                 'name' => 'Regular',
                 'is_active' => true,

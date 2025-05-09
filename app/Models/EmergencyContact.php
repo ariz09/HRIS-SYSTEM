@@ -9,12 +9,13 @@ class EmergencyContact extends Model
 {
     use HasFactory;
 
+    protected $table = 'employee_emergency_contacts';
+
     protected $fillable = [
         'employee_id',
         'name',
         'relationship',
-        'phone',
-        'address'
+        'phone'
     ];
 
     public function employee()

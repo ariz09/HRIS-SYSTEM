@@ -64,6 +64,7 @@ class EmployeeController extends Controller
             ->with('success', 'Employee created. Please fill in personal information.');
     }
 
+
     public function edit(Employee $employee)
     {
         return view('employees.create-edit', [
@@ -114,7 +115,8 @@ class EmployeeController extends Controller
         $employee->update($validated);
 
         return redirect()->route('employees.personal.edit', $employee)
-            ->with('success', 'Personal information updated successfully!');
+        ->with('success', 'Personal information updated successfully!');
+
     }
 
     // Government IDs Module

@@ -50,10 +50,10 @@
                             </div>
                             <h5 class="card-title">Personal Information</h5>
                             <p class="card-text">Basic details and identification</p>
-                            <a href="{{ $employee->exists ? route('employees.personal.edit', $employee) : route('employees.personal.create') }}" 
-                               class="btn btn-sm {{ $employee->personalInfo ? 'btn-outline-success' : 'btn-danger' }}">
-                                {{ $employee->personalInfo ? 'Edit' : 'Add' }}
-                            </a>
+                            <a href="{{ route('employees.personal.edit', $employee) }}" 
+   class="btn btn-sm {{ $employee->personalInfo ? 'btn-outline-success' : 'btn-danger' }}">
+    {{ $employee->personalInfo ? 'Edit' : 'Add' }}
+</a>
                             @if($employee->personalInfo)
                                 <span class="badge bg-success ms-2">Completed</span>
                             @endif
@@ -70,9 +70,9 @@
                             </div>
                             <h5 class="card-title">Government IDs</h5>
                             <p class="card-text">SSS, TIN, Philhealth, etc.</p>
-                            <a href="{{ $employee->exists ? route('employees.government.edit', $employee) : '#' }}" 
-                            class="btn btn-sm {{ ($employee->governmentIds && $employee->governmentIds->isNotEmpty()) ? 'btn-outline-success' : 'btn-danger' }} {{ !$employee->exists ? 'disabled' : '' }}">
-                                {{ ($employee->governmentIds && $employee->governmentIds->isNotEmpty()) ? 'Edit' : 'Add' }}
+                            <a href="{{ route('employees.government.edit', $employee) }}"
+                            class="btn btn-sm {{ $employee->governmentIds->isNotEmpty() ? 'btn-outline-success' : 'btn-danger' }}">
+                                {{ $employee->governmentIds->isNotEmpty() ? 'Edit' : 'Add' }}
                             </a>
                             @if($employee->governmentIds && $employee->governmentIds->isNotEmpty())
                                 <span class="badge bg-success ms-2">Completed</span>
@@ -90,10 +90,11 @@
                             </div>
                             <h5 class="card-title">Employment</h5>
                             <p class="card-text">Position, department, status</p>
-                            <a href="{{ $employee->exists ? route('employees.employment.edit', $employee) : '#' }}" 
-                               class="btn btn-sm {{ $employee->employment ? 'btn-outline-success' : 'btn-danger' }} {{ !$employee->exists ? 'disabled' : '' }}">
+                            <a href="{{ route('employees.employment.edit', $employee) }}"
+                            class="btn btn-sm {{ $employee->employment ? 'btn-outline-success' : 'btn-danger' }}">
                                 {{ $employee->employment ? 'Edit' : 'Add' }}
                             </a>
+
                             @if($employee->employment)
                                 <span class="badge bg-success ms-2">Completed</span>
                             @endif

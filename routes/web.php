@@ -54,25 +54,25 @@ Route::middleware(['auth'])->group(function () {
     Route::prefix('employees')->group(function () {
         // Main resource routes
         Route::resource('/', EmployeeController::class)->except(['create', 'edit']);
+        Route::get('create/personal', [EmployeeController::class, 'createPersonal'])
+        ->name('employees.personal.create');
         
         // Personal Information
-        Route::get('create/personal', [EmployeeController::class, 'createPersonal'])
-            ->name('employees.personal.create');
-            Route::get('{employee}/personal/edit', [EmployeeController::class, 'editPersonal'])
-        ->name('employees.personal.edit');
-    Route::put('{employee}/personal/update', [EmployeeController::class, 'updatePersonal'])
-        ->name('employees.personal.update');
-    
+        Route::get('personal/edit', [EmployeeController::class, 'editPersonal'])
+            ->name('employees.personal.edit');
+        Route::put('personal/update', [EmployeeController::class, 'updatePersonal'])
+            ->name('employees.personal.update');
+        
         // Government IDs
-        Route::get('{employee}/government', [EmployeeController::class, 'editGovernment'])
+        Route::get('government/edit', [EmployeeController::class, 'editGovernment'])
             ->name('employees.government.edit');
-        Route::put('{employee}/government', [EmployeeController::class, 'updateGovernment'])
+        Route::put('government/update', [EmployeeController::class, 'updateGovernment'])
             ->name('employees.government.update');
-    
+        
         // Employment
-        Route::get('{employee}/employment', [EmployeeController::class, 'editEmployment'])
+        Route::get('employment/edit', [EmployeeController::class, 'editEmployment'])
             ->name('employees.employment.edit');
-        Route::put('{employee}/employment', [EmployeeController::class, 'updateEmployment'])
+        Route::put('employment/update', [EmployeeController::class, 'updateEmployment'])
             ->name('employees.employment.update');
     
         // Contact Information

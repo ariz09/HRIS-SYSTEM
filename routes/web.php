@@ -16,7 +16,9 @@ use App\Http\Controllers\{
     EmploymentTypeController,
     HolidayController,
     RoleController,
-    RolePermissionController
+    RolePermissionController,
+    AdminController,
+    LeaveApplicationController
 };
 
 use App\Http\Controllers\{
@@ -122,16 +124,39 @@ Route::middleware(['auth'])->group(function () {
         'roles' => RoleController::class,
         'role_permissions' => RolePermissionController::class,
         'employment_types' => EmploymentTypeController::class,
-        'holidays' => HolidayController::class
     ]);
 
-    Route::get('/positions/by-cdm-level/{cdmLevel}', [PositionController::class, 'getByCdmLevel']);
-    Route::get('/positions/{position}/cdm-level', [PositionController::class, 'getCdmLevel']);
+    Route::prefix('employees')->name('employees.')->group(function () {
+        Route::get('/', [EmployeeController::class, 'index'])->name('index');
+        Route::get('create', [EmployeeController::class, 'create'])->name('create');
+        Route::post('store', [EmployeeController::class, 'store'])->name('store');
+        Route::get('{employee}/edit', [EmployeeController::class, 'edit'])->name('edit');
+        Route::put('{employee}', [EmployeeController::class, 'update'])->name('update');
+        Route::delete('{employee}', [EmployeeController::class, 'destroy'])->name('destroy');
+    
+        Route::put('{employee}/personal-info', [EmployeePersonalInfoController::class, 'update'])->name('personal-info.update');
+        Route::resource('emergency-contact', EmployeeEmergencyContactController::class)->except(['show']);
+        Route::resource('dependent', EmployeeDependentController::class)->except(['show']);
+        Route::resource('education', EmployeeEducationController::class)->except(['show']);
+        Route::resource('employment-history', EmployeeEmploymentHistoryController::class)->except(['show']);
+    });
+    Route::get('/positions/by-cdm-level/{cdmLevel}', [App\Http\Controllers\PositionController::class, 'getByCdmLevel']);
+    Route::get('/positions/{position}/cdm-level', [App\Http\Controllers\PositionController::class, 'getCdmLevel']);
+    Route::resource('holidays', HolidayController::class);
 
-    // Leave and Assign Leave
+    Route::resource('positions', PositionController::class)
+        ->parameters(['positions' => 'position'])
+        ->names('positions');
+    // Leave and Leave Types
     Route::resource('leaves', LeaveController::class);
-    Route::resource('leave-types', LeaveTypeController::class)->parameters(['leave-types' => 'leave_type'])->names('leave_types');
-    Route::resource('assign_leaves', AssignLeaveController::class)->parameters(['assign_leaves' => 'assignLeave']);
+    Route::resource('leave-types', LeaveTypeController::class)
+        ->parameters(['leave-types' => 'leave_type'])
+        ->names('leave_types');
+    Route::resource('assign_leaves', AssignLeaveController::class)
+        ->parameters(['assign_leaves' => 'assignLeave']);
+    
+    Route::resource('departments', DepartmentController::class)
+        ->parameters(['assign_leaves' => 'assignLeave']);
 
     // Profile
     Route::prefix('profile')->group(function () {
@@ -153,7 +178,7 @@ Route::middleware(['auth'])->group(function () {
 
 // Admin Authenticated Routes
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
-    // Add admin routes here
+    // Add admin-only routes here
 });
 
 // Public resource registration

@@ -31,7 +31,7 @@
                 </a>
             </div>
         </div>
-        
+
         <div class="card-body">
             <div class="d-flex align-items-center mb-4">
                 <div class="me-3">
@@ -45,7 +45,7 @@
                 </div>
                 <div>
                     <h4 class="mb-0">
-                        {{ $employee->last_name }}, {{ $employee->first_name }} 
+                        {{ $employee->last_name }}, {{ $employee->first_name }}
                         {{ $employee->middle_name ? $employee->middle_name . ' ' : '' }}
                         {{ $employee->name_suffix ?? '' }}
                     </h4>
@@ -53,7 +53,7 @@
                     <p class="text-muted mb-0">{{ optional($employee->department)->name ?? 'N/A' }}</p>
                 </div>
             </div>
-            
+
             <!-- Tab Navigation -->
             <ul class="nav nav-tabs mb-4" id="employeeTabs" role="tablist">
                 <li class="nav-item" role="presentation">
@@ -109,7 +109,7 @@
                                     <p class="form-control-plaintext">{{ $employee->alias ?? 'N/A' }}</p>
                                 </div>
                             </div>
-                            
+
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">Birthday</label>
@@ -160,7 +160,7 @@
                                     <p class="form-control-plaintext">{{ $employee->tin ?? 'N/A' }}</p>
                                 </div>
                             </div>
-                            
+
                             <div class="row">
                                 <div class="col-md-6 mb-3">
                                     <label class="form-label fw-bold">ATM Account</label>
@@ -199,7 +199,7 @@
                                             <p class="form-control-plaintext">{{ optional($employee->cdmLevel)->name ?? 'N/A' }}</p>
                                         </div>
                                     </div>
-                                    
+
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label fw-bold">Position</label>
@@ -215,7 +215,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                
+
                                 <div class="col-md-6">
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
@@ -285,7 +285,7 @@
                                     <p class="form-control-plaintext">₱{{ number_format($employee->transpo_allowance, 2) }}</p>
                                 </div>
                             </div>
-                            
+
                             <div class="row">
                                 <div class="col-md-3 mb-3">
                                     <label class="form-label fw-bold">Parking/Toll</label>
@@ -495,7 +495,7 @@
         const tabs = ['personal', 'government', 'employment', 'contact', 'compensation',
             'education', 'dependents', 'emergency', 'history', 'account'
         ];
-        
+
         // Tab navigation
         $('#nextTabBtn').on('click', function() {
             const currentTab = $('.nav-link.active').attr('id').replace('-tab', '');

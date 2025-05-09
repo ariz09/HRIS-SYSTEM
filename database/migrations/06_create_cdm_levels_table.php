@@ -8,10 +8,10 @@ use Illuminate\Support\Facades\DB;
 return new class extends Migration {
     public function up()
     {
+        Schema::dropIfExists('cdm_levels');
         Schema::create('cdm_levels', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('code')->unique();
             $table->text('description')->nullable();
             $table->boolean('status')->default(true);
             $table->timestamps();
@@ -21,7 +21,6 @@ return new class extends Migration {
         DB::table('cdm_levels')->insert([
             [
                 'name' => 'Management (Execom)',
-                'code' => 'EXECOM',
                 'description' => 'Executive Committee level',
                 'status' => true,
                 'created_at' => now(),
@@ -29,7 +28,6 @@ return new class extends Migration {
             ],
             [
                 'name' => 'Consultant',
-                'code' => 'CONSULT',
                 'description' => 'Consultant level',
                 'status' => true,
                 'created_at' => now(),
@@ -37,7 +35,6 @@ return new class extends Migration {
             ],
             [
                 'name' => 'Mancom (Expert)',
-                'code' => 'MANCOM',
                 'description' => 'Management Committee expert level',
                 'status' => true,
                 'created_at' => now(),
@@ -45,7 +42,6 @@ return new class extends Migration {
             ],
             [
                 'name' => 'Team Lead/Supervisor (Specialist)',
-                'code' => 'TLSPVSR',
                 'description' => 'Team Lead or Supervisor specialist level',
                 'status' => true,
                 'created_at' => now(),
@@ -53,7 +49,6 @@ return new class extends Migration {
             ],
             [
                 'name' => 'Advanced',
-                'code' => 'ADVANCED',
                 'description' => 'Advanced professional level',
                 'status' => true,
                 'created_at' => now(),
@@ -61,7 +56,6 @@ return new class extends Migration {
             ],
             [
                 'name' => 'Learner',
-                'code' => 'LEARNER',
                 'description' => 'Entry level or learning position',
                 'status' => true,
                 'created_at' => now(),

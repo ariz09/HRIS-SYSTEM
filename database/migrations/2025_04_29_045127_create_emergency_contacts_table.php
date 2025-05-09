@@ -7,19 +7,21 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up()
     {
-        Schema::create('emergency_contacts', function (Blueprint $table) {
+        Schema::dropIfExists('employee_employment_histories');
+    
+        Schema::create('employee_employment_histories', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id')->constrained()->onDelete('cascade');
-            $table->string('name');
-            $table->string('relationship');
-            $table->string('phone');
-            $table->string('address')->nullable();
+            $table->foreignId('employee_id')->constrained('employee_info')->onDelete('cascade');
+            $table->string('job_title');
+            $table->text('job_description');
+            $table->date('start_date');
+            $table->date('end_date')->nullable();
             $table->timestamps();
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('emergency_contacts');
+        Schema::dropIfExists('employee_employment_histories');
     }
 };

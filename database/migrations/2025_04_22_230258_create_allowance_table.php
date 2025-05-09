@@ -11,6 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
+        Schema::dropIfExists('allowance');
+        
         Schema::create('allowance', function (Blueprint $table) {
             $table->id();
             $table->timestamps();

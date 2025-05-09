@@ -12,6 +12,9 @@ return new class extends Migration
      */
     public function up(): void
     {
+
+        Schema::dropIfExists('leave_types');
+
         Schema::create('leave_types', function (Blueprint $table) {
             $table->id();
             $table->string('code', 10)->unique();

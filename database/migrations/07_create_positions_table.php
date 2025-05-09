@@ -7,18 +7,18 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up()
     {
-        Schema::create('dependents', function (Blueprint $table) {
+        Schema::dropIfExists('positions');
+        Schema::create('positions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id')->constrained()->onDelete('cascade');
             $table->string('name');
-            $table->string('relationship');
-            $table->date('birthdate')->nullable();
+            $table->foreignId('cdm_level_id')->nullable()->constrained();
+            $table->boolean('status')->default(1); // Add the 'status' column, defaulting to 1 (Active)
             $table->timestamps();
         });
     }
 
     public function down()
     {
-        Schema::dropIfExists('dependents');
+        Schema::dropIfExists('positions');
     }
 };

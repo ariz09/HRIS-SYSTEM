@@ -8,6 +8,10 @@ use Illuminate\Support\Facades\DB;
 return new class extends Migration {
     public function up()
     {
+        // Drop the employment_types table if it exists
+        Schema::dropIfExists('employment_types');
+
+        // Create the employment_types table
         Schema::create('employment_types', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique(); // Added unique constraint
@@ -70,6 +74,7 @@ return new class extends Migration {
 
     public function down()
     {
+        // Drop the employment_types table if it exists
         Schema::dropIfExists('employment_types');
     }
 };

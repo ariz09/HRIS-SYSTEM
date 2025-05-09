@@ -9,61 +9,78 @@ class CreateRolesAndPermissionsTables extends Migration
 {
     public function up()
     {
+        // Disable foreign key checks
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+        // Drop roles table if it exists before creating
+        Schema::dropIfExists('roles');
+
         // Create roles table if it doesn't exist
-        if (!Schema::hasTable('roles')) {
-            Schema::create('roles', function (Blueprint $table) {
-                $table->id();
-                $table->string('name')->unique();
-                $table->timestamps();
-            });
+        Schema::create('roles', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->timestamps();
+        });
 
-            // Insert default roles
-            DB::table('roles')->insert([
-                ['name' => 'employee'],
-                ['name' => 'recruiter'],
-                ['name' => 'timekeeper'],
-                ['name' => 'payroll officer'],
-                ['name' => 'supervisor'],
-                ['name' => 'manager'],
-                ['name' => 'admin'],
-            ]);
-        }
+        // Insert default roles
+        DB::table('roles')->insert([
+            ['name' => 'employee'],
+            ['name' => 'recruiter'],
+            ['name' => 'timekeeper'],
+            ['name' => 'payroll officer'],
+            ['name' => 'supervisor'],
+            ['name' => 'manager'],
+            ['name' => 'admin']
+        ]);
 
+        // Drop permissions table if it exists before creating
+        Schema::dropIfExists('permissions');
+        
         // Create permissions table if it doesn't exist
-        if (!Schema::hasTable('permissions')) {
-            Schema::create('permissions', function (Blueprint $table) {
-                $table->id();
-                $table->string('name')->unique();
-                $table->timestamps();
-            });
-        }
+        Schema::create('permissions', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->unique();
+            $table->timestamps();
+        });
 
+        // Drop permission_role pivot table if it exists before creating
+        Schema::dropIfExists('permission_role');
+        
         // Create permission_role pivot table if it doesn't exist
-        if (!Schema::hasTable('permission_role')) {
-            Schema::create('permission_role', function (Blueprint $table) {
-                $table->id();
-                $table->foreignId('role_id')->constrained('roles')->onDelete('cascade');
-                $table->foreignId('permission_id')->constrained('permissions')->onDelete('cascade');
-                $table->timestamps();
-            });
-        }
+        Schema::create('permission_role', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('role_id')->constrained('roles')->onDelete('cascade');
+            $table->foreignId('permission_id')->constrained('permissions')->onDelete('cascade');
+            $table->timestamps();
+        });
 
+        // Drop role_user pivot table if it exists before creating
+        Schema::dropIfExists('role_user');
+        
         // Create role_user pivot table if it doesn't exist
-        if (!Schema::hasTable('role_user')) {
-            Schema::create('role_user', function (Blueprint $table) {
-                $table->id();
-                $table->foreignId('role_id')->constrained('roles')->onDelete('cascade');
-                $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
-                $table->timestamps();
-            });
-        }
+        Schema::create('role_user', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('role_id')->constrained('roles')->onDelete('cascade');
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->timestamps();
+        });
+
+        // Re-enable foreign key checks
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 
     public function down()
     {
+        // Disable foreign key checks temporarily
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+        // Drop all the tables in reverse order
         Schema::dropIfExists('role_user');
         Schema::dropIfExists('permission_role');
         Schema::dropIfExists('permissions');
         Schema::dropIfExists('roles');
+
+        // Re-enable foreign key checks
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
 }

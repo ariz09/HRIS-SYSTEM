@@ -10,6 +10,8 @@ return new class extends Migration {
      */
     public function up(): void
     {
+        Schema::dropIfExists('assign_leaves');
+        
         Schema::create('assign_leaves', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('cdm_level_id')->nullable(); // Add the cdm_level_id field

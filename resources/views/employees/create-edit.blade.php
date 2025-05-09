@@ -7,7 +7,7 @@
 <div class="container-fluid px-4">
     <h1 class="mt-4">Employee Management</h1>
     <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
         <li class="breadcrumb-item active">{{ isset($employee) ? 'Edit' : 'Create' }} Employee</li>
     </ol>
 
@@ -16,7 +16,7 @@
             <i class="fas fa-user me-1"></i> Employee Details
         </div>
         <div class="card-body">
-            <form action="{{ isset($employee) ? route('employees.update', $employee->id) : route('employees.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ isset($employee) ? route('admin.employees.update', $employee->id) : route('admin.employees.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 @if(isset($employee))
                 @method('PUT')
@@ -57,21 +57,21 @@
                     <div class="tab-pane fade show active" id="personal" role="tabpanel">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="employee_number" class="form-label">Employee Number *</label>
+                                <label for="employee_number" class="form-label">Employee Number</label>
                                 <input type="text" class="form-control @error('employee_number') is-invalid @enderror"
                                     id="employee_number" name="employee_number"
                                     value="{{ old('employee_number', $employee->employee_number ?? $formattedEmployeeNumber ?? '') }}"
-                                    required readonly>
+                                    readonly>
                                 @error('employee_number')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="first_name" class="form-label">First Name *</label>
+                                <label for="first_name" class="form-label">First Name</label>
                                 <input type="text" class="form-control @error('first_name') is-invalid @enderror"
                                     id="first_name" name="first_name"
-                                    value="{{ old('first_name', $employee->first_name ?? '') }}" required>
+                                    value="{{ old('first_name', $employee->first_name ?? '') }}">
                                 @error('first_name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -84,10 +84,10 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="last_name" class="form-label">Last Name *</label>
+                                <label for="last_name" class="form-label">Last Name</label>
                                 <input type="text" class="form-control @error('last_name') is-invalid @enderror"
                                     id="last_name" name="last_name"
-                                    value="{{ old('last_name', $employee->last_name ?? '') }}" required>
+                                    value="{{ old('last_name', $employee->last_name ?? '') }}">
                                 @error('last_name')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -127,9 +127,9 @@
                         <div class="row">
 
                             <div class="col-md-6 mb-3">
-                                <label for="agency_id" class="form-label">Agency *</label>
+                                <label for="agency_id" class="form-label">Agency</label>
                                 <select class="form-select @error('agency_id') is-invalid @enderror"
-                                    id="agency_id" name="agency_id" required>
+                                    id="agency_id" name="agency_id">
                                     <option value="">Select Agency</option>
                                     @foreach($agencies as $agency)
                                     <option value="{{ $agency->id }}"
@@ -144,9 +144,9 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="department_id" class="form-label">Department *</label>
+                                <label for="department_id" class="form-label">Department</label>
                                 <select class="form-select @error('department_id') is-invalid @enderror"
-                                    id="department_id" name="department_id" required>
+                                    id="department_id" name="department_id">
                                     <option value="">Select Department</option>
                                     @foreach($departments as $department)
                                     <option value="{{ $department->id }}"
@@ -161,9 +161,9 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="cdm_level_id" class="form-label">CDM Level *</label>
+                                <label for="cdm_level_id" class="form-label">CDM Level</label>
                                 <select class="form-select @error('cdm_level_id') is-invalid @enderror"
-                                    id="cdm_level_id" name="cdm_level_id" required>
+                                    id="cdm_level_id" name="cdm_level_id">
                                     <option value="">Select CDM Level</option>
                                     @foreach($cdmLevels as $cdmLevel)
                                     <option value="{{ $cdmLevel->id }}"
@@ -178,9 +178,9 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="position_id" class="form-label">Position *</label>
+                                <label for="position_id" class="form-label">Position</label>
                                 <select class="form-select @error('position_id') is-invalid @enderror"
-                                    id="position_id" name="position_id" required>
+                                    id="position_id" name="position_id">
                                     <option value="">Select Position</option>
                                     @foreach($positions as $position)
                                     <option value="{{ $position->id }}"
@@ -195,19 +195,19 @@
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="hiring_date" class="form-label">Hiring Date *</label>
+                                <label for="hiring_date" class="form-label">Hiring Date</label>
                                 <input type="date" class="form-control @error('hiring_date') is-invalid @enderror"
                                     id="hiring_date" name="hiring_date"
-                                    value="{{ old('hiring_date', $employee->hiring_date ?? '') }}" required>
+                                    value="{{ old('hiring_date', $employee->hiring_date ?? '') }}">
                                 @error('hiring_date')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
                             <div class="col-md-6 mb-3">
-                                <label for="employment_status" class="form-label">Employment Status *</label>
+                                <label for="employment_status" class="form-label">Employment Status</label>
                                 <select class="form-select @error('employment_status') is-invalid @enderror"
-                                    id="employment_status" name="employment_status" required>
+                                    id="employment_status" name="employment_status">
                                     <option value="">Select Status</option>
                                     @foreach($employmentStatuses as $status)
                                     <option value="{{ $status->name }}"
@@ -255,10 +255,10 @@
                     <div class="tab-pane fade" id="contact" role="tabpanel">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">Email *</label>
+                                <label for="email" class="form-label">Email</label>
                                 <input type="email" class="form-control @error('email') is-invalid @enderror"
                                     id="email" name="email"
-                                    value="{{ old('email', $employee->email ?? '') }}" required>
+                                    value="{{ old('email', $employee->email ?? '') }}">
                                 @error('email')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -281,10 +281,10 @@
                     <div class="tab-pane fade" id="compensation" role="tabpanel">
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="basic_pay" class="form-label">Basic Pay *</label>
+                                <label for="basic_pay" class="form-label">Basic Pay</label>
                                 <input type="number" step="0.01" class="form-control @error('basic_pay') is-invalid @enderror"
                                     id="basic_pay" name="basic_pay"
-                                    value="{{ old('basic_pay', $employee->basic_pay ?? '') }}" required>
+                                    value="{{ old('basic_pay', $employee->basic_pay ?? '') }}">
                                 @error('basic_pay')
                                 <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -352,18 +352,18 @@
                                     <button type="button" class="btn-close float-end remove-item" aria-label="Close"></button>
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Degree *</label>
-                                            <input type="text" name="educations[{{ $index }}][degree]" 
-                                            class="form-control" value="{{ $education->degree ?? '' }}" required>
+                                            <label class="form-label">Degree</label>
+                                            <input type="text" name="educations[{{ $index }}][degree]"
+                                            class="form-control" value="{{ $education->degree ?? '' }}">
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">School Name *</label>
-                                            <input type="text" name="educations[{{ $index }}][school_name]" 
-                                            class="form-control" value="{{ $education->school_name ?? '' }}" required>
+                                            <label class="form-label">School Name</label>
+                                            <input type="text" name="educations[{{ $index }}][school_name]"
+                                            class="form-control" value="{{ $education->school_name ?? '' }}">
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Year Completed</label>
-                                            <select name="educations[{{ $index }}][year_completed]" class="form-select" required>
+                                            <select name="educations[{{ $index }}][year_completed]" class="form-select">
                                                 <option value="">Select Year</option>
                                                 @foreach($formOptions['years'] as $year)
                                                 <option value="{{ $year }}" {{ $education->year_completed == $year ? 'selected' : '' }}>
@@ -383,15 +383,15 @@
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Degree</label>
-                                            <input type="text" name="educations[0][degree]" class="form-control" required>
+                                            <input type="text" name="educations[0][degree]" class="form-control">
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">School</label>
-                                            <input type="text" name="educations[0][school]" class="form-control" required>
+                                            <input type="text" name="educations[0][school]" class="form-control">
                                         </div>
                                         <div class="col-md-6 mb-3">
                                             <label class="form-label">Year Completed</label>
-                                            <select name="educations[0][year_completed]" class="form-select" required>
+                                            <select name="educations[0][year_completed]" class="form-select">
                                                 <option value="">Select Year</option>
                                                 @foreach($formOptions['years'] as $year)
                                                 <option value="{{ $year }}">{{ $year }}</option>
@@ -476,16 +476,16 @@
                     <!-- Emergency Contacts Tab -->
                     <div class="tab-pane fade" id="emergency" role="tabpanel">
                         <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i> Please provide exactly 2 emergency contacts
+                            <i class="fas fa-info-circle"></i> Please provide at least 2 emergency contacts
                         </div>
-                        
+
                         <div id="emergency-container">
                             @php
-                                $emergencyContacts = isset($employee) && $employee->emergencyContacts->count() > 0 
-                                    ? $employee->emergencyContacts 
+                                $emergencyContacts = isset($employee) && $employee->emergencyContacts->count() > 0
+                                    ? $employee->emergencyContacts
                                     : [null, null]; // Initialize with 2 empty contacts
                             @endphp
-                            
+
                             @foreach($emergencyContacts as $index => $contact)
                             <div class="emergency-item card mb-3">
                                 <div class="card-body">
@@ -494,16 +494,16 @@
                                     @endif
                                     <div class="row">
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Name *</label>
+                                            <label class="form-label">Name</label>
                                             <input type="text" name="emergency_contacts[{{ $index }}][name]"
-                                                class="form-control" value="{{ $contact->name ?? '' }}" required>
+                                                class="form-control" value="{{ $contact->name ?? '' }}">
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Relationship *</label>
-                                            <select name="emergency_contacts[{{ $index }}][relationship]" class="form-select" required>
+                                            <label class="form-label">Relationship</label>
+                                            <select name="emergency_contacts[{{ $index }}][relationship]" class="form-select">
                                                 <option value="">Select Relationship</option>
                                                 @foreach($formOptions['relationships'] as $relationship)
-                                                <option value="{{ $relationship }}" 
+                                                <option value="{{ $relationship }}"
                                                     {{ (isset($contact) && $contact->relationship == $relationship) ? 'selected' : '' }}>
                                                     {{ $relationship }}
                                                 </option>
@@ -511,16 +511,16 @@
                                             </select>
                                         </div>
                                         <div class="col-md-6 mb-3">
-                                            <label class="form-label">Phone *</label>
+                                            <label class="form-label">Phone</label>
                                             <input type="text" name="emergency_contacts[{{ $index }}][phone]"
-                                                class="form-control" value="{{ $contact->phone ?? '' }}" required>
+                                                class="form-control" value="{{ $contact->phone ?? '' }}">
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             @endforeach
                         </div>
-                        
+
                         <button type="button" class="btn btn-sm btn-info mb-3" id="add-emergency">
                             <i class="fas fa-plus"></i> Add Additional Contact
                         </button>
@@ -648,7 +648,7 @@ $(document).ready(function() {
         // Hide all tabs
         $('.nav-link').removeClass('active');
         $('.tab-pane').removeClass('show active');
-        
+
         // Show current tab
         $(`#${tabs[index]}-tab`).addClass('active');
         $(`#${tabs[index]}`).addClass('show active');
@@ -676,14 +676,20 @@ $(document).ready(function() {
         }
     });
 
+    // Form submission validation - temporarily disabled for testing
+    $('form').on('submit', function(e) {
+        // Allow form submission without validation
+        return true;
+    });
+
     // 2. Education Fields ============================================
     let educationIndex = {{ isset($employee) && $employee->educations ? $employee->educations->count() : 1 }};
-    
+
     $('#add-education').on('click', function() {
         // Get years from PHP
         const years = @json($formOptions['years'] ?? range(1950, date('Y') + 5));
         let yearOptions = '<option value="">Select Year</option>';
-        
+
         years.forEach(year => {
             yearOptions += `<option value="${year}">${year}</option>`;
         });
@@ -694,23 +700,23 @@ $(document).ready(function() {
                 <button type="button" class="btn-close float-end remove-item" aria-label="Close"></button>
                 <div class="row">
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Degree *</label>
-                        <input type="text" name="educations[${educationIndex}][degree]" class="form-control" required>
+                        <label class="form-label">Degree</label>
+                        <input type="text" name="educations[${educationIndex}][degree]" class="form-control">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">School *</label>
-                        <input type="text" name="educations[${educationIndex}][school]" class="form-control" required>
+                        <label class="form-label">School</label>
+                        <input type="text" name="educations[${educationIndex}][school]" class="form-control">
                     </div>
                     <div class="col-md-6 mb-3">
-                        <label class="form-label">Year Completed *</label>
-                        <select name="educations[${educationIndex}][year_completed]" class="form-select" required>
+                        <label class="form-label">Year Completed</label>
+                        <select name="educations[${educationIndex}][year_completed]" class="form-select">
                             ${yearOptions}
                         </select>
                     </div>
                 </div>
             </div>
         </div>`;
-        
+
         $('#education-container').append(html);
         educationIndex++;
     });
@@ -770,19 +776,19 @@ $(document).ready(function() {
                     <button type="button" class="btn-close float-end remove-item" aria-label="Close"></button>
                     <div class="row">
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Name *</label>
-                            <input type="text" name="emergency_contacts[${emergencyIndex}][name]" class="form-control" required>
+                            <label class="form-label">Name</label>
+                            <input type="text" name="emergency_contacts[${emergencyIndex}][name]" class="form-control">
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Relationship *</label>
-                            <select name="emergency_contacts[${emergencyIndex}][relationship]" class="form-select" required>
+                            <label class="form-label">Relationship</label>
+                            <select name="emergency_contacts[${emergencyIndex}][relationship]" class="form-select">
                                 <option value="">Select Relationship</option>
                                 ${relationshipOptions}
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Phone *</label>
-                            <input type="text" name="emergency_contacts[${emergencyIndex}][phone]" class="form-control" required>
+                            <label class="form-label">Phone</label>
+                            <input type="text" name="emergency_contacts[${emergencyIndex}][phone]" class="form-control">
                         </div>
                     </div>
                 </div>
@@ -791,57 +797,37 @@ $(document).ready(function() {
             emergencyIndex++;
         });
 
-        // Form submission validation
-        $('form').on('submit', function(e) {
-            const emergencyContacts = $('#emergency-container .emergency-item').length;
-            if (emergencyContacts < 2) {
-                e.preventDefault();
-                alert('Please provide at least 2 emergency contacts');
-                $('#emergency-tab').click(); // Switch to emergency tab
-            }
-        });
+        // 5. Employment History Fields ===================================
+        let historyIndex = {{ isset($employee) && $employee->employmentHistories ? $employee->employmentHistories->count() : 1 }};
 
-        // Form submission validation
-        $('form').on('submit', function(e) {
-            const emergencyContacts = $('#emergency-container .emergency-item').length;
-            if (emergencyContacts < 2) {
-                e.preventDefault();
-                alert('Please provide at least 2 emergency contacts');
-                $('#emergency-tab').click(); // Switch to emergency tab
-            }
-        });
-
-    // 5. Employment History Fields ===================================
-    let historyIndex = {{ isset($employee) && $employee->employmentHistories ? $employee->employmentHistories->count() : 1 }};
-
-    $('#add-history').on('click', function() {
-        const html = `
-        <div class="history-item card mb-3">
-            <div class="card-body">
-                <button type="button" class="btn-close float-end remove-item" aria-label="Close"></button>
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Company Name</label>
-                        <input type="text" name="employment_histories[${historyIndex}][company_name]" class="form-control">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Position</label>
-                        <input type="text" name="employment_histories[${historyIndex}][position]" class="form-control">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">Start Date</label>
-                        <input type="date" name="employment_histories[${historyIndex}][start_date]" class="form-control">
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <label class="form-label">End Date</label>
-                        <input type="date" name="employment_histories[${historyIndex}][end_date]" class="form-control">
+        $('#add-history').on('click', function() {
+            const html = `
+            <div class="history-item card mb-3">
+                <div class="card-body">
+                    <button type="button" class="btn-close float-end remove-item" aria-label="Close"></button>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Company Name</label>
+                            <input type="text" name="employment_histories[${historyIndex}][company_name]" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Position</label>
+                            <input type="text" name="employment_histories[${historyIndex}][position]" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Start Date</label>
+                            <input type="date" name="employment_histories[${historyIndex}][start_date]" class="form-control">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">End Date</label>
+                            <input type="date" name="employment_histories[${historyIndex}][end_date]" class="form-control">
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>`;
-        $('#history-container').append(html);
-        historyIndex++;
-    });
+            </div>`;
+            $('#history-container').append(html);
+            historyIndex++;
+        });
 
     // 6. Remove Item Handler =========================================
     $(document).on('click', '.remove-item', function() {

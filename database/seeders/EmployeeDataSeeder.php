@@ -20,13 +20,13 @@ class EmployeeDataSeeder extends Seeder
         // Seed employment types
         $employmentTypes = ['Regular', 'Contractual', 'Probationary', 'Part-time', 'Project-based'];
         foreach ($employmentTypes as $type) {
-            EmploymentType::create(['name' => $type]);
+            EmploymentType::firstOrCreate(['name' => $type]);
         }
 
         // Seed employment statuses
         $employmentStatuses = ['Active', 'Inactive', 'On Leave', 'Suspended', 'Terminated'];
         foreach ($employmentStatuses as $status) {
-            EmploymentStatus::create(['name' => $status]);
+            EmploymentStatus::firstOrCreate(['name' => $status]);
         }
 
         // You can add more seed data for other tables as needed

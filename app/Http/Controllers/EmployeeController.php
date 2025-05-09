@@ -51,13 +51,13 @@ class EmployeeController extends Controller
     public function store(Request $request)
     {
         $validated = $this->validateEmployee($request);
-        
+
         DB::transaction(function () use ($validated, $request) {
             $employee = Employee::create($validated);
             $this->saveRelationships($employee, $request);
         });
 
-        return redirect()->route('employees.index')->with('success', 'Employee created successfully.');
+        return redirect()->route('admin.employees.index')->with('success', 'Employee created successfully.');
     }
 
     public function edit(Employee $employee)
@@ -73,9 +73,9 @@ class EmployeeController extends Controller
             ],
             'years' => range(1950, date('Y') + 5)
         ];
-    
+
         $employee->load('dependents', 'educations', 'emergencyContacts', 'employmentHistories');
-    
+
         return view('employees.create-edit', [
             'employee' => $employee,
             'agencies' => Agency::all(),
@@ -91,26 +91,26 @@ class EmployeeController extends Controller
     public function update(Request $request, Employee $employee)
     {
         $validated = $this->validateEmployee($request, $employee);
-        
+
         DB::transaction(function () use ($employee, $validated, $request) {
             $employee->update($validated);
             $this->saveRelationships($employee, $request, true);
         });
 
-        return redirect()->route('employees.index')->with('success', 'Employee updated successfully.');
+        return redirect()->route('admin.employees.index')->with('success', 'Employee updated successfully.');
     }
 
     public function destroy(Employee $employee)
     {
         $employee->delete();
-        return redirect()->route('employees.index')->with('success', 'Employee deleted successfully.');
+        return redirect()->route('admin.employees.index')->with('success', 'Employee deleted successfully.');
     }
 
     public function show(Employee $employee)
     {
         $employee->load([
-            'department', 
-            'position', 
+            'department',
+            'position',
             'agency',
             'cdmLevel',
             'employmentStatus',
@@ -119,27 +119,27 @@ class EmployeeController extends Controller
             'emergencyContacts',
             'employmentHistories'
         ]);
-        
+
         return view('employees.show', compact('employee'));
     }
 
     protected function validateEmployee(Request $request, Employee $employee = null)
     {
         $rules = [
-            'employee_number' => 'required|numeric|max:99999|unique:employees,employee_number' . ($employee ? ','.$employee->id : ''),
-            'agency_id' => 'required|exists:agencies,id',
-            'department_id' => 'required|exists:departments,id',
-            'cdm_level_id' => 'required|exists:cdm_levels,id',
-            'position_id' => 'required|exists:positions,id',
-            'first_name' => 'required|string|max:255',
+            'employee_number' => 'nullable|numeric|max:99999|unique:employees,employee_number' . ($employee ? ','.$employee->id : ''),
+            'agency_id' => 'nullable|exists:agencies,id',
+            'department_id' => 'nullable|exists:departments,id',
+            'cdm_level_id' => 'nullable|exists:cdm_levels,id',
+            'position_id' => 'nullable|exists:positions,id',
+            'first_name' => 'nullable|string|max:255',
             'middle_name' => 'nullable|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'last_name' => 'nullable|string|max:255',
             'name_suffix' => 'nullable|string|max:50',
             'alias' => 'nullable|string|max:255',
-            'hiring_date' => 'required|date',
+            'hiring_date' => 'nullable|date',
             'last_day' => 'nullable|date',
-            'employment_status_id' => 'required|exists:employment_statuses,id',
-            'basic_pay' => 'required|numeric|min:0',
+            'employment_status_id' => 'nullable|exists:employment_statuses,id',
+            'basic_pay' => 'nullable|numeric|min:0',
             'rata' => 'nullable|numeric|min:0',
             'comm_allowance' => 'nullable|numeric|min:0',
             'transpo_allowance' => 'nullable|numeric|min:0',
@@ -149,7 +149,7 @@ class EmployeeController extends Controller
             'philhealth_number' => 'nullable|string|max:50',
             'pag_ibig_number' => 'nullable|string|max:50',
             'tin' => 'nullable|string|max:50',
-            'email' => 'required|email|max:255|unique:employees,email' . ($employee ? ','.$employee->id : ''),
+            'email' => 'nullable|email|max:255|unique:employees,email' . ($employee ? ','.$employee->id : ''),
             'phone_number' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:500',
             'atm_account_number' => 'nullable|string|max:50',
@@ -157,27 +157,24 @@ class EmployeeController extends Controller
             'birthday' => 'nullable|date',
             'gender' => 'nullable|string|in:male,female,other',
             'civil_status' => 'nullable|string|in:single,married,widowed,divorced',
-            
+
             // Relationship validation rules
-            'educations.*.degree' => 'required|string|max:255',
-            'educations.*.school_name' => 'required|string|max:255',
+            'educations.*.degree' => 'nullable|string|max:255',
+            'educations.*.school_name' => 'nullable|string|max:255',
             'educations.*.year_completed' => 'nullable|numeric',
-            'dependents.*.name' => 'required|string|max:255',
-            'dependents.*.relationship' => 'required|string|max:255',
+            'dependents.*.name' => 'nullable|string|max:255',
+            'dependents.*.relationship' => 'nullable|string|max:255',
             'dependents.*.birthdate' => 'nullable|date',
-            
-            // Emergency Contacts - mandatory 2 contacts
-            'emergency_contacts' => 'required|array|size:2',
-            'emergency_contacts.0.name' => 'required|string|max:255',
-            'emergency_contacts.0.relationship' => 'required|string|max:255',
-            'emergency_contacts.0.phone' => 'required|string|max:20',
-            'emergency_contacts.1.name' => 'required|string|max:255',
-            'emergency_contacts.1.relationship' => 'required|string|max:255',
-            'emergency_contacts.1.phone' => 'required|string|max:20',
-            
-            'employment_histories.*.company_name' => 'required|string|max:255',
-            'employment_histories.*.position' => 'required|string|max:255',
-            'employment_histories.*.start_date' => 'required|date',
+
+            // Emergency Contacts - make optional
+            'emergency_contacts' => 'nullable|array',
+            'emergency_contacts.*.name' => 'nullable|string|max:255',
+            'emergency_contacts.*.relationship' => 'nullable|string|max:255',
+            'emergency_contacts.*.phone' => 'nullable|string|max:20',
+
+            'employment_histories.*.company_name' => 'nullable|string|max:255',
+            'employment_histories.*.position' => 'nullable|string|max:255',
+            'employment_histories.*.start_date' => 'nullable|date',
             'employment_histories.*.end_date' => 'nullable|date',
         ];
 
@@ -218,7 +215,7 @@ class EmployeeController extends Controller
         if ($isUpdate) {
             $employee->emergencyContacts()->delete();
         }
-        
+
         // Save exactly 2 emergency contacts
         foreach ($request->emergency_contacts as $contact) {
             $employee->emergencyContacts()->create([

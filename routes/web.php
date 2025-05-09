@@ -11,7 +11,7 @@ use App\Http\Controllers\{
     SearchController,
     AssignLeaveController,
     AgencyController,
-    CDMLevelController ,
+    CDMLevelController,
     DashboardController,
     EmploymentTypeController,
     HolidayController,
@@ -19,47 +19,98 @@ use App\Http\Controllers\{
     RolePermissionController
 };
 
-use App\Http\Controllers\EmployeePersonalInfoController;
-use App\Http\Controllers\EmployeeEmergencyContactController;
-use App\Http\Controllers\EmployeeDependentController;
-use App\Http\Controllers\EmployeeEducationController;
-use App\Http\Controllers\EmployeeEmploymentHistoryController;
+use App\Http\Controllers\{
+    EmployeePersonalInfoController,
+    EmployeeEmergencyContactController,
+    EmployeeDependentController,
+    EmployeeEducationController,
+    EmployeeEmploymentHistoryController
+};
 
 use App\Http\Controllers\Auth\{
     AuthenticatedSessionController,
     AdminAuthenticatedSessionController
 };
-use App\Models\EmploymentType;
 
 // Redirect root to login
 Route::redirect('/', '/login');
 
 
-// Guest Routes (Unauthenticated)
 Route::middleware('guest')->group(function () {
-
-    // Regular User Login
     Route::get('login', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
-    // Admin Login
     Route::prefix('admin')->group(function () {
         Route::get('login', [AdminAuthenticatedSessionController::class, 'create'])->name('admin.login');
         Route::post('login', [AdminAuthenticatedSessionController::class, 'store']);
     });
 });
 
-
 Route::middleware(['auth'])->group(function () {
+    // Employee Bulk Upload
     Route::get('employees/bulk-upload', [EmployeeController::class, 'bulkUploadForm'])->name('employees.bulk-upload');
     Route::post('employees/bulk-upload/process', [EmployeeController::class, 'bulkUploadProcess'])->name('employees.bulk-upload.process');
+
+    Route::prefix('employees')->group(function () {
+        // Main resource routes
+        Route::resource('/', EmployeeController::class)->except(['create', 'edit']);
+        
+        // Personal Information
+        Route::get('create/personal', [EmployeeController::class, 'createPersonal'])
+            ->name('employees.personal.create');
+            Route::get('{employee}/personal/edit', [EmployeeController::class, 'editPersonal'])
+        ->name('employees.personal.edit');
+    Route::put('{employee}/personal/update', [EmployeeController::class, 'updatePersonal'])
+        ->name('employees.personal.update');
+    
+        // Government IDs
+        Route::get('{employee}/government', [EmployeeController::class, 'editGovernment'])
+            ->name('employees.government.edit');
+        Route::put('{employee}/government', [EmployeeController::class, 'updateGovernment'])
+            ->name('employees.government.update');
+    
+        // Employment
+        Route::get('{employee}/employment', [EmployeeController::class, 'editEmployment'])
+            ->name('employees.employment.edit');
+        Route::put('{employee}/employment', [EmployeeController::class, 'updateEmployment'])
+            ->name('employees.employment.update');
+    
+        // Contact Information
+        Route::get('{employee}/contact', [EmployeeController::class, 'editContact'])
+            ->name('employees.contact.edit');
+        Route::put('{employee}/contact', [EmployeeController::class, 'updateContact'])
+            ->name('employees.contact.update');
+    
+        // Compensation
+        Route::get('{employee}/compensation', [EmployeeController::class, 'editCompensation'])
+            ->name('employees.compensation.edit');
+        Route::put('{employee}/compensation', [EmployeeController::class, 'updateCompensation'])
+            ->name('employees.compensation.update');
+    
+        // Education
+        Route::get('{employee}/education', [EmployeeController::class, 'editEducation'])
+            ->name('employees.education.edit');
+        Route::put('{employee}/education', [EmployeeController::class, 'updateEducation'])
+            ->name('employees.education.update');
+    
+        // Dependents
+        Route::get('{employee}/dependents', [EmployeeController::class, 'editDependents'])
+            ->name('employees.dependents.edit');
+        Route::put('{employee}/dependents', [EmployeeController::class, 'updateDependents'])
+            ->name('employees.dependents.update');
+    
+        // Emergency Contacts
+        Route::get('{employee}/emergency', [EmployeeController::class, 'editEmergency'])
+            ->name('employees.emergency.edit');
+        Route::put('{employee}/emergency', [EmployeeController::class, 'updateEmergency'])
+            ->name('employees.emergency.update');
+    
+        // Employment History
+        Route::get('{employee}/history', [EmployeeController::class, 'editHistory'])
+            ->name('employees.history.edit');
+        Route::put('{employee}/history', [EmployeeController::class, 'updateHistory'])
+            ->name('employees.history.update');
     });
-
-// Authenticated User Routes
-Route::middleware(['auth'])->group(function () {
-
-    // Employee Routes
-    Route::resource('employees', EmployeeController::class);
 
 
     // General Resources
@@ -71,39 +122,16 @@ Route::middleware(['auth'])->group(function () {
         'roles' => RoleController::class,
         'role_permissions' => RolePermissionController::class,
         'employment_types' => EmploymentTypeController::class,
+        'holidays' => HolidayController::class
     ]);
 
-    Route::prefix('employees')->name('employees.')->group(function () {
-        Route::get('/', [EmployeeController::class, 'index'])->name('index');
-        Route::get('create', [EmployeeController::class, 'create'])->name('create');
-        Route::post('store', [EmployeeController::class, 'store'])->name('store');
-        Route::get('{employee}/edit', [EmployeeController::class, 'edit'])->name('edit');
-        Route::put('{employee}', [EmployeeController::class, 'update'])->name('update');
-        Route::delete('{employee}', [EmployeeController::class, 'destroy'])->name('destroy');
-    
-        Route::put('{employee}/personal-info', [EmployeePersonalInfoController::class, 'update'])->name('personal-info.update');
-        Route::resource('emergency-contact', EmployeeEmergencyContactController::class)->except(['show']);
-        Route::resource('dependent', EmployeeDependentController::class)->except(['show']);
-        Route::resource('education', EmployeeEducationController::class)->except(['show']);
-        Route::resource('employment-history', EmployeeEmploymentHistoryController::class)->except(['show']);
-    });
-    Route::get('/positions/by-cdm-level/{cdmLevel}', [App\Http\Controllers\PositionController::class, 'getByCdmLevel']);
-    Route::get('/positions/{position}/cdm-level', [App\Http\Controllers\PositionController::class, 'getCdmLevel']);
-    Route::resource('holidays', HolidayController::class);
+    Route::get('/positions/by-cdm-level/{cdmLevel}', [PositionController::class, 'getByCdmLevel']);
+    Route::get('/positions/{position}/cdm-level', [PositionController::class, 'getCdmLevel']);
 
-    Route::resource('positions', PositionController::class)
-        ->parameters(['positions' => 'position'])
-        ->names('positions');
-    // Leave and Leave Types
+    // Leave and Assign Leave
     Route::resource('leaves', LeaveController::class);
-    Route::resource('leave-types', LeaveTypeController::class)
-        ->parameters(['leave-types' => 'leave_type'])
-        ->names('leave_types');
-    Route::resource('assign_leaves', AssignLeaveController::class)
-        ->parameters(['assign_leaves' => 'assignLeave']);
-    
-    Route::resource('departments', DepartmentController::class)
-        ->parameters(['assign_leaves' => 'assignLeave']);
+    Route::resource('leave-types', LeaveTypeController::class)->parameters(['leave-types' => 'leave_type'])->names('leave_types');
+    Route::resource('assign_leaves', AssignLeaveController::class)->parameters(['assign_leaves' => 'assignLeave']);
 
     // Profile
     Route::prefix('profile')->group(function () {
@@ -112,20 +140,23 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
     });
 
+    // Dashboard
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::post('/dashboard/action', [DashboardController::class, 'handleAction'])->name('dashboard.action');
+
     // Search
     Route::get('/search', [SearchController::class, 'index'])->name('search');
 
     // Logout
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
-
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::post('/dashboard/action', [DashboardController::class, 'handleAction'])->name('dashboard.action');
-
 });
 
-// Admin Routes
+// Admin Authenticated Routes
 Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
-    // Add admin-only routes here
+    // Add admin routes here
 });
+
+// Public resource registration
+Route::resource('employees', EmployeeController::class);
 
 require __DIR__ . '/auth.php';

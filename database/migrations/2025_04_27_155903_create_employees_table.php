@@ -30,6 +30,8 @@ class CreateEmployeesTable extends Migration
             $table->string('atm_account_number')->nullable();
             $table->string('bank')->nullable();
             $table->string('phone_number')->nullable();     
+            $table->string('address')->nullable();     
+            $table->string('civil_status')->nullable();     
             $table->unsignedBigInteger('agency_id')->nullable();
             $table->foreign('agency_id')->references('id')->on('agencies')->onDelete('cascade');
 
@@ -49,6 +51,9 @@ class CreateEmployeesTable extends Migration
             $table->decimal('rata', 10, 2)->default(0)->nullable();
             $table->decimal('comm_allowance', 10, 2)->default(0)->nullable();
             $table->decimal('transpo_allowance', 10, 2)->default(0)->nullable();
+            $table->decimal('parking_toll_allowance', 10, 2)->default(0)->nullable();
+            $table->decimal('clothing_allowance', 10, 2)->default(0)->nullable();
+            
             $table->timestamps();
         });
     }

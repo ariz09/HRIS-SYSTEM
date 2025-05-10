@@ -20,9 +20,7 @@
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="{{ route('employees.index') }}">Employees</a>
                     </nav>
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{ route('employees.bulk-upload') }}">Bulk-upload</a>
-                    </nav>
+
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="{{ route('leaves.index') }}">Leave Application</a>
                     </nav>

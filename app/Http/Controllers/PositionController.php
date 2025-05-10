@@ -39,7 +39,7 @@ class PositionController extends Controller
             'name' => $validated['name'],
             'status' => $validated['status'],
             'cdm_level_id' => $validated['cdm_level_id'],
-            'code' => $positionCode, // Auto-generate code
+
         ]);
 
         return redirect()->route('positions.index')
@@ -66,7 +66,6 @@ class PositionController extends Controller
 
         // Validate the updated form data, including CDM level
         $validator = Validator::make($request->all(), [
-            'code' => 'required|max:10|unique:positions,code,' . $position->id, // Allow the same code during update
             'name' => 'required|max:100',
             'status' => 'required|boolean',
             'cdm_level_id' => 'required|exists:cdm_levels,id' // Validate CDM level

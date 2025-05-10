@@ -9,7 +9,7 @@ class Position extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'cdm_level_id', 'code', 'status'];  // Make sure 'code' is here
+    protected $fillable = ['name', 'cdm_level_id', 'status']; 
 
     public function cdmLevel()
     {
@@ -18,7 +18,7 @@ class Position extends Model
 
     public function employees()
     {
-        return $this->hasMany(Employee::class);
+        return $this->hasMany(EmploymentInfo::class);
     }
 }
 

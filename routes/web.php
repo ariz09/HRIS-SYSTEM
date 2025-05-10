@@ -3,7 +3,6 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\{
     ProfileController,
-    EmployeeController,
     DepartmentController,
     LeaveController,
     LeaveTypeController,
@@ -18,7 +17,9 @@ use App\Http\Controllers\{
     RoleController,
     RolePermissionController,
     LeaveApplicationController,
-    EmployeeInfoController
+    EmployeeInfoController,
+    PersonalInfoController,
+    EmployeeController
 };
 
 use App\Http\Controllers\EmployeePersonalInfoController;
@@ -46,6 +47,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard/action', [DashboardController::class, 'handleAction'])->name('dashboard.action');
 
+
     // Profile
     Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -55,12 +57,13 @@ Route::middleware(['auth'])->group(function () {
 
     // Employee Management
     Route::resource('employee-info', EmployeeInfoController::class);
-    Route::get('employees/bulk-upload', [EmployeeController::class, 'bulkUploadForm'])->name('employees.bulk-upload');
-    Route::post('employees/bulk-upload/process', [EmployeeController::class, 'bulkUploadProcess'])->name('employees.bulk-upload.process');
+
+    Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
+    Route::resource('employees', EmployeeController::class);
 
     // Employee Details
     Route::prefix('employees')->name('employees.')->group(function () {
-        Route::put('{employee}/personal-info', [EmployeePersonalInfoController::class, 'update'])->name('personal-info.update');
+        Route::resource('personal_infos', PersonalInfoController::class);
         Route::resource('emergency-contact', EmployeeEmergencyContactController::class)->except(['show']);
         Route::resource('dependent', EmployeeDependentController::class)->except(['show']);
         Route::resource('education', EmployeeEducationController::class)->except(['show']);

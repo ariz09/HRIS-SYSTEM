@@ -20,7 +20,8 @@ use App\Http\Controllers\{
     EmployeeInfoController,
     PersonalInfoController,
     EmployeeController,
-    PendingUserController
+    PendingUserController,
+    UserController
 };
 
 use App\Http\Controllers\EmployeePersonalInfoController;
@@ -105,6 +106,11 @@ Route::middleware(['auth'])->group(function () {
 
     // Logout
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+    // Users
+    Route::get('/users', [UserController::class, 'index'])->name('users.index');
+    Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
 });
 
 // Temporary route to check roles (remove after use)

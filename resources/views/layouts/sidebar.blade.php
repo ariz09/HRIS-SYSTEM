@@ -19,6 +19,10 @@
                         <i class="fas fa-user-clock me-2"></i>Pending Users
                     </a>
 
+                    <a class="nav-link" href="{{ route('users.index') }}">
+                        <i class="fas fa-users me-2"></i>User Management
+                    </a>
+
                     <!--Employees -->
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="{{ route('employees.index') }}">Employees</a>

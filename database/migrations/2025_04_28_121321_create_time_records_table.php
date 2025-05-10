@@ -14,7 +14,7 @@ class CreateTimeRecordsTable extends Migration
             $table->foreignId('user_id')->constrained();
             $table->enum('type', ['time_in', 'time_out']);
             $table->timestamp('recorded_at');
-            $table->string('status')->default('pending');
+            $table->string('status')->default('active');
             $table->timestamps();
         });
     }

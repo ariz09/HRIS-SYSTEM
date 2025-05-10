@@ -46,10 +46,10 @@ Route::middleware('guest')->group(function () {
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
     // Admin Login
-    Route::prefix('admin')->group(function () {
-        Route::get('login', [AdminAuthenticatedSessionController::class, 'create'])->name('login');
-        Route::post('login', [AdminAuthenticatedSessionController::class, 'store']);
-    });
+    // Route::prefix('admin')->group(function () {
+    //     Route::get('login', [AdminAuthenticatedSessionController::class, 'create'])->name('login');
+    //     Route::post('login', [AdminAuthenticatedSessionController::class, 'store']);
+    // });
 });
 
 
@@ -162,5 +162,9 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     // Logout
     Route::post('logout', [AdminAuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
+
+Route::get('/pending', function () {
+    return view('auth.pending');
+})->name('pending');
 
 require __DIR__ . '/auth.php';

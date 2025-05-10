@@ -24,11 +24,23 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
-
-        $request->session()->regenerate();
-
-        return redirect()->intended(route('dashboard', absolute: false));
+        try {
+            $request->authenticate();
+            $request->session()->regenerate();
+            return redirect()->intended(route('dashboard', absolute: false));
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            // Check if the error message is 'pending'
+            if ($e->getMessage() === 'pending') {
+                // Get the pending user from session
+                $pendingUser = session('pending_user');
+                // Clear the session
+                session()->forget('pending_user');
+                // Redirect to pending page
+                return redirect()->route('pending');
+            }
+            // If it's any other validation error, throw it
+            throw $e;
+        }
     }
 
     /**
@@ -36,10 +48,9 @@ class AuthenticatedSessionController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        Auth::guard('web')->logout();
+        Auth::logout();
 
         $request->session()->invalidate();
-
         $request->session()->regenerateToken();
 
         return redirect('/');

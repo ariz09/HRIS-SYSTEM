@@ -41,6 +41,11 @@ Route::middleware('guest')->group(function () {
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 });
 
+// Pending Account Route
+Route::get('/pending', function () {
+    return view('auth.pending');
+})->name('pending')->middleware('auth');
+
 // Authenticated User Routes
 Route::middleware(['auth'])->group(function () {
     // Dashboard

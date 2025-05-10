@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
 
 class LoginRequest extends FormRequest
 {
@@ -37,10 +38,45 @@ class LoginRequest extends FormRequest
      *
      * @throws \Illuminate\Validation\ValidationException
      */
-    public function authenticate(): void
+    public function authenticate(): bool
     {
         $this->ensureIsNotRateLimited();
 
+        // First check if user exists and is active
+        $user = \App\Models\User::where('email', $this->email)->first();
+
+        if (!$user) {
+            RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'email' => trans('auth.failed'),
+            ]);
+        }
+
+        // If user is not active, authenticate them
+        if (!$user->is_active) {
+            if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+                RateLimiter::hit($this->throttleKey());
+                throw ValidationException::withMessages([
+                    'email' => trans('auth.failed'),
+                ]);
+            }
+            RateLimiter::clear($this->throttleKey());
+            return true; // Return true to indicate pending status
+        }
+
+        // Check if user has any roles
+        $hasRole = \Illuminate\Support\Facades\DB::table('role_user')
+            ->where('user_id', $user->id)
+            ->exists();
+
+        if (!$hasRole) {
+            RateLimiter::hit($this->throttleKey());
+            throw ValidationException::withMessages([
+                'email' => trans('auth.failed'),
+            ]);
+        }
+
+        // If user is active and has role, attempt authentication
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
@@ -50,6 +86,7 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+        return false; // Return false to indicate active status
     }
 
     /**

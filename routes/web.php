@@ -81,9 +81,9 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // Admin Routes
-Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
+Route::prefix('admin')->middleware(['auth', \App\Http\Middleware\CheckAdminRole::class])->group(function () {
     // Dashboard
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::post('/dashboard/action', [DashboardController::class, 'handleAction'])->name('dashboard.action');
 
     // Employee Routes
@@ -159,9 +159,12 @@ Route::prefix('admin')->middleware(['auth:admin'])->group(function () {
     // Search
     Route::get('/search', [SearchController::class, 'index'])->name('search');
 
-    // Logout
-    Route::post('logout', [AdminAuthenticatedSessionController::class, 'destroy'])->name('logout');
+    // Logout - Move this outside the admin middleware group
+    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('admin.logout');
 });
+
+// Move the logout route outside of any middleware groups
+Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
 Route::get('/pending', function () {
     return view('auth.pending');

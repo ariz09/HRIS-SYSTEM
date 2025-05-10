@@ -42,7 +42,7 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        // First, find the user by email
+        // find the user by email
         $user = User::where('email', $this->email)->first();
 
         // Check if user exists and is active
@@ -53,13 +53,19 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        // If user exists but is inactive, we'll handle this in the controller
+        // If user exists but is inactive
         if (!$user->is_active) {
-            // We'll pass the user to the session so the controller can access it
+            // pass the user to the session so the controller can access it
             session(['pending_user' => $user]);
             throw ValidationException::withMessages([
                 'email' => 'pending',
             ]);
+        }
+
+        // Check if user has admin role
+        $isAdmin = $user->roles()->where('name', 'admin')->exists();
+        if ($isAdmin) {
+            session(['is_admin' => true]);
         }
 
         // Then attempt authentication

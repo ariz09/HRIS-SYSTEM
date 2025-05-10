@@ -19,7 +19,8 @@ use App\Http\Controllers\{
     LeaveApplicationController,
     EmployeeInfoController,
     PersonalInfoController,
-    EmployeeController
+    EmployeeController,
+    PendingUserController
 };
 
 use App\Http\Controllers\EmployeePersonalInfoController;
@@ -52,6 +53,10 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard/action', [DashboardController::class, 'handleAction'])->name('dashboard.action');
 
+    // Pending Users Routes
+    Route::get('/pending-users', [PendingUserController::class, 'index'])->name('pending-users.index');
+    Route::put('/pending-users/{id}/activate', [PendingUserController::class, 'activate'])->name('pending-users.activate');
+    Route::delete('/pending-users/{id}/reject', [PendingUserController::class, 'reject'])->name('pending-users.reject');
 
     // Profile
     Route::prefix('profile')->group(function () {
@@ -101,5 +106,21 @@ Route::middleware(['auth'])->group(function () {
     // Logout
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
+
+// Temporary route to check roles (remove after use)
+Route::get('/check-roles', function () {
+    if (!auth()->check()) {
+        return 'Not logged in';
+    }
+
+    $user = auth()->user();
+    $roles = $user->roles;
+
+    return [
+        'user_id' => $user->id,
+        'user_name' => $user->name,
+        'roles' => $roles->pluck('name')
+    ];
+})->middleware('auth');
 
 require __DIR__ . '/auth.php';

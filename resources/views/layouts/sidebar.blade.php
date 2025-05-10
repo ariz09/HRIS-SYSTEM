@@ -15,8 +15,11 @@
             </a>
             <div class="collapse" id="collapseSettings" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                 <nav class="sb-sidenav-menu-nested nav">
+                    <a class="nav-link" href="{{ route('pending-users.index') }}">
+                        <i class="fas fa-user-clock me-2"></i>Pending Users
+                    </a>
 
-                     <!--Employees -->
+                    <!--Employees -->
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="{{ route('employees.index') }}">Employees</a>
                     </nav>

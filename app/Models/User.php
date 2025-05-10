@@ -37,7 +37,12 @@ class User extends Authenticatable
 
     public function employeeInfo(): HasOne
     {
-        return $this->hasOne(EmployeeInfo::class);
+        return $this->hasOne(EmploymentInfo::class);
+    }
+
+    public function employmentInfo(): HasOne
+    {
+        return $this->hasOne(EmploymentInfo::class);
     }
 
     public function roles(): BelongsToMany

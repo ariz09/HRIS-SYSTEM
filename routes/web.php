@@ -21,7 +21,10 @@ use App\Http\Controllers\{
     PersonalInfoController,
     EmployeeController,
     PendingUserController,
-    UserController
+    UserController,
+    PasswordController,
+    EmailVerificationController,
+    ProfileCompletionController
 };
 
 use App\Http\Controllers\EmployeePersonalInfoController;
@@ -65,6 +68,14 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
     });
+
+    // Password Update
+    Route::put('/password', [PasswordController::class, 'update'])->name('password.update');
+
+    // Email Verification
+    Route::post('/email/verification-notification', [EmailVerificationController::class, 'store'])
+        ->middleware(['auth', 'throttle:6,1'])
+        ->name('verification.send');
 
     // Employee Management
     Route::resource('employee-info', EmployeeInfoController::class);
@@ -111,6 +122,64 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/users', [UserController::class, 'index'])->name('users.index');
     Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+
+    // Profile Completion
+    Route::get('/profile/complete', [ProfileCompletionController::class, 'show'])->name('profile.complete');
+    Route::post('/profile/complete', [ProfileCompletionController::class, 'store'])->name('profile.complete.store');
+
+    // Apply profile completion middleware to all routes except profile completion and auth routes
+    Route::middleware(['auth', \App\Http\Middleware\EnsureProfileIsComplete::class])->group(function () {
+        // Dashboard
+        Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+        Route::post('/dashboard/action', [DashboardController::class, 'handleAction'])->name('dashboard.action');
+
+        // Pending Users Routes
+        Route::get('/pending-users', [PendingUserController::class, 'index'])->name('pending-users.index');
+        Route::put('/pending-users/{id}/activate', [PendingUserController::class, 'activate'])->name('pending-users.activate');
+        Route::delete('/pending-users/{id}/reject', [PendingUserController::class, 'reject'])->name('pending-users.reject');
+
+        // Employee Management
+        Route::resource('employee-info', EmployeeInfoController::class);
+        Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
+        Route::resource('employees', EmployeeController::class);
+
+        // Employee Details
+        Route::prefix('employees')->name('employees.')->group(function () {
+            Route::resource('personal_infos', PersonalInfoController::class);
+            Route::resource('emergency-contact', EmployeeEmergencyContactController::class)->except(['show']);
+            Route::resource('dependent', EmployeeDependentController::class)->except(['show']);
+            Route::resource('education', EmployeeEducationController::class)->except(['show']);
+            Route::resource('employment-history', EmployeeEmploymentHistoryController::class)->except(['show']);
+        });
+
+        // Leave Management
+        Route::resource('leaves', LeaveController::class)->names('leaves');
+        Route::resource('leave-types', LeaveTypeController::class)->parameters(['leave-types' => 'leave_type'])->names('leave_types');
+        Route::resource('assign_leaves', AssignLeaveController::class)->parameters(['assign_leaves' => 'assignLeave'])->names('assign_leaves');
+
+        // Holiday Management
+        Route::resource('holidays', HolidayController::class)->names('holidays');
+
+        // General Management
+        Route::resource('departments', DepartmentController::class)->names('departments');
+        Route::resource('positions', PositionController::class)->names('positions');
+        Route::resource('agencies', AgencyController::class)->names('agencies');
+        Route::resource('cdmlevels', CDMLevelController::class)->names('cdmlevels');
+        Route::resource('roles', RoleController::class)->names('roles');
+        Route::resource('role_permissions', RolePermissionController::class)->names('role_permissions');
+        Route::resource('employment_types', EmploymentTypeController::class)->names('employment_types');
+
+        Route::get('/positions/by-cdm-level/{cdmLevel}', [PositionController::class, 'getByCdmLevel'])->name('positions.by-cdm-level');
+        Route::get('/positions/{position}/cdm-level', [PositionController::class, 'getCdmLevel'])->name('positions.cdm-level');
+
+        // Search
+        Route::get('/search', [SearchController::class, 'index'])->name('search');
+
+        // Users
+        Route::get('/users', [UserController::class, 'index'])->name('users.index');
+        Route::get('/users/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+        Route::put('/users/{user}', [UserController::class, 'update'])->name('users.update');
+    });
 });
 
 // Temporary route to check roles (remove after use)

@@ -62,18 +62,18 @@ class LoginRequest extends FormRequest
             ]);
         }
 
-        // Check if user has admin role
-        $isAdmin = $user->roles()->where('name', 'admin')->exists();
-        if ($isAdmin) {
-            session(['is_admin' => true]);
-        }
-
-        // Then attempt authentication
+        // Attempt authentication first
         if (!Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
             ]);
+        }
+
+        // After successful authentication, check if user has admin role
+        $isAdmin = Auth::user()->roles()->where('name', 'admin')->exists();
+        if ($isAdmin) {
+            session(['is_admin' => true]);
         }
 
         RateLimiter::clear($this->throttleKey());

@@ -19,7 +19,8 @@ use App\Http\Controllers\{
     RolePermissionController,
     AdminController,
     LeaveApplicationController,
-    EmployeeInfoController
+    EmployeeInfoController,
+    EmployeeDashboardController
 };
 
 use App\Http\Controllers\EmployeePersonalInfoController;
@@ -56,7 +57,9 @@ Route::middleware('guest')->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('employees/bulk-upload', [EmployeeController::class, 'bulkUploadForm'])->name('employees.bulk-upload');
     Route::post('employees/bulk-upload/process', [EmployeeController::class, 'bulkUploadProcess'])->name('employees.bulk-upload.process');
-    });
+    // Employee Dashboard
+    Route::get('/employee/dashboard', [EmployeeDashboardController::class, 'index'])->name('employee.dashboard');
+});
 
 // Authenticated User Routes
 Route::middleware(['auth'])->group(function () {

@@ -8,6 +8,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use App\Models\User;
+use App\Models\Role;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -28,12 +30,21 @@ class AuthenticatedSessionController extends Controller
             $request->authenticate();
             $request->session()->regenerate();
 
+            // Get the authenticated user
+            $user = Auth::user();
+
+            // Check if user has employee role
+            if ($user && $user->roles()->where('name', 'employee')->exists()) {
+                return redirect()->intended(route('employee.dashboard', absolute: false));
+            }
+
             // Check if user is admin and redirect accordingly
             if (session('is_admin')) {
                 session()->forget('is_admin'); // Clear the session flag
                 return redirect()->intended(route('admin.dashboard', absolute: false));
             }
 
+            // Default redirect for other roles
             return redirect()->intended(route('dashboard', absolute: false));
         } catch (\Illuminate\Validation\ValidationException $e) {
             // Check if the error message is 'pending'

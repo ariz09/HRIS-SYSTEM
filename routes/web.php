@@ -65,6 +65,13 @@ Route::middleware(['auth'])->group(function () {
         Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
     }); */
+    Route::prefix('profile')->group(function () {
+        Route::get('/show', [ProfileController::class, 'show'])->name('profile.show');
+        Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
+        Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
+        Route::put('/personal', [ProfileController::class, 'updatePersonal'])->name('profile.personal.update');
+    });
 
 
 

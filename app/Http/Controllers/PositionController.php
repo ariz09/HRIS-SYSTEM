@@ -10,16 +10,18 @@ use Illuminate\Support\Str;
 
 class PositionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Fetch positions with CDM Level relationship
-        $positions = Position::with('cdmLevel')->latest()->get();
+        $cdmLevelId = $request->query('cdm_level_id');
         
-        // Fetch active CDM Levels
-        $cdmLevels = CDMLevel::active()->get();  // Fetch active CDM levels
-
-        // Return view with positions and CDM levels
-        return view('positions.index', compact('positions', 'cdmLevels'));
+        $positions = Position::when($cdmLevelId, function($query) use ($cdmLevelId) {
+                return $query->where('cdm_level_id', $cdmLevelId);
+            })
+            ->get(['id', 'name']);
+        
+        return response()->json([
+            'positions' => $positions
+        ]);
     }
 
     public function store(Request $request)
@@ -39,7 +41,7 @@ class PositionController extends Controller
             'name' => $validated['name'],
             'status' => $validated['status'],
             'cdm_level_id' => $validated['cdm_level_id'],
-            'code' => $positionCode, // Auto-generate code
+
         ]);
 
         return redirect()->route('positions.index')
@@ -66,7 +68,6 @@ class PositionController extends Controller
 
         // Validate the updated form data, including CDM level
         $validator = Validator::make($request->all(), [
-            'code' => 'required|max:10|unique:positions,code,' . $position->id, // Allow the same code during update
             'name' => 'required|max:100',
             'status' => 'required|boolean',
             'cdm_level_id' => 'required|exists:cdm_levels,id' // Validate CDM level

@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Authenticatable
 {
@@ -29,8 +30,8 @@ class User extends Authenticatable
         'password_changed' => 'boolean',
     ];
 
-    public function employee()
+    public function employeeInfo(): HasOne
     {
-        return $this->hasOne(Employee::class);
+        return $this->hasOne(EmployeeInfo::class);
     }
 }

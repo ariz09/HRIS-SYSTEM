@@ -9,6 +9,7 @@ class CreateHolidaysTable extends Migration
 {
     public function up()
     {
+        Schema::dropIfExists('holidays');
         Schema::create('holidays', function (Blueprint $table) {
             $table->id();
             $table->string('name');

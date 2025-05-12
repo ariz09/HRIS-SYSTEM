@@ -17,11 +17,11 @@ class Authenticate
      */
     public function handle(Request $request, Closure $next, ...$guards): Response
     {
-        $guards = empty($guards) ? [null] : $guards;
+        $guards = empty($guards) ? ['web'] : $guards;  // Default to 'web' guard
 
         foreach ($guards as $guard) {
             if (!Auth::guard($guard)->check()) {
-                return $this->unauthenticated($request, $guard);
+                return $this->unauthenticated($request);
             }
         }
 
@@ -31,16 +31,13 @@ class Authenticate
     /**
      * Handle unauthenticated users.
      */
-    protected function unauthenticated(Request $request, ?string $guard): Response
+    protected function unauthenticated(Request $request): Response
     {
         if ($request->expectsJson()) {
             return response()->json(['message' => 'Unauthenticated.'], 401);
         }
 
-        // Redirect to appropriate login based on guard
-        return match ($guard) {
-            'admin' => redirect()->guest(route('admin.login')),
-            default => redirect()->guest(route('login')),
-        };
+        // Redirect to the login route
+        return redirect()->guest(route('login'));
     }
 }

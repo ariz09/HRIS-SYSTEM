@@ -1,99 +1,106 @@
 @extends('layouts.app')
 
 @section('content')
-<x-success-alert :message="session('success')" />
-<x-error-alert :errors="$errors" />
-
-<div class="container-fluid px-4">
-    <h1 class="mt-4">Employee Management</h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="{{ route('admin.dashboard') }}">Dashboard</a></li>
-        <li class="breadcrumb-item active">Employees</li>
-    </ol>
-
-    <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <div><i class="fas fa-table me-1"></i> Employee List</div>
-            <div>
-                <a href="{{ route('admin.employees.create') }}" class="btn btn-primary btn-sm">
-                    <i class="fas fa-plus"></i> Add Employee
-                </a>
-                <a href="{{ route('admin.employees.bulk-upload') }}" class="btn btn-success btn-sm">
-                    <i class="fas fa-file-import"></i> Bulk Upload
-                </a>
+    <x-success-alert :message="session('success')" />
+    <x-error-alert :message="session('error')" />
+    <div class="container">
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <div><i class="fas fa-users me-1"></i> Employee List</div>
+                <a href="{{ route('employees.create') }}" class="btn btn-primary">Add New Employee</a>
             </div>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table id="employeesTable" class="table table-striped table-bordered nowrap" style="width:100%">
-                    <thead class="table-light">
-                        <tr>
-                            <th>Employee #</th>
-                            <th>Name</th>
-                            <th>Position</th>
-                            <th>Department</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($employees as $employee)
-                        <tr>
-                            <td>{{ $employee->employee_number ?? '-' }}</td>
-                            <td>{{ ($employee->last_name ?? '') . ', ' . ($employee->first_name ?? '') }}</td>
-                            <td>{{ $employee->position ? $employee->position->name : '-' }}</td>
-                            <td>{{ $employee->department ? $employee->department->name : '-' }}</td>
-                            <td>
-                                @if($employee->employment_status_id === 1)
-                                    <span class="badge bg-success">Active</span>
-                                @elseif($employee->employment_status_id === 0)
-                                    <span class="badge bg-secondary">Inactive</span>
-                                @else
-                                    <span class="badge bg-warning">No Status</span>
-                                @endif
-                            </td>
-                            <td class="text-center">
-                                <div class="btn-group" role="group">
-                                    <a href="{{ route('admin.employees.show', $employee->id) }}" class="btn btn-info btn-sm" title="View" data-bs-toggle="tooltip">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-                                    <a href="{{ route('admin.employees.edit', $employee->id) }}" class="btn btn-primary btn-sm" title="Edit" data-bs-toggle="tooltip">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <form action="{{ route('admin.employees.destroy', $employee->id) }}" method="POST" class="d-inline">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button type="submit" class="btn btn-danger btn-sm" title="Delete" data-bs-toggle="tooltip" onclick="return confirm('Are you sure you want to delete this employee?')">
-                                            <i class="fas fa-trash"></i>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table id="employeesTable" class="table table-striped table-bordered nowrap" style="width:100%">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Employee Number</th>
+                                <th>Full Name</th>
+                                <th>Agency</th>
+                                <th>Position</th>
+                                <th>Status</th>
+                                <th>Employee Type</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($employees as $employee)
+                                <tr>
+                                    <td>{{ $employee->employee_number }}</td>
+                                    <td>{{ ucfirst(strtolower(optional($employee->personalInfo)->first_name)) }}
+                                        {{ ucfirst(strtolower(optional($employee->personalInfo)->last_name)) }}
+                                    </td>
+                                    <td>{{ optional($employee->agency)->name }}</td>
+                                    <td>{{ optional($employee->position)->name }}</td>
+                                    <td>{{ optional($employee->employmentStatus)->name }}</td>
+                                    <td>{{ optional($employee->employmentType)->name ?? 'Not specified' }}</td>
+                                    <td>
+                                        <a href="{{ route('employees.edit', $employee) }}" class="btn btn-sm btn-warning"
+                                            data-bs-toggle="tooltip" title="Edit Employee">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal"
+                                            data-bs-target="#deleteModal" data-employee="{{ $employee->id }}"
+                                            title="Delete Employee">
+                                            <i class="fas fa-trash-alt"></i>
                                         </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="d-flex justify-content-between mt-4">
+                    <div>
+                        Showing {{ $employees->firstItem() }} to {{ $employees->lastItem() }} of {{ $employees->total() }}
+                        employees
+                    </div>
+                    <div>
+                        {{ $employees->links() }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="deleteForm" method="POST">
+                @csrf
+                @method('DELETE')
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        Are you sure you want to delete this employee? This action cannot be undone.
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-danger">Delete</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
 @endsection
 
-@push('scripts')
-<!-- DataTables CSS and JS -->
-<link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
-
 <script>
-    $(document).ready(function() {
-        // Initialize DataTable
-        $('#employeesTable').DataTable({
-            responsive: true
-        });
+    document.addEventListener('DOMContentLoaded', function () {
+        const deleteModal = document.getElementById('deleteModal');
 
-        // Initialize tooltips
-        $('[data-bs-toggle="tooltip"]').tooltip();
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const employeeId = button.getAttribute('data-employee');
+
+            const form = document.getElementById('deleteForm');
+            form.action = "{{ route('employees.destroy', ':id') }}".replace(':id', employeeId);
+        });
     });
 </script>
-@endpush

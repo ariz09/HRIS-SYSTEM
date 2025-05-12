@@ -8,12 +8,13 @@ class CreateTimeRecordsTable extends Migration
 {
     public function up()
     {
+        Schema::dropIfExists('time_records');
         Schema::create('time_records', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('employee_id')->constrained();
-            $table->enum('type', ['time_in', 'time_out', 'break_in', 'break_out']);
+            $table->foreignId('user_id')->constrained();
+            $table->enum('type', ['time_in', 'time_out']);
             $table->timestamp('recorded_at');
-            $table->string('status')->default('pending');
+            $table->string('status')->default('active');
             $table->timestamps();
         });
     }

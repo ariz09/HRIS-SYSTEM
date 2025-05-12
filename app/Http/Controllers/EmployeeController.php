@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\PersonalInfo;
@@ -15,6 +14,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 class EmployeeController extends Controller
 {
@@ -23,14 +23,16 @@ class EmployeeController extends Controller
         $employees = EmploymentInfo::with('personalInfo', 'agency', 'position', 'employmentStatus', 'department', 'employmentType')
             ->orderBy('employee_number')
             ->paginate(10);
-            foreach ($employees as $employee) {
-                \Log::info("Employee #{$employee->id} - Employment Type ID: {$employee->employment_type_id}");
-                if ($employee->employmentType) {
-                    \Log::info("Found employment type: {$employee->employmentType->name}");
-                } else {
-                    \Log::warning("No employment type found for employee #{$employee->id}");
-                }
+
+        foreach ($employees as $employee) {
+            \Log::info("Employee #{$employee->id} - Employment Type ID: {$employee->employment_type_id}");
+            if ($employee->employmentType) {
+                \Log::info("Found employment type: {$employee->employmentType->name}");
+            } else {
+                \Log::warning("No employment type found for employee #{$employee->id}");
             }
+        }
+
         return view('employees.index', compact('employees'));
     }
 
@@ -52,7 +54,8 @@ class EmployeeController extends Controller
             'statuses' => EmploymentStatus::all(),
             'employmentTypes' => EmploymentType::all(),
             'cdmLevels' => CDMLevel::all(),
-            'defaultEmployeeNumber' => $defaultEmployeeNumber
+            'defaultEmployeeNumber' => $defaultEmployeeNumber,
+            'isEdit' => false // Pass false when creating
         ]);
     }
 
@@ -135,10 +138,90 @@ class EmployeeController extends Controller
         }
     }
 
+    public function edit(EmploymentInfo $employee)
+{
+    $employee->load(['personalInfo']); // Or use 'employee' if that's the relationship name
+
+    return view('employees.edit', [
+        'employee' => $employee,
+        'statuses' => EmploymentStatus::all(),
+        'employmentTypes' => EmploymentType::all(),
+        'agencies' => Agency::all(),
+        'departments' => Department::all(),
+        'cdmLevels' => CDMLevel::all(),
+        'positions' => Position::all(),
+        'isEdit' => true
+    ]);
+}
+
+
+    public function update(Request $request, EmploymentInfo $employee)
+    {
+        $request->validate([
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'hiring_date' => 'required|date',
+            'basic_pay' => 'required|numeric',
+            'employment_type_id' => 'required|exists:employment_types,id',
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            // Update Personal Info
+            if ($employee->personalInfo) {
+                $employee->personalInfo->update([
+                    'first_name' => $request->first_name,
+                    'middle_name' => $request->middle_name,
+                    'last_name' => $request->last_name,
+                    'name_suffix' => $request->name_suffix,
+                    'preferred_name' => $request->preferred_name,
+                    'gender' => $request->gender,
+                    'birthday' => $request->birthday,
+                    'email' => $request->email,
+                    'phone_number' => $request->phone_number,
+                    'civil_status' => $request->civil_status,
+                ]);
+            }
+
+            // Update Employment Info
+            $employee->update([
+                'hiring_date' => $request->hiring_date,
+                'employment_status_id' => $request->employment_status_id,
+                'agency_id' => $request->agency_id,
+                'department_id' => $request->department_id,
+                'cdm_level_id' => $request->cdm_level_id,
+                'position_id' => $request->position_id,
+                'employment_type_id' => $request->employment_type_id,
+            ]);
+
+            // Update Compensation Info
+            if ($employee->compensationPackage) {
+                $employee->compensationPackage->update([
+                    'basic_pay' => $request->basic_pay,
+                    'rata' => $request->rata,
+                    'comm_allowance' => $request->comm_allowance,
+                    'transpo_allowance' => $request->transpo_allowance,
+                    'parking_toll_allowance' => $request->parking_toll_allowance,
+                    'clothing_allowance' => $request->clothing_allowance,
+                    'atm_account_number' => $request->atm_account_number,
+                    'bank_name' => $request->bank_name,
+                ]);
+            }
+
+            DB::commit();
+            return redirect()->route('employees.index')->with('success', 'Employee updated successfully.');
+        } catch (\Exception $e) {
+            DB::rollback();
+            Log::error('Error updating employee: ' . $e->getMessage());
+            return redirect()->back()->with('error', 'Something went wrong. Please try again.');
+        }
+    }
+
     public function destroy(EmploymentInfo $employee)
     {
         try {
-            \DB::beginTransaction();
+            DB::beginTransaction();
 
             // Delete related records
             if ($employee->compensationPackage) {
@@ -157,10 +240,10 @@ class EmployeeController extends Controller
             // Finally delete the employee
             $employee->delete();
 
-            \DB::commit();
+            DB::commit();
             return redirect()->route('employees.index')->with('success', 'Employee deleted successfully');
         } catch (\Exception $e) {
-            \DB::rollback();
+            DB::rollback();
             Log::error('Error deleting employee: ' . $e->getMessage());
             return redirect()->route('employees.index')->with('error', 'Error deleting employee: ' . $e->getMessage());
         }

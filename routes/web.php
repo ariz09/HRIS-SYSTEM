@@ -48,22 +48,25 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/dashboard/action', [DashboardController::class, 'handleAction'])->name('dashboard.action');
 
     // Profile
-    Route::prefix('profile')->group(function () {
+  /*   Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
         Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    });
+    }); */
 
 
 
     // Employee Routes
 Route::prefix('employees')->name('employees.')->group(function () {
+    Route::get('{employee}/edit', [EmployeeController::class, 'edit'])->name('edit');
+    
     Route::resource('personal_infos', PersonalInfoController::class);
     Route::resource('emergency-contact', EmployeeEmergencyContactController::class)->except(['show']);
     Route::resource('dependent', EmployeeDependentController::class)->except(['show']);
     Route::resource('education', EmployeeEducationController::class)->except(['show']);
     Route::resource('employment-history', EmployeeEmploymentHistoryController::class)->except(['show']);
 });
+
 
 // Main employees resource route (this already includes the delete route)
 Route::resource('employees', EmployeeController::class);

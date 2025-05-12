@@ -7,14 +7,18 @@ use Illuminate\Database\Eloquent\Model;
 class TimeRecord extends Model
 {
     protected $fillable = [
-        'employee_id',
+        'user_id',
         'type',
         'recorded_at',
         'status'
     ];
 
-    public function employee()
+    protected $casts = [
+        'recorded_at' => 'datetime',
+    ];
+
+    public function user()
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(User::class);
     }
 }

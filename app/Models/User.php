@@ -2,26 +2,21 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, Notifiable, HasRoles;
 
     protected $fillable = [
         'name',
         'email',
         'password',
-        'employee_id',
-        'temp_password',
-        'password_changed',
-        'is_active'
+        'is_active',
+        'last_login_at',
     ];
 
     protected $hidden = [
@@ -32,26 +27,20 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
-        'password_changed' => 'boolean',
+        'is_active' => 'boolean',
+        'last_login_at' => 'datetime',
     ];
 
-    public function employeeInfo(): HasOne
+    public function timeRecords()
     {
-        return $this->hasOne(EmployeeInfo::class);
+        return $this->hasMany(TimeRecord::class);
     }
 
-    public function roles(): BelongsToMany
+    public function getLatestTimeRecord()
     {
-        return $this->belongsToMany(Role::class);
-    }
-
-    /**
-     * Check if the user is an admin
-     *
-     * @return bool
-     */
-    public function isAdmin()
-    {
-        return $this->hasRole('admin');
+        return $this->timeRecords()
+            ->whereDate('recorded_at', today())
+            ->latest()
+            ->first();
     }
 }

@@ -59,6 +59,11 @@ Route::middleware(['auth'])->group(function () {
     // Employee Routes
 Route::prefix('employees')->name('employees.')->group(function () {
     Route::get('{employee}/edit', [EmployeeController::class, 'edit'])->name('edit');
+
+      Route::get('/template-download', [EmployeeController::class, 'downloadTemplate'])->name('template.download');
+      Route::post('/bulk-upload', [EmployeeController::class, 'bulkUpload'])->name('bulkUpload');
+
+
     
     Route::resource('personal_infos', PersonalInfoController::class);
     Route::resource('emergency-contact', EmployeeEmergencyContactController::class)->except(['show']);

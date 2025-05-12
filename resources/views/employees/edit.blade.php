@@ -4,11 +4,13 @@
     <x-success-alert :message="session('success')" />
     <x-error-alert :message="session('error')" />
 
-    <div class="container py-4">
-        <div class="card shadow border-0 rounded-3 mb-4">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
-                <h5 class="mb-0">Edit Employee</h5>
-            </div>
+  <div class="container-fluid px-4">
+    <h1 class="mt-4">Employee Management</h1>
+    <ol class="breadcrumb mb-4">
+        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+        <li class="breadcrumb-item"><a href="{{ route('employees.index') }}">Employees</a></li>
+        <li class="breadcrumb-item active">Edit Employee</li>
+    </ol>
             <div class="card-body">
                 <form action="{{ route('employees.update', $employee->id) }}" method="POST">
                     @csrf
@@ -209,8 +211,8 @@
                     </div>
 
                     <!-- Submit -->
-                    <div class="form-group">
-                        <button type="submit" class="btn btn-primary">Update Employee</button>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary rounded-pill shadow-sm">Update Employee</button>
                     </div>
                 </form>
             </div>

@@ -15,9 +15,25 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Response;
 
 class EmployeeController extends Controller
 {
+
+    private function generateEmployeeNumber()
+{
+    $latestEmployee = EmploymentInfo::orderBy('employee_number', 'desc')->first();
+    $defaultEmployeeNumber = '000001';
+
+    if ($latestEmployee) {
+        $latestNumber = (int)$latestEmployee->employee_number;
+        $defaultEmployeeNumber = str_pad($latestNumber + 1, 6, '0', STR_PAD_LEFT);
+    }
+
+    return $defaultEmployeeNumber;
+}
+
     public function index()
     {
         $employees = EmploymentInfo::with('personalInfo', 'agency', 'position', 'employmentStatus', 'department', 'employmentType')
@@ -38,15 +54,7 @@ class EmployeeController extends Controller
 
     public function create()
     {
-        // Generate default employee number
-        $latestEmployee = EmploymentInfo::orderBy('employee_number', 'desc')->first();
-        $defaultEmployeeNumber = '000001';
-
-        if ($latestEmployee) {
-            $latestNumber = (int)$latestEmployee->employee_number;
-            $defaultEmployeeNumber = str_pad($latestNumber + 1, 6, '0', STR_PAD_LEFT);
-        }
-
+        
         return view('employees.create', [
             'agencies' => Agency::all(),
             'positions' => Position::all(),
@@ -54,7 +62,7 @@ class EmployeeController extends Controller
             'statuses' => EmploymentStatus::all(),
             'employmentTypes' => EmploymentType::all(),
             'cdmLevels' => CDMLevel::all(),
-            'defaultEmployeeNumber' => $defaultEmployeeNumber,
+            'defaultEmployeeNumber' => $this->generateEmployeeNumber(),
             'isEdit' => false // Pass false when creating
         ]);
     }
@@ -248,4 +256,121 @@ class EmployeeController extends Controller
             return redirect()->route('employees.index')->with('error', 'Error deleting employee: ' . $e->getMessage());
         }
     }
+
+    public function bulkUpload(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|file|mimes:csv,txt',
+        ]);
+    
+        $path = $request->file('file')->getRealPath();
+        $data = array_map('str_getcsv', file($path));
+        $header = array_map('trim', array_shift($data));
+    
+        // Get the latest number only once
+        $latestEmployee = EmploymentInfo::orderBy('employee_number', 'desc')->first();
+        $latestNumber = $latestEmployee ? (int)$latestEmployee->employee_number : 0;
+    
+        foreach ($data as $row) {
+            $row = array_combine($header, $row);
+    
+            // Generate employee number
+            $latestNumber++;
+            $newEmployeeNumber = str_pad($latestNumber, 6, '0', STR_PAD_LEFT);
+    
+            // Create user
+            $user = User::create([
+                'name' => $row['first_name'] . ' ' . $row['last_name'],
+                'email' => $row['email'],
+                'password' => bcrypt('PassW0rd@2025'),
+            ]);
+    
+            // Create personal info
+            PersonalInfo::create([
+                'user_id' => $user->id,
+                'first_name' => $row['first_name'],
+                'middle_name' => $row['middle_name'],
+                'last_name' => $row['last_name'],
+                'name_suffix' => $row['name_suffix'],
+                'preferred_name' => $row['preferred_name'],
+                'gender' => $row['gender'],
+                'birthday' => $row['birthday'],
+                'email' => $row['email'],
+                'phone_number' => $row['phone_number'],
+                'civil_status' => $row['civil_status'],
+            ]);
+    
+            // Create employment info
+            EmploymentInfo::create([
+                'user_id' => $user->id,
+                'employee_number' => $newEmployeeNumber,
+                'hiring_date' => $row['hiring_date'],
+                'employment_status_id' => $row['employment_status_id'],
+                'agency_id' => $row['agency_id'],
+                'department_id' => $row['department_id'],
+                'cdm_level_id' => $row['cdm_level_id'],
+                'position_id' => $row['position_id'],
+                'employment_type_id' => $row['employment_type_id'],
+            ]);
+    
+            // Compensation info
+            CompensationPackage::create([
+                'employee_number' => $newEmployeeNumber,
+                'basic_pay' => $row['basic_pay'],
+                'rata' => $row['rata'],
+                'comm_allowance' => $row['comm_allowance'],
+                'transpo_allowance' => $row['transpo_allowance'],
+                'parking_toll_allowance' => $row['parking_toll_allowance'],
+                'clothing_allowance' => $row['clothing_allowance'],
+                'atm_account_number' => $row['atm_account_number'],
+                'bank_name' => $row['bank_name'],
+            ]);
+        }
+    
+        return redirect()->back()->with('success', 'Bulk upload successful.');
+    }
+
+
+public function downloadTemplate()
+{
+    $headers = [
+        'first_name', 'middle_name', 'last_name', 'name_suffix', 'preferred_name', 'gender', 'birthday',
+        'email', 'phone_number', 'civil_status', 'hiring_date', 'employment_status_id', 'agency_id',
+        'department_id', 'cdm_level_id', 'position_id', 'employment_type_id', 'basic_pay', 'rata',
+        'comm_allowance', 'transpo_allowance', 'parking_toll_allowance', 'clothing_allowance',
+        'atm_account_number', 'bank_name'
+    ];
+
+    // Sample data (IDs from reference tables)
+    $sample = [[
+        'Juan', 'Dela', 'Cruz', '', 'JD', 'Male', '1990-01-01',
+        'juan@example.com', '09171234567', 'Single', '2024-01-15',
+        EmploymentStatus::first()?->id ?? '',
+        Agency::first()?->id ?? '',
+        Department::first()?->id ?? '',
+        CDMLevel::first()?->id ?? '',
+        Position::first()?->id ?? '',
+        EmploymentType::first()?->id ?? '',
+        '25000', '5000', '2000', '1500', '1000',
+        '1234567890', 'BPI'
+    ]];
+
+    $callback = function () use ($headers, $sample) {
+        $file = fopen('php://output', 'w');
+        fputcsv($file, $headers);
+
+        foreach ($sample as $row) {
+            fputcsv($file, $row);
+        }
+
+        fclose($file);
+    };
+
+    return Response::stream($callback, 200, [
+        "Content-Type" => "text/csv",
+        "Content-Disposition" => "attachment; filename=employee_upload_template.csv",
+    ]);
+}
+    
+
 }

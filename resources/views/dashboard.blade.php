@@ -74,9 +74,19 @@
             </div>
 
             <div class="btn-block-custom">
-                <button class="btn btn-success" id="time-in"><i class="fas fa-sign-in-alt mr-1"></i> Login</button>
-                <button class="btn btn-danger" id="time-out"><i class="fas fa-sign-out-alt mr-1"></i> Logout</button>
+                @if($canTimeIn)
+                    <button class="btn btn-success" id="time-in"><i class="fas fa-sign-in-alt mr-1"></i> Time In</button>
+                @endif
+                @if($canTimeOut)
+                    <button class="btn btn-danger" id="time-out"><i class="fas fa-sign-out-alt mr-1"></i> Time Out</button>
+                @endif
             </div>
+
+            @if($statusMessage)
+                <div class="alert alert-info mt-3">
+                    {{ $statusMessage }}
+                </div>
+            @endif
 
             <div class="card shadow mt-4">
                 <div class="card-header py-3">
@@ -87,7 +97,7 @@
                         <table class="table table-bordered table-sm">
                             <thead class="thead-light">
                                 <tr>
-                                    <th>Employee</th>
+                                    <th>User</th>
                                     <th>Type</th>
                                     <th>Time</th>
                                     <th>Status</th>
@@ -97,9 +107,9 @@
                                 @if($timeRecords && $timeRecords->count())
                                     @foreach($timeRecords as $record)
                                         <tr>
-                                            <td>{{ $record->employee->first_name }} {{ $record->employee->last_name }}</td>
+                                            <td>{{ $record->user->name }}</td>
                                             <td>{{ ucfirst(str_replace('_', ' ', $record->type)) }}</td>
-                                            <td>{{ $record->recorded_at->format('H:i:s') }}</td>
+                                            <td>{{ is_string($record->recorded_at) ? $record->recorded_at : $record->recorded_at->format('H:i:s') }}</td>
                                             <td>{{ ucfirst($record->status) }}</td>
                                         </tr>
                                     @endforeach
@@ -135,6 +145,11 @@
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
+        console.log('DOM Content Loaded'); // Debug log
+
+        // Set up axios defaults
+        axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+
         const events = @json($events); // Pass the events as JSON
 
         var calendar = new FullCalendar.Calendar(document.getElementById('holiday-calendar'), {
@@ -154,8 +169,122 @@
         });
 
         calendar.render();  // Render the calendar
-    });
 
+        // Time In/Out functionality
+        const timeInBtn = document.getElementById('time-in');
+        const timeOutBtn = document.getElementById('time-out');
+        const timeRecordsBody = document.getElementById('time-records-body');
+        const btnBlockCustom = document.querySelector('.btn-block-custom');
+
+        console.log('Time In Button:', timeInBtn); // Debug log
+        console.log('Time Out Button:', timeOutBtn); // Debug log
+
+        function updateTimeRecords(records) {
+            console.log('Updating time records:', records); // Debug log
+            timeRecordsBody.innerHTML = records.length ? records.map(record => `
+                <tr>
+                    <td>${record.user.name}</td>
+                    <td>${record.type.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</td>
+                    <td>${new Date(record.recorded_at).toLocaleTimeString()}</td>
+                    <td>${record.status.charAt(0).toUpperCase() + record.status.slice(1)}</td>
+                </tr>
+            `).join('') : `
+                <tr>
+                    <td colspan="4" class="text-center text-muted">No time transactions yet.</td>
+                </tr>
+            `;
+        }
+
+        function updateButtons(canTimeIn, canTimeOut) {
+            console.log('Updating buttons:', { canTimeIn, canTimeOut }); // Debug log
+            btnBlockCustom.innerHTML = '';
+
+            if (canTimeIn) {
+                btnBlockCustom.innerHTML += `
+                    <button class="btn btn-success" id="time-in">
+                        <i class="fas fa-sign-in-alt mr-1"></i> Time In
+                    </button>
+                `;
+                const newTimeInBtn = document.getElementById('time-in');
+                if (newTimeInBtn) {
+                    newTimeInBtn.addEventListener('click', () => {
+                        console.log('Time In button clicked'); // Debug log
+                        handleTimeAction('time_in');
+                    });
+                }
+            }
+
+            if (canTimeOut) {
+                btnBlockCustom.innerHTML += `
+                    <button class="btn btn-danger" id="time-out">
+                        <i class="fas fa-sign-out-alt mr-1"></i> Time Out
+                    </button>
+                `;
+                const newTimeOutBtn = document.getElementById('time-out');
+                if (newTimeOutBtn) {
+                    newTimeOutBtn.addEventListener('click', () => {
+                        console.log('Time Out button clicked'); // Debug log
+                        handleTimeAction('time_out');
+                    });
+                }
+            }
+        }
+
+        function handleTimeAction(action) {
+            console.log('Handling time action:', action); // Debug log
+            axios.post('/dashboard/action', { action })
+                .then(response => {
+                    console.log('Server response:', response.data); // Debug log
+                    if (response.data.message) {
+                        // Show success message
+                        const alertDiv = document.createElement('div');
+                        alertDiv.className = 'alert alert-success alert-dismissible fade show';
+                        alertDiv.innerHTML = `
+                            ${response.data.message}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        `;
+                        document.querySelector('.container-fluid').insertBefore(alertDiv, document.querySelector('.row'));
+
+                        // Force reload the page immediately
+                        window.location.href = window.location.href;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error); // Debug log
+                    // Show error message
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = 'alert alert-danger alert-dismissible fade show';
+                    alertDiv.innerHTML = `
+                        ${error.response?.data?.message || 'An error occurred while processing your request.'}
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    `;
+                    document.querySelector('.container-fluid').insertBefore(alertDiv, document.querySelector('.row'));
+
+                    // Auto dismiss after 3 seconds
+                    setTimeout(() => alertDiv.remove(), 3000);
+                });
+        }
+
+        // Initial button setup
+        if (timeInBtn) {
+            console.log('Adding click listener to Time In button'); // Debug log
+            timeInBtn.addEventListener('click', () => {
+                console.log('Time In button clicked'); // Debug log
+                handleTimeAction('time_in');
+            });
+        }
+        if (timeOutBtn) {
+            console.log('Adding click listener to Time Out button'); // Debug log
+            timeOutBtn.addEventListener('click', () => {
+                console.log('Time Out button clicked'); // Debug log
+                handleTimeAction('time_out');
+            });
+        }
+    });
 </script>
 @endpush
 

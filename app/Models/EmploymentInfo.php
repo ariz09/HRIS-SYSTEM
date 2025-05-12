@@ -18,13 +18,9 @@ class EmploymentInfo extends Model
         'department_id',
         'cdm_level_id',
         'position_id',
-        'employmentType' 
+        'employment_type_id'
     ];
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
 
     public function department()
     {
@@ -51,12 +47,23 @@ class EmploymentInfo extends Model
         return $this->belongsTo(Agency::class);
     }
 
+    public function employmentType()
+    {
+        return $this->belongsTo(EmploymentType::class, 'employment_type_id');
+    }
+
     public function personalInfo()
     {
         return $this->hasOne(PersonalInfo::class, 'user_id', 'user_id');
     }
-    public function employmentType()
+
+    public function compensationPackage()
     {
-        return $this->belongsTo(EmploymentType::class, 'employment_type_id');
+        return $this->hasOne(CompensationPackage::class, 'employee_number', 'employee_number');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

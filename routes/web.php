@@ -47,7 +47,6 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard/action', [DashboardController::class, 'handleAction'])->name('dashboard.action');
 
-
     // Profile
     Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -55,21 +54,19 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
     });
 
-    // Employee Management
-    Route::resource('employee-info', EmployeeInfoController::class);
 
-    Route::get('/employees', [EmployeeController::class, 'index'])->name('employees.index');
-    Route::resource('employees', EmployeeController::class);
 
-    // Employee Details
-    Route::prefix('employees')->name('employees.')->group(function () {
-        Route::resource('personal_infos', PersonalInfoController::class);
-        Route::resource('emergency-contact', EmployeeEmergencyContactController::class)->except(['show']);
-        Route::resource('dependent', EmployeeDependentController::class)->except(['show']);
-        Route::resource('education', EmployeeEducationController::class)->except(['show']);
-        Route::resource('employment-history', EmployeeEmploymentHistoryController::class)->except(['show']);
-    });
+    // Employee Routes
+Route::prefix('employees')->name('employees.')->group(function () {
+    Route::resource('personal_infos', PersonalInfoController::class);
+    Route::resource('emergency-contact', EmployeeEmergencyContactController::class)->except(['show']);
+    Route::resource('dependent', EmployeeDependentController::class)->except(['show']);
+    Route::resource('education', EmployeeEducationController::class)->except(['show']);
+    Route::resource('employment-history', EmployeeEmploymentHistoryController::class)->except(['show']);
+});
 
+// Main employees resource route (this already includes the delete route)
+Route::resource('employees', EmployeeController::class);
     // Leave Management
     Route::resource('leaves', LeaveController::class)->names('leaves');
     Route::resource('leave-types', LeaveTypeController::class)->parameters(['leave-types' => 'leave_type'])->names('leave_types');

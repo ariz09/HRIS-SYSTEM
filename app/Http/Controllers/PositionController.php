@@ -10,16 +10,18 @@ use Illuminate\Support\Str;
 
 class PositionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Fetch positions with CDM Level relationship
-        $positions = Position::with('cdmLevel')->latest()->get();
+        $cdmLevelId = $request->query('cdm_level_id');
         
-        // Fetch active CDM Levels
-        $cdmLevels = CDMLevel::active()->get();  // Fetch active CDM levels
-
-        // Return view with positions and CDM levels
-        return view('positions.index', compact('positions', 'cdmLevels'));
+        $positions = Position::when($cdmLevelId, function($query) use ($cdmLevelId) {
+                return $query->where('cdm_level_id', $cdmLevelId);
+            })
+            ->get(['id', 'name']);
+        
+        return response()->json([
+            'positions' => $positions
+        ]);
     }
 
     public function store(Request $request)

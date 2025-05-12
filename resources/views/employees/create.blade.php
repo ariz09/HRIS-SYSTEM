@@ -1,6 +1,7 @@
 @extends('layouts.app')
-
 @section('content')
+<x-success-alert :message="session('success')" />
+    <x-error-alert :message="session('error')" />
 <div class="container">
     <div class="card mb-4">
         <div class="card-header">
@@ -73,8 +74,8 @@
                             </div>
                             <div class="card-body">
                                 <div class="form-group mb-3">
-                                    <label for="employee_number">Employee Number</label>
-                                    <input type="text" name="employee_number" id="employee_number" class="form-control" required>
+                                    <label>Employee Number</label>
+                                    <input type="text" class="form-control" value="{{ $defaultEmployeeNumber }}" >
                                 </div>
                                 <div class="form-group mb-3">
                                     <label for="hiring_date">Hiring Date</label>
@@ -113,10 +114,19 @@
                                     </select>
                                 </div>
                                 <div class="form-group mb-3">
+                                    <label for="cdm_level_id">CDM Level</label>
+                                    <select name="cdm_level_id" id="cdm_level_id" class="form-control">
+                                        @foreach($cdmLevels as $cdmLevel)
+                                            <option value="{{ $cdmLevel->id }}">{{ $cdmLevel->name }}</option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                <div class="form-group mb-3">
                                     <label for="position_id">Position</label>
                                     <select name="position_id" id="position_id" class="form-control">
+                                        <option value="">Select Position</option>
                                         @foreach($positions as $position)
-                                            <option value="{{ $position->id }}">{{ $position->name }}</option>
+                                            <option value="{{ $position->id }}" data-cdm-level="{{ $position->cdm_level_id }}">{{ $position->name }}</option>
                                         @endforeach
                                     </select>
                                 </div>
@@ -176,4 +186,63 @@
         </div>
     </div>
 </div>
+
+<script>
+    // JavaScript to filter positions based on selected CDM level
+    document.getElementById('cdm_level_id').addEventListener('change', function() {
+        var selectedCDMLevelId = this.value;
+        var positions = document.querySelectorAll('#position_id option');
+        
+        positions.forEach(function(option) {
+            if (option.getAttribute('data-cdm-level') == selectedCDMLevelId || selectedCDMLevelId == "") {
+                option.style.display = "block"; // Show the option
+            } else {
+                option.style.display = "none"; // Hide the option
+            }
+        });
+    });
+</script>
 @endsection
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // CDM level change handler
+    const cdmSelect = document.getElementById('cdm_level_id');
+    if (cdmSelect) { // Check if element exists
+        cdmSelect.addEventListener('change', function () {
+            const selectedCDMLevelId = this.value;
+            const positionSelect = document.getElementById('position_id');
+            
+            // Reset to default option immediately
+            positionSelect.innerHTML = '<option value="">Select Position</option>';
+            positionSelect.value = '';
+            
+            if (!selectedCDMLevelId) return;
+            
+            // Show loading state
+            positionSelect.innerHTML = '<option value="">Loading positions...</option>';
+            
+            fetch('/positions?cdm_level_id=' + selectedCDMLevelId)
+                .then(response => response.json())
+                .then(data => {
+                    positionSelect.innerHTML = '<option value="">Select Position</option>';
+                    data.positions.forEach(function (position) {
+                        const option = new Option(position.name, position.id);
+                        positionSelect.add(option);
+                    });
+                    positionSelect.value = '';
+                })
+                .catch(error => {
+                    console.error('Error fetching positions:', error);
+                    positionSelect.innerHTML = '<option value="">Error loading positions</option>';
+                });
+        });
+
+        // Trigger initial load if value exists
+        if (cdmSelect.value) {
+            cdmSelect.dispatchEvent(new Event('change'));
+        }
+    } else {
+        console.error('CDM Level select element not found');
+    }
+});
+</script>

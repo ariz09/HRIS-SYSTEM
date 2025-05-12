@@ -30,7 +30,7 @@ class EmployeeInfoController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'employee_number' => 'required|unique:employee_info|max:50',
+            'employee_number' => 'required|unique:employment_infos,employee_number',
             'first_name' => 'required|max:100',
             'last_name' => 'required|max:100',
             'gender' => 'required|in:1,2,3'
@@ -64,7 +64,7 @@ class EmployeeInfoController extends Controller
     public function update(Request $request, EmployeeInfo $employeeInfo)
     {
         $validated = $request->validate([
-            'employee_number' => 'required|max:50|unique:employee_info,employee_number,'.$employeeInfo->id,
+            'employee_number' => 'required|max:6|unique:employee_info,employee_number,'.$employeeInfo->id,
             'first_name' => 'required|max:100',
             'last_name' => 'required|max:100',
             'gender' => 'required|in:1,2,3'

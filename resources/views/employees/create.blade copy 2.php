@@ -12,70 +12,72 @@
         <div class="card-body">
             <form action="{{ route('employees.store') }}" method="POST">
                 @csrf
-                <!-- Personal Information -->
-                <div class="card mb-4 shadow-sm border-0">
-                    <div class="card-header bg-light">
-                        <h6 class="mb-0 text-primary fw-bold">Personal Information</h6>
-                    </div>
-                    <div class="card-body row g-3">
-                    <div class="col-md-3">
-                        <label for="employee_number" class="form-label">Employee ID</label>
-                        <input type="text" name="employee_number" id="employee_number" class="form-control rounded-2 shadow-sm" value="{{ $defaultEmployeeNumber }}" readonly>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="first_name" class="form-label">First Name</label>
-                        <input type="text" name="first_name" id="first_name" class="form-control rounded-2 shadow-sm" placeholder="Enter first name" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="middle_name" class="form-label">Middle Name</label>
-                        <input type="text" name="middle_name" id="middle_name" class="form-control rounded-2 shadow-sm" placeholder="Enter middle name">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="last_name" class="form-label">Last Name</label>
-                        <input type="text" name="last_name" id="last_name" class="form-control rounded-2 shadow-sm" placeholder="Enter last name" required>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="name_suffix" class="form-label">Name Suffix</label>
-                        <input type="text" name="name_suffix" id="name_suffix" class="form-control rounded-2 shadow-sm" placeholder="e.g. Jr., Sr.">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="preferred_name" class="form-label">Preferred Name</label>
-                        <input type="text" name="preferred_name" id="preferred_name" class="form-control rounded-2 shadow-sm" placeholder="Enter preferred name">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="gender" class="form-label">Gender</label>
-                        <select name="gender" id="gender" class="form-select rounded-2 shadow-sm">
-                            <option value="">Select gender</option>
-                            <option value="male">Male</option>
-                            <option value="female">Female</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="birthday" class="form-label">Birthday</label>
-                        <input type="date" name="birthday" id="birthday" class="form-control rounded-2 shadow-sm">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" name="email" id="email" class="form-control rounded-2 shadow-sm" placeholder="Enter email address">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="phone_number" class="form-label">Phone Number</label>
-                        <input type="text" name="phone_number" id="phone_number" class="form-control rounded-2 shadow-sm" placeholder="Enter phone number">
-                    </div>
-                    <div class="col-md-3">
-                        <label for="civil_status" class="form-label">Civil Status</label>
-                        <select name="civil_status" id="civil_status" class="form-select rounded-2 shadow-sm">
-                            <option value="">Select status</option>
-                            <option value="single">Single</option>
-                            <option value="married">Married</option>
-                            <option value="separated">Separated</option>
-                            <option value="widowed">Widowed</option>
-                        </select>
-                    </div>
-                </div>
 
-                </div>
+                <!-- Personal Information -->
+                <!-- Personal Information -->
+<div class="card mb-4 shadow-sm border-0">
+    <div class="card-header bg-light">
+        <h6 class="mb-0 text-primary fw-bold">Personal Information</h6>
+    </div>
+    <div class="card-body row g-3">
+    <div class="col-md-3">
+        <label for="employee_number" class="form-label">Employee ID</label>
+        <input type="text" name="employee_number" id="employee_number" class="form-control rounded-2 shadow-sm" value="{{ $defaultEmployeeNumber }}" readonly>
+    </div>
+    <div class="col-md-3">
+        <label for="first_name" class="form-label">First Name</label>
+        <input type="text" name="first_name" id="first_name" class="form-control rounded-2 shadow-sm" placeholder="Enter first name" required>
+    </div>
+    <div class="col-md-3">
+        <label for="middle_name" class="form-label">Middle Name</label>
+        <input type="text" name="middle_name" id="middle_name" class="form-control rounded-2 shadow-sm" placeholder="Enter middle name">
+    </div>
+    <div class="col-md-3">
+        <label for="last_name" class="form-label">Last Name</label>
+        <input type="text" name="last_name" id="last_name" class="form-control rounded-2 shadow-sm" placeholder="Enter last name" required>
+    </div>
+    <div class="col-md-3">
+        <label for="name_suffix" class="form-label">Name Suffix</label>
+        <input type="text" name="name_suffix" id="name_suffix" class="form-control rounded-2 shadow-sm" placeholder="e.g. Jr., Sr.">
+    </div>
+    <div class="col-md-3">
+        <label for="preferred_name" class="form-label">Preferred Name</label>
+        <input type="text" name="preferred_name" id="preferred_name" class="form-control rounded-2 shadow-sm" placeholder="Enter preferred name">
+    </div>
+    <div class="col-md-3">
+        <label for="gender" class="form-label">Gender</label>
+        <select name="gender" id="gender" class="form-select rounded-2 shadow-sm">
+            <option value="">Select gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <label for="birthday" class="form-label">Birthday</label>
+        <input type="date" name="birthday" id="birthday" class="form-control rounded-2 shadow-sm">
+    </div>
+    <div class="col-md-3">
+        <label for="email" class="form-label">Email</label>
+        <input type="email" name="email" id="email" class="form-control rounded-2 shadow-sm" placeholder="Enter email address">
+    </div>
+    <div class="col-md-3">
+        <label for="phone_number" class="form-label">Phone Number</label>
+        <input type="text" name="phone_number" id="phone_number" class="form-control rounded-2 shadow-sm" placeholder="Enter phone number">
+    </div>
+    <div class="col-md-3">
+        <label for="civil_status" class="form-label">Civil Status</label>
+        <select name="civil_status" id="civil_status" class="form-select rounded-2 shadow-sm">
+            <option value="">Select status</option>
+            <option value="single">Single</option>
+            <option value="married">Married</option>
+            <option value="separated">Separated</option>
+            <option value="widowed">Widowed</option>
+        </select>
+    </div>
+</div>
+
+</div>
 
 
                 <!-- Employment Information and Compensation in one row -->
@@ -113,16 +115,16 @@
                                 </div>
 
                                 <div class="mb-3">
-                                    <label for="position_id" class="form-label">Position</label>
-                                    <select name="position_id" id="position_id" class="form-select rounded-2 shadow-sm">
-                                        <option value="">Select Position</option>
-                                        @foreach($positions as $position)
-                                            <option value="{{ $position->id }}" data-cdm-level="{{ $position->cdm_level_id }}">{{ $position->name }}</option>
-                                        @endforeach
-                                    </select>
-                                </div>
+    <label for="position_id" class="form-label">Position</label>
+    <select name="position_id" id="position_id" class="form-select rounded-2 shadow-sm">
+        <option value="">Select Position</option>
+        @foreach($positions as $position)
+            <option value="{{ $position->id }}" data-cdm-level="{{ $position->cdm_level_id }}">{{ $position->name }}</option>
+        @endforeach
+    </select>
+</div>
 
-                                        <div class="mb-3">
+                                <div class="mb-3">
                                     <label for="hiring_date" class="form-label">Hiring Date</label>
                                     <input type="date" name="hiring_date" id="hiring_date" class="form-control rounded-2 shadow-sm">
                                 </div>

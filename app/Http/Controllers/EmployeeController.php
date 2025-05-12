@@ -23,7 +23,14 @@ class EmployeeController extends Controller
         $employees = EmploymentInfo::with('personalInfo', 'agency', 'position', 'employmentStatus', 'department', 'employmentType')
             ->orderBy('employee_number')
             ->paginate(10);
-
+            foreach ($employees as $employee) {
+                \Log::info("Employee #{$employee->id} - Employment Type ID: {$employee->employment_type_id}");
+                if ($employee->employmentType) {
+                    \Log::info("Found employment type: {$employee->employmentType->name}");
+                } else {
+                    \Log::warning("No employment type found for employee #{$employee->id}");
+                }
+            }
         return view('employees.index', compact('employees'));
     }
 

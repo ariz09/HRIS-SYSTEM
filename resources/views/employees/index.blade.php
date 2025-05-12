@@ -33,7 +33,7 @@
                                     <td>{{ optional($employee->agency)->name }}</td>
                                     <td>{{ optional($employee->position)->name }}</td>
                                     <td>{{ optional($employee->employmentStatus)->name }}</td>
-                                    <td>{{ optional($employee->employeeType)->name }}</td>
+                                    <td>{{ optional($employee->employmentType)->name ?? 'Not specified' }}</td>
                                     <td>
                                         <a href="{{ route('employees.edit', $employee) }}" class="btn btn-sm btn-warning"
                                             data-bs-toggle="tooltip" title="Edit Employee">

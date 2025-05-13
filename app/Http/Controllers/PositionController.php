@@ -13,16 +13,24 @@ class PositionController extends Controller
     public function index(Request $request)
     {
         $cdmLevelId = $request->query('cdm_level_id');
-        
-        $positions = Position::when($cdmLevelId, function($query) use ($cdmLevelId) {
+    
+        $positions = Position::with('cdmLevel')
+            ->when($cdmLevelId, function ($query) use ($cdmLevelId) {
                 return $query->where('cdm_level_id', $cdmLevelId);
             })
-            ->get(['id', 'name']);
-        
-        return response()->json([
-            'positions' => $positions
-        ]);
+            ->get();
+    
+        $cdmLevels = CDMLevel::all(); // 
+    
+        if ($request->wantsJson()) {
+            return response()->json([
+                'positions' => $positions
+            ]);
+        }
+    
+        return view('positions.index', compact('positions', 'cdmLevels'));
     }
+
 
     public function store(Request $request)
     {

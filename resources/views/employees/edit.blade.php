@@ -233,7 +233,11 @@
 
                 positionSelect.innerHTML = '<option value="">Loading positions...</option>';
 
-                fetch('/positions?cdm_level_id=' + selectedCDMLevelId)
+                fetch('/positions?cdm_level_id=' + selectedCDMLevelId, {
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                })
                     .then(response => response.json())
                     .then(data => {
                         positionSelect.innerHTML = '<option value="">Select Position</option>';

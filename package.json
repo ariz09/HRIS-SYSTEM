@@ -8,15 +8,14 @@
     "devDependencies": {
         "@tailwindcss/forms": "^0.5.2",
         "@tailwindcss/vite": "^4.0.0",
-        "admin-lte": "^3.2",
+        "admin-lte": "^4.0.0-beta3",
         "alpinejs": "^3.4.2",
         "autoprefixer": "^10.4.2",
-        "axios": "^1.8.2",
-        "bootstrap": "^4.6",
+        "axios": "^1.9.0",
+        "bootstrap": "^5.3.6",
         "concurrently": "^9.0.1",
         "font-awesome": "^4.7",
         "husky": "^9.1.7",
-
         "jquery": "^3.6",
         "laravel-vite-plugin": "^1.2.0",
         "postcss": "^8.4.31",

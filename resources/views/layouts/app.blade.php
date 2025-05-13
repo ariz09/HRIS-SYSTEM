@@ -13,7 +13,7 @@
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="{{ asset('css/employee-form.css') }}" rel="stylesheet">
-    <!-- SB Admin 2 CSS -->
+    <!-- Custom Styles -->
     <link href="{{ asset('css/styles.css') }}" rel="stylesheet">
     
     @stack('styles')
@@ -58,16 +58,6 @@
             }
         });
     </script>
-
-    <!-- Tab Switching JavaScript for Bootstrap 5 -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var myTab = new bootstrap.Tab(document.querySelector('#personal-info-tab')); // Initialize the first tab
-            myTab.show(); // Show the first tab on load
-        });
-    </script>
-
-    <!-- Your other scripts -->
     @stack('scripts')
-</body>
+    </body>
 </html>

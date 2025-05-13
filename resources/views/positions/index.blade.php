@@ -41,7 +41,7 @@
                             <td class="d-none">{{ $loop->iteration }}</td>
                             <td class="d-none">{{ $position->code }}</td>
                             <td>{{ $position->name }}</td>
-                            <td>{{ $position->cdmLevel->name }}</td>
+                            <td>{{ $position->cdmLevel?->name ?? '—' }}</td>
                             <td>
                                 @if($position->status)
                                     <span class="badge bg-success">Active</span>

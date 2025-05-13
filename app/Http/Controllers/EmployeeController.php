@@ -75,6 +75,8 @@ class EmployeeController extends Controller
             'hiring_date' => 'required|date',
             'basic_pay' => 'required|numeric',
             'employment_type_id' => 'required|exists:employment_types,id',
+            'position_id' => 'required|exists:positions,id', // Add this line
+            'cdm_level_id' => 'required|exists:cdm_levels,id', // Add this line
         ]);
 
         try {

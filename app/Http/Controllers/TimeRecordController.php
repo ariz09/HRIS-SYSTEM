@@ -11,24 +11,20 @@ class TimeRecordController extends Controller
 {
     public function index(Request $request)
     {
+        $user = Auth::user();
 
-        
-        // For API requests (from JavaScript)
         if ($request->wantsJson()) {
             return response()->json(
-                TimeRecord::with('user')
+                TimeRecord::where('user_id', $user->id)
                     ->whereDate('recorded_at', Carbon::today())
                     ->orderBy('recorded_at', 'desc')
                     ->get()
             );
         }
 
-        // For regular page loads
-        return TimeRecord::with('user')
-            ->whereDate('recorded_at', Carbon::today())
-            ->orderBy('recorded_at', 'desc')
-            ->get();
+        return view('time_records.index'); // We'll create this Blade view
     }
+
 
     public function timeIn(Request $request)
 {
@@ -129,3 +125,5 @@ class TimeRecordController extends Controller
 }
 
 }
+
+

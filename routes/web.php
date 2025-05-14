@@ -48,14 +48,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard/action', [DashboardController::class, 'handleAction'])->name('dashboard.action');
 
-    // Time Records Routes
-    Route::prefix('time-records')->group(function () {
-        Route::get('/', [TimeRecordController::class, 'index'])->name('time-records');
-        Route::post('/time-in', [TimeRecordController::class, 'timeIn'])->name('time-in');
-        Route::post('/time-out', [TimeRecordController::class, 'timeOut'])->name('time-out');
-        Route::post('/time-out/update-status', [TimeRecordController::class, 'updateTimeInStatus'])->name('time-out.update-status');
+// Remove this if you're grouping everything:
+Route::get('/time-records', [TimeRecordController::class, 'index'])->name('time-records.index');
 
-    });
+// Inside the group — make sure the route name is correct
+Route::prefix('time-records')->group(function () {
+    Route::get('/', [TimeRecordController::class, 'index'])->name('time-records.index'); // <-- Fixed here
+    Route::post('/time-in', [TimeRecordController::class, 'timeIn'])->name('time-in');
+    Route::post('/time-out', [TimeRecordController::class, 'timeOut'])->name('time-out');
+    Route::post('/time-out/update-status', [TimeRecordController::class, 'updateTimeInStatus'])->name('time-out.update-status');
+});
+
     // Profile
   /*   Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');

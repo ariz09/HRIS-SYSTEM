@@ -1,8 +1,29 @@
 @extends('layouts.app')
 @section('title', 'HRIS Dashboard')
 @section('content')
+
+<!-- Logout Confirmation Modal -->
+<div class="modal fade" id="logoutConfirmModal" tabindex="-1" aria-labelledby="logoutConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirm Time-Out</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to time out and log your session?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button id="confirm-time-out" type="button" class="btn btn-danger">Yes, Time Out</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <x-success-alert :message="session('success')" />
 <x-error-alert :message="session('error')" />
+
 @push('styles')
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
@@ -10,27 +31,22 @@
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
-
     .fc {
         font-size: 0.9rem;
     }
-
     .fc-toolbar-title {
         font-weight: 600;
         font-size: 1.25rem;
     }
-
     #holiday-calendar {
         min-height: 500px;
     }
-
     .fc-event-ph {
         background-color: #e74a3b !important;
         border-color: #e74a3b !important;
         color: white !important;
         font-weight: 500;
     }
-
     .mac-clock {
         font-size: 3rem;
         font-weight: bold;
@@ -42,7 +58,6 @@
         box-shadow: inset 0 0 20px #ccc;
         font-family: 'Courier New', Courier, monospace;
     }
-
     .btn-block-custom {
         display: flex;
         justify-content: space-around;
@@ -50,26 +65,23 @@
         margin-top: 1rem;
         flex-wrap: wrap;
     }
-
     .btn-block-custom .btn {
         flex: 1 1 30%;
         font-size: 1rem;
         padding: 15px;
     }
-    /* Add this to your dashboard's styles */
-.alert {
-    position: fixed;
-    top: 70px; /* Adjust based on your navbar height */
-    right: 20px;
-    z-index: 9999; /* Very high to ensure it's on top */
-    max-width: 400px;
-    animation: slideIn 0.5s forwards;
-}
-
-@keyframes slideIn {
-    from { transform: translateX(100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-}
+    .alert {
+        position: fixed;
+        top: 70px;
+        right: 20px;
+        z-index: 9999;
+        max-width: 400px;
+        animation: slideIn 0.5s forwards;
+    }
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
 </style>
 @endpush
 
@@ -79,7 +91,7 @@
     </div>
 
     <div class="row">
-        <!-- Timer + Buttons + Table -->
+        <!-- Clock, Buttons, Table -->
         <div class="col-md-4">
             <div x-data="{ time: new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' }) }"
                  x-init="setInterval(() => { time = new Date().toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' }) }, 1000)">
@@ -106,27 +118,19 @@
                                 </tr>
                             </thead>
                             <tbody id="time-records-body">
-                                @if($timeRecords && $timeRecords->count())
-                                    @foreach($timeRecords as $record)
-                                        <tr>
-                                            <td>{{ ucfirst(str_replace('_', ' ', $record->type)) }}</td>
-                                            <td>{{ $record->recorded_at->format('H:i:s') }}</td>
-                                            <td>{{ ucfirst($record->status) }}</td>
-                                        </tr>
-                                    @endforeach
-                                @else
-                                    <tr>
-                                        <td colspan="4" class="text-center text-muted">No time transactions yet.</td>
-                                    </tr>
-                                @endif
+                                <tr>
+                                    <td colspan="3" class="text-center text-muted">Loading...</td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
             </div>
+           <a href="{{ route('time-records.index') }}" class="btn btn-primary mt-3">View All Time Records</a>
+
         </div>
 
-        <!-- Holiday Calendar -->
+        <!-- Calendar -->
         <div class="col-md-8">
             <div class="card shadow mb-4">
                 <div class="card-header py-3">
@@ -145,108 +149,183 @@
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const events = @json($events);
-
-        var calendar = new FullCalendar.Calendar(document.getElementById('holiday-calendar'), {
-            initialView: 'dayGridMonth',
-            events: events.map(event => ({
-                title: event.title,
-                start: event.start,
-                backgroundColor: '#e74a3b',
-                borderColor: '#e74a3b',
-                textColor: 'white',
-            })),
-            editable: false,
-            droppable: false,
-            eventClick: function(info) {
-                alert('Holiday: ' + info.event.title);
-            },
-        });
-
-        calendar.render();
-    });
-
-
-    document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
+    // Initialize elements
     const timeInBtn = document.getElementById('time-in');
     const timeOutBtn = document.getElementById('time-out');
+    const confirmTimeOutBtn = document.getElementById('confirm-time-out');
+    const timeOutModal = new bootstrap.Modal(document.getElementById('logoutConfirmModal'));
 
-    // Set CSRF token for all Axios requests
-    axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    // Set CSRF token
+    axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').content;
+    axios.defaults.headers.common['Accept'] = 'application/json';
 
-    // Function to show alerts (success & error)
+    // State management
+    let isProcessing = false;
+
+    // Improved alert function
     function showAlert(type, message) {
+        // Remove existing alerts first
+        const existingAlerts = document.querySelectorAll('.alert');
+        existingAlerts.forEach(alert => {
+            const bsAlert = bootstrap.Alert.getInstance(alert);
+            if (bsAlert) bsAlert.close();
+        });
+
         const alert = document.createElement('div');
-        alert.className = `alert alert-${type}`;
+        alert.className = `alert alert-${type} alert-dismissible fade show`;
         alert.style.position = 'fixed';
         alert.style.top = '70px';
         alert.style.right = '20px';
         alert.style.zIndex = '9999';
         alert.style.maxWidth = '400px';
-        alert.textContent = message;
+        alert.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle me-2"></i>
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
         document.body.appendChild(alert);
-        setTimeout(() => alert.remove(), 5000);
+
+        setTimeout(() => {
+            const bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+            bsAlert.close();
+        }, 5000);
     }
 
-    // Function to handle Time-In/Time-Out
-    function handleTimeAction(url, actionName) {
-        axios.post(url)
-            .then(response => {
-                if (response.data.success) {
-                    showAlert('success', `${actionName} recorded successfully!`);
-                    loadTimeRecords(); // Refresh records without page reload
-                } else {
-                    showAlert('danger', response.data.message || `Failed to record ${actionName}`);
-                }
-            })
-            .catch(error => {
-                let message = 'Something went wrong. Please try again.';
-                if (error.response?.data?.message) {
-                    message = error.response.data.message;
-                }
-                showAlert('danger', message);
-            });
+    // Time-in handler
+    async function handleTimeIn() {
+        if (isProcessing) return;
+        isProcessing = true;
+        timeInBtn.disabled = true;
+
+        try {
+            const response = await axios.post('{{ route("time-in") }}');
+            
+            if (response.data.success) {
+                showAlert('success', 'Time-In recorded successfully!');
+                await loadTimeRecords();
+            } else {
+                showAlert('warning', response.data.message || 'Time-In failed. Please try again.');
+            }
+        } catch (error) {
+            const errorMsg = error.response?.data?.message || 
+                           error.response?.data?.error || 
+                           'An error occurred during Time-In';
+            showAlert('danger', errorMsg);
+        } finally {
+            isProcessing = false;
+            timeInBtn.disabled = false;
+        }
     }
 
-    // Function to load time records (without page reload)
-    function loadTimeRecords() {
-        axios.get('{{ route("time-records") }}')
-            .then(response => {
-                const recordsBody = document.getElementById('time-records-body');
-                recordsBody.innerHTML = '';
-                
-                if (response.data.length === 0) {
-                    recordsBody.innerHTML = `
-                        <tr>
-                            <td colspan="4" class="text-center text-muted">No time transactions yet.</td>
-                        </tr>
-                    `;
-                    return;
-                }
-                
-                response.data.forEach(record => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
- 
-                        <td>${record.type.replace('_', ' ')}</td>
-                        <td>${new Date(record.recorded_at).toLocaleTimeString()}</td>
-                        <td>${record.status}</td>
-                    `;
-                    recordsBody.appendChild(row);
-                });
-            })
-            .catch(error => {
-                console.error('Failed to fetch time records:', error);
-            });
+    // Time-out handler
+    async function handleTimeOut() {
+        if (isProcessing) return;
+        isProcessing = true;
+        confirmTimeOutBtn.disabled = true;
+
+        try {
+            const response = await axios.post('{{ route("dashboard.action") }}', { action: 'time_out' });
+            
+            if (response.data.success) {
+                showAlert('success', 'Time-Out recorded successfully!');
+                // Force full reload to ensure consistent state
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showAlert('warning', response.data.message || 'Time-Out failed. Please try again.');
+            }
+        } catch (error) {
+            const errorMsg = error.response?.data?.message || 
+                           error.response?.data?.error || 
+                           'An error occurred during Time-Out';
+            showAlert('danger', errorMsg);
+        } finally {
+            isProcessing = false;
+            confirmTimeOutBtn.disabled = false;
+            timeOutModal.hide();
+        }
     }
 
-    // Event listeners for Time-In/Time-Out buttons
-    timeInBtn.addEventListener('click', () => handleTimeAction('{{ route("time-in") }}', 'Time-In'));
-    timeOutBtn.addEventListener('click', () => handleTimeAction('{{ route("time-out") }}', 'Time-Out'));
+    // Load time records
+    async function loadTimeRecords() {
+    try {
+        const response = await axios.get('{{ route("time-records.index") }}');
 
-    // Initial load of time records
+        const recordsBody = document.getElementById('time-records-body');
+        recordsBody.innerHTML = '';
+
+        const today = new Date().toISOString().split('T')[0];
+        const todayRecords = response.data.filter(record => 
+            record.recorded_at.startsWith(today)
+        );
+
+        const timeInRecord = todayRecords.find(r => r.type === 'time_in');
+        const timeOutRecord = todayRecords.find(r => r.type === 'time_out');
+
+        // Time-In button: disable if already timed in (regardless of status)
+        timeInBtn.disabled = !!timeInRecord;
+
+        // Time-Out button: enable only if Time-In exists and is on-going, and no Time-Out exists
+        timeOutBtn.disabled = !(timeInRecord && timeInRecord.status === 'on-going') || !!timeOutRecord;
+
+
+        if (todayRecords.length === 0) {
+            recordsBody.innerHTML = `
+                <tr>
+                    <td colspan="3" class="text-center text-muted">No time records today</td>
+                </tr>
+            `;
+            return;
+        }
+
+        todayRecords.forEach(record => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${record.type.replace('_', ' ')}</td>
+                <td>${new Date(record.recorded_at).toLocaleTimeString()}</td>
+                <td>${record.status}</td>
+            `;
+            recordsBody.appendChild(row);
+        });
+    } catch (error) {
+        console.error('Failed to load time records:', error);
+        showAlert('warning', 'Failed to load time records');
+    }
+}
+
+
+    // Event listeners
+    timeInBtn.addEventListener('click', handleTimeIn);
+    
+    timeOutBtn.addEventListener('click', () => {
+        const alreadyOut = [...document.querySelectorAll('#time-records-body tr td:first-child')]
+            .some(td => td.textContent.trim().toLowerCase().includes('time out'));
+        
+        if (alreadyOut) {
+            showAlert('info', 'You have already timed out today');
+        } else {
+            timeOutModal.show();
+        }
+    });
+
+    confirmTimeOutBtn.addEventListener('click', handleTimeOut);
+
+    // Initialize calendar
+    const events = @json($events);
+    new FullCalendar.Calendar(document.getElementById('holiday-calendar'), {
+        initialView: 'dayGridMonth',
+        events: events.map(event => ({
+            title: event.title,
+            start: event.start,
+            backgroundColor: '#e74a3b',
+            borderColor: '#e74a3b',
+            textColor: 'white'
+        })),
+        editable: false,
+        eventClick: info => alert('Holiday: ' + info.event.title)
+    }).render();
+
+    // Initial load
     loadTimeRecords();
 });
 </script>

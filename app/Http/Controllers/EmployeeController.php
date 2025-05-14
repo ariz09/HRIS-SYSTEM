@@ -148,21 +148,21 @@ class EmployeeController extends Controller
         }
     }
 
-    public function edit(EmploymentInfo $employee)
-{
-    $employee->load(['personalInfo']); // Or use 'employee' if that's the relationship name
+            public function edit(EmploymentInfo $employee)
+        {
+            $employee->load(['personalInfo']); // Or use 'employee' if that's the relationship name
 
-    return view('employees.edit', [
-        'employee' => $employee,
-        'statuses' => EmploymentStatus::all(),
-        'employmentTypes' => EmploymentType::all(),
-        'agencies' => Agency::all(),
-        'departments' => Department::all(),
-        'cdmLevels' => CDMLevel::all(),
-        'positions' => Position::all(),
-        'isEdit' => true
-    ]);
-}
+            return view('employees.edit', [
+                'employee' => $employee,
+                'statuses' => EmploymentStatus::all(),
+                'employmentTypes' => EmploymentType::all(),
+                'agencies' => Agency::all(),
+                'departments' => Department::all(),
+                'cdmLevels' => CDMLevel::all(),
+                'positions' => Position::all(),
+                'isEdit' => true
+            ]);
+        }
 
 
     public function update(Request $request, EmploymentInfo $employee)
@@ -346,15 +346,9 @@ public function downloadTemplate()
     // Sample data (IDs from reference tables)
     $sample = [[
         'Juan', 'Dela', 'Cruz', '', 'JD', 'Male', '1990-01-01',
-        'juan@example.com', '09171234567', 'Single', '2024-01-15',
-        EmploymentStatus::first()?->id ?? '',
-        Agency::first()?->id ?? '',
-        Department::first()?->id ?? '',
-        CDMLevel::first()?->id ?? '',
-        Position::first()?->id ?? '',
-        EmploymentType::first()?->id ?? '',
-        '25000', '5000', '2000', '1500', '1000',
-        '1234567890', 'BPI'
+        'juan@example.com', '09171234567', 'Single', '2024-01-15', EmploymentStatus::first()?->id ?? '', Agency::first()?->id ?? '',
+        Department::first()?->id ?? '', CDMLevel::first()?->id ?? '', Position::first()?->id ?? '', EmploymentType::first()?->id ?? '','25000', '5000',
+        '2000', '1500', '1000','1000', '1234567890', 'BPI'
     ]];
 
     $callback = function () use ($headers, $sample) {

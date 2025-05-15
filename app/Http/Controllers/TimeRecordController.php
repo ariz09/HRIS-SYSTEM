@@ -53,7 +53,7 @@ class TimeRecordController extends Controller
                 'user_id' => $user->id,
                 'type' => 'time_in',
                 'recorded_at' => now(),
-                'status' => 'pending',
+                'status' => 'on-going', // changed from 'pending' to 'on-going'
                 'ip_address' => $request->ip(),
             ]);
 

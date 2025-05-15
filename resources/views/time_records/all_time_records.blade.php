@@ -10,6 +10,11 @@
             <h6 class="m-0 font-weight-bold text-primary">Time Records</h6>
         </div>
         <div class="card-body">
+            <div class="mb-3">
+                <a href="{{ route('time-records.all', array_merge(request()->all(), ['report' => '1'])) }}" class="btn btn-success">
+                    <i class="fas fa-file-excel"></i> Generate Report
+                </a>
+            </div>
             <div class="table-responsive">
                 <table class="table table-bordered table-sm">
                     <thead class="thead-light">

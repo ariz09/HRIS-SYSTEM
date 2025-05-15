@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\TimeRecord;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Response;
 
 class TimeRecordController extends Controller
 {
@@ -134,14 +135,71 @@ class TimeRecordController extends Controller
             $query->whereDate('recorded_at', '<=', $request->end_date);
         }
         $timeRecords = $query->orderBy('recorded_at', 'desc')->get();
+
+        // Export to CSV if requested
+        if ($request->has('report')) {
+            $filename = 'my_time_records_' . now()->format('Ymd_His') . '.csv';
+            $headers = [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => "attachment; filename=\"$filename\"",
+            ];
+            $columns = ['Date', 'Type', 'Time', 'Status'];
+            $callback = function() use ($timeRecords, $columns) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, $columns);
+                foreach ($timeRecords as $record) {
+                    fputcsv($file, [
+                        \Carbon\Carbon::parse($record->recorded_at)->format('Y-m-d'),
+                        ucfirst(str_replace('_', ' ', $record->type)),
+                        \Carbon\Carbon::parse($record->recorded_at)->format('h:i:s A'),
+                        ucfirst($record->status),
+                    ]);
+                }
+                fclose($file);
+            };
+            return Response::stream($callback, 200, $headers);
+        }
+
         return view('time_records.my_time_records', compact('timeRecords'));
     }
 
-    public function allTimeRecords()
+    public function allTimeRecords(Request $request)
     {
-        $timeRecords = \App\Models\TimeRecord::with(['employee.user'])
-            ->orderBy('recorded_at', 'desc')
-            ->get();
+        $query = \App\Models\TimeRecord::with(['employee.user']);
+        if ($request->filled('start_date')) {
+            $query->whereDate('recorded_at', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $query->whereDate('recorded_at', '<=', $request->end_date);
+        }
+        $timeRecords = $query->orderBy('recorded_at', 'desc')->get();
+
+        // Export to CSV if requested
+        if ($request->has('report')) {
+            $filename = 'all_time_records_' . now()->format('Ymd_His') . '.csv';
+            $headers = [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => "attachment; filename=\"$filename\"",
+            ];
+            $columns = ['Employee', 'Date', 'Type', 'Time', 'Status'];
+            $callback = function() use ($timeRecords, $columns) {
+                $file = fopen('php://output', 'w');
+                fputcsv($file, $columns);
+                foreach ($timeRecords as $record) {
+                    $employeeName = $record->employee->user->name ?? $record->employee->name ?? 'N/A';
+                    fputcsv($file, [
+                        $employeeName,
+                        \Carbon\Carbon::parse($record->recorded_at)->format('Y-m-d'),
+                        ucfirst(str_replace('_', ' ', $record->type)),
+                        \Carbon\Carbon::parse($record->recorded_at)->format('h:i:s A'),
+                        ucfirst($record->status),
+                    ]);
+                }
+                fclose($file);
+            };
+            return Response::stream($callback, 200, $headers);
+        }
+
         return view('time_records.all_time_records', compact('timeRecords'));
     }
 }

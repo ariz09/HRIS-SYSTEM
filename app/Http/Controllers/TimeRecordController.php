@@ -123,12 +123,17 @@ class TimeRecordController extends Controller
         return response()->json(['message' => 'No pending time-in record found.'], 400);
     }
 
-    public function myTimeRecords()
+    public function myTimeRecords(Request $request)
     {
         $user = Auth::user();
-        $timeRecords = \App\Models\TimeRecord::where('user_id', $user->id)
-            ->orderBy('recorded_at', 'desc')
-            ->get();
+        $query = \App\Models\TimeRecord::where('user_id', $user->id);
+        if ($request->filled('start_date')) {
+            $query->whereDate('recorded_at', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $query->whereDate('recorded_at', '<=', $request->end_date);
+        }
+        $timeRecords = $query->orderBy('recorded_at', 'desc')->get();
         return view('time_records.my_time_records', compact('timeRecords'));
     }
 

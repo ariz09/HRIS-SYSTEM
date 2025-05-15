@@ -8,6 +8,26 @@
     <div class="card shadow mb-4">
         <div class="card-header py-3">
             <h6 class="m-0 font-weight-bold text-primary">Time Records</h6>
+            <form method="GET" class="row g-2 align-items-center mt-2" action="">
+                <div class="col-auto">
+                    <label for="start_date" class="col-form-label">Start Date</label>
+                </div>
+                <div class="col-auto">
+                    <input type="date" id="start_date" name="start_date" class="form-control" value="{{ request('start_date') }}">
+                </div>
+                <div class="col-auto">
+                    <label for="end_date" class="col-form-label">End Date</label>
+                </div>
+                <div class="col-auto">
+                    <input type="date" id="end_date" name="end_date" class="form-control" value="{{ request('end_date') }}">
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">Filter</button>
+                </div>
+                <div class="col-auto">
+                    <a href="{{ route('time-records.my') }}" class="btn btn-secondary">Reset</a>
+                </div>
+            </form>
         </div>
         <div class="card-body">
             <div class="table-responsive">

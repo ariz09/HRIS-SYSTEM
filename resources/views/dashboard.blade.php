@@ -230,7 +230,6 @@ document.addEventListener('DOMContentLoaded', function () {
     async function handleTimeOut() {
         if (isProcessing) return;
         isProcessing = true;
-        confirmTimeOutBtn.disabled = true;
 
         try {
             const response = await axios.post('{{ route("dashboard.action") }}', { action: 'time_out' });
@@ -251,6 +250,10 @@ document.addEventListener('DOMContentLoaded', function () {
             isProcessing = false;
             confirmTimeOutBtn.disabled = false;
             timeOutModal.hide();
+            // Restore button after processing
+            timeOutBtn.disabled = true;
+            timeOutBtn.innerHTML = '<i class="fas fa-sign-out-alt mr-1"></i> Time-out';
+            timeOutBtn.classList.remove('btn-warning', 'disabled');
         }
     }
 
@@ -315,7 +318,46 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    confirmTimeOutBtn.addEventListener('click', handleTimeOut);
+    // Move loading transition to confirmation click
+    confirmTimeOutBtn.addEventListener('click', () => {
+        // Add animation to indicate processing (same as Time-In)
+        timeOutBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing...';
+        timeOutBtn.classList.add('disabled', 'btn-warning');
+        timeOutBtn.disabled = true;
+        confirmTimeOutBtn.disabled = true;
+        handleTimeOut();
+    });
+
+    // Remove loading transition from start of handleTimeOut
+    async function handleTimeOut() {
+        if (isProcessing) return;
+        isProcessing = true;
+
+        try {
+            const response = await axios.post('{{ route("dashboard.action") }}', { action: 'time_out' });
+
+            if (response.data.success) {
+                showAlert('success', 'Time-Out recorded successfully!');
+                // Force full reload to ensure consistent state
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showAlert('warning', response.data.message || 'Time-Out failed. Please try again.');
+            }
+        } catch (error) {
+            const errorMsg = error.response?.data?.message ||
+                           error.response?.data?.error ||
+                           'An error occurred during Time-Out';
+            showAlert('danger', errorMsg);
+        } finally {
+            isProcessing = false;
+            confirmTimeOutBtn.disabled = false;
+            timeOutModal.hide();
+            // Restore button after processing
+            timeOutBtn.disabled = true;
+            timeOutBtn.innerHTML = '<i class="fas fa-sign-out-alt mr-1"></i> Time-out';
+            timeOutBtn.classList.remove('btn-warning', 'disabled');
+        }
+    }
 
     // Initialize calendar
     const events = @json($events);

@@ -126,7 +126,8 @@
                     </div>
                 </div>
             </div>
-           <a href="{{ route('time-records.index') }}" class="btn btn-primary mt-3">View All Time Records</a>
+           <a href="{{ route('time-records.my') }}" class="btn btn-info mt-3">My Time Records</a>
+           <a href="{{ route('time-records.all') }}" class="btn btn-secondary mt-3">All Employees Time Records</a>
 
         </div>
 
@@ -197,10 +198,13 @@ document.addEventListener('DOMContentLoaded', function () {
         if (isProcessing) return;
         isProcessing = true;
         timeInBtn.disabled = true;
+        // Add animation to indicate processing
+        timeInBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing...';
+        timeInBtn.classList.add('disabled', 'btn-warning');
 
         try {
             const response = await axios.post('{{ route("time-in") }}');
-            
+
             if (response.data.success) {
                 showAlert('success', 'Time-In recorded successfully!');
                 await loadTimeRecords();
@@ -208,13 +212,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 showAlert('warning', response.data.message || 'Time-In failed. Please try again.');
             }
         } catch (error) {
-            const errorMsg = error.response?.data?.message || 
-                           error.response?.data?.error || 
+            const errorMsg = error.response?.data?.message ||
+                           error.response?.data?.error ||
                            'An error occurred during Time-In';
             showAlert('danger', errorMsg);
         } finally {
             isProcessing = false;
-            timeInBtn.disabled = false;
+            // Restore button after processing
+            timeInBtn.disabled = !!document.querySelector('#time-records-body tr td:first-child')?.textContent.toLowerCase().includes('time in');
+            timeInBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-1"></i> Time-in';
+            timeInBtn.classList.remove('btn-warning', 'disabled');
         }
     }
 
@@ -226,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         try {
             const response = await axios.post('{{ route("dashboard.action") }}', { action: 'time_out' });
-            
+
             if (response.data.success) {
                 showAlert('success', 'Time-Out recorded successfully!');
                 // Force full reload to ensure consistent state
@@ -235,8 +242,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 showAlert('warning', response.data.message || 'Time-Out failed. Please try again.');
             }
         } catch (error) {
-            const errorMsg = error.response?.data?.message || 
-                           error.response?.data?.error || 
+            const errorMsg = error.response?.data?.message ||
+                           error.response?.data?.error ||
                            'An error occurred during Time-Out';
             showAlert('danger', errorMsg);
         } finally {
@@ -255,7 +262,7 @@ document.addEventListener('DOMContentLoaded', function () {
         recordsBody.innerHTML = '';
 
         const today = new Date().toISOString().split('T')[0];
-        const todayRecords = response.data.filter(record => 
+        const todayRecords = response.data.filter(record =>
             record.recorded_at.startsWith(today)
         );
 
@@ -296,11 +303,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Event listeners
     timeInBtn.addEventListener('click', handleTimeIn);
-    
+
     timeOutBtn.addEventListener('click', () => {
         const alreadyOut = [...document.querySelectorAll('#time-records-body tr td:first-child')]
             .some(td => td.textContent.trim().toLowerCase().includes('time out'));
-        
+
         if (alreadyOut) {
             showAlert('info', 'You have already timed out today');
         } else {

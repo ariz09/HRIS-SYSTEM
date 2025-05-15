@@ -25,53 +25,52 @@ class TimeRecordController extends Controller
         return view('time_records.index'); // We'll create this Blade view
     }
 
-
     public function timeIn(Request $request)
-{
-    try {
-        $user = Auth::user();
-        
-        if (!$user) {
+    {
+        try {
+            $user = Auth::user();
+
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User not authenticated'
+                ], 401);
+            }
+
+            // Check if already timed in today
+            if (TimeRecord::where('user_id', $user->id)
+                ->whereDate('recorded_at', Carbon::today())
+                ->where('type', 'time_in')
+                ->exists()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'You have already logged in today.'
+                ], 409);
+            }
+
+            $timeRecord = TimeRecord::create([
+                'user_id' => $user->id,
+                'type' => 'time_in',
+                'recorded_at' => now(),
+                'status' => 'pending',
+                'ip_address' => $request->ip(),
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Time In recorded successfully.',
+                'record' => $timeRecord
+            ]);
+
+        } catch (\Exception $e) {
+            \Log::error('Time In Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'User not authenticated'
-            ], 401);
+                'message' => 'Server Error: ' . $e->getMessage(),
+                'trace' => config('app.debug') ? $e->getTrace() : null
+            ], 500);
         }
-
-        // Check if already timed in today
-        if (TimeRecord::where('user_id', $user->id)
-            ->whereDate('recorded_at', Carbon::today())
-            ->where('type', 'time_in')
-            ->exists()) {
-            return response()->json([
-                'success' => false,
-                'message' => 'You have already logged in today.'
-            ], 409);
-        }
-
-        $timeRecord = TimeRecord::create([
-            'user_id' => $user->id,
-            'type' => 'time_in',
-            'recorded_at' => now(),
-            'status' => 'pending',
-            'ip_address' => $request->ip(),
-        ]);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Time In recorded successfully.',
-            'record' => $timeRecord
-        ]);
-
-    } catch (\Exception $e) {
-        \Log::error('Time In Error: ' . $e->getMessage());
-        return response()->json([
-            'success' => false,
-            'message' => 'Server Error: ' . $e->getMessage(),
-            'trace' => config('app.debug') ? $e->getTrace() : null
-        ], 500);
     }
-}
 
     public function timeOut(Request $request)
     {
@@ -108,22 +107,38 @@ class TimeRecordController extends Controller
     }
 
     public function updateTimeInStatus(Request $request)
-{
-    $timeIn = TimeRecord::where('type', 'time_in')
-                        ->where('status', 'pending')
-                        ->latest()
-                        ->first();
+    {
+        $timeIn = TimeRecord::where('type', 'time_in')
+                            ->where('status', 'pending')
+                            ->latest()
+                            ->first();
 
-    if ($timeIn) {
-        $timeIn->status = 'completed';
-        $timeIn->save();
+        if ($timeIn) {
+            $timeIn->status = 'completed';
+            $timeIn->save();
 
-        return response()->json(['message' => 'Time-in status updated successfully.']);
+            return response()->json(['message' => 'Time-in status updated successfully.']);
+        }
+
+        return response()->json(['message' => 'No pending time-in record found.'], 400);
     }
 
-    return response()->json(['message' => 'No pending time-in record found.'], 400);
-}
+    public function myTimeRecords()
+    {
+        $user = Auth::user();
+        $timeRecords = \App\Models\TimeRecord::where('user_id', $user->id)
+            ->orderBy('recorded_at', 'desc')
+            ->get();
+        return view('time_records.my_time_records', compact('timeRecords'));
+    }
 
+    public function allTimeRecords()
+    {
+        $timeRecords = \App\Models\TimeRecord::with(['employee.user'])
+            ->orderBy('recorded_at', 'desc')
+            ->get();
+        return view('time_records.all_time_records', compact('timeRecords'));
+    }
 }
 
 

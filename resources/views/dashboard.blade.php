@@ -70,6 +70,26 @@
         font-size: 1rem;
         padding: 15px;
     }
+    .btn-block-custom .btn-records {
+        color: #fff !important;
+        font-weight: 500;
+    }
+    .btn-block-custom .btn-primary {
+        background: #007bff;
+        border: none;
+    }
+    .btn-block-custom .btn-primary:hover, .btn-block-custom .btn-primary:focus {
+        background: #0056b3;
+    }
+    .btn-block-custom .btn-warning {
+        background: #ffc107;
+        border: none;
+        color: #222 !important;
+    }
+    .btn-block-custom .btn-warning:hover, .btn-block-custom .btn-warning:focus {
+        background: #e0a800;
+        color: #111 !important;
+    }
     .alert {
         position: fixed;
         top: 70px;
@@ -101,6 +121,8 @@
             <div class="btn-block-custom">
                 <button class="btn btn-success" id="time-in"><i class="fas fa-sign-in-alt mr-1"></i> Time-in</button>
                 <button class="btn btn-danger" id="time-out"><i class="fas fa-sign-out-alt mr-1"></i> Time-out</button>
+                <a href="{{ route('time-records.my') }}" class="btn btn-primary btn-records"><i class="fas fa-clock mr-1"></i> My Time Records</a>
+                <a href="{{ route('time-records.all') }}" class="btn btn-warning btn-records"><i class="fas fa-users mr-1"></i> All Employees Time Records</a>
             </div>
 
             <div class="card shadow mt-4">
@@ -126,9 +148,6 @@
                     </div>
                 </div>
             </div>
-           <a href="{{ route('time-records.my') }}" class="btn btn-info mt-3">My Time Records</a>
-           <a href="{{ route('time-records.all') }}" class="btn btn-secondary mt-3">All Employees Time Records</a>
-
         </div>
 
         <!-- Calendar -->

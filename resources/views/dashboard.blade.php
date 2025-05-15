@@ -207,6 +207,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if (response.data.success) {
                 showAlert('success', 'Time-In recorded successfully!');
+                timeOutBtn.disabled = false; // Enable Time-Out button after successful Time-In
                 await loadTimeRecords();
             } else {
                 showAlert('warning', response.data.message || 'Time-In failed. Please try again.');
@@ -272,9 +273,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Time-In button: disable if already timed in (regardless of status)
         timeInBtn.disabled = !!timeInRecord;
 
-        // Time-Out button: enable only if Time-In exists and is on-going, and no Time-Out exists
-        timeOutBtn.disabled = !(timeInRecord && timeInRecord.status === 'on-going') || !!timeOutRecord;
-
+        // Time-Out button: enable if Time-In exists (regardless of status) and no Time-Out exists
+        timeOutBtn.disabled = !(timeInRecord) || !!timeOutRecord;
 
         if (todayRecords.length === 0) {
             recordsBody.innerHTML = `

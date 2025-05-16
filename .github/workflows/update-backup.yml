@@ -1,0 +1,29 @@
+name: Update Backup Branch
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-backup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Fetch all branches
+        run: git fetch origin
+
+      - name: Create or update backup branch
+        run: |
+          git checkout -B backup
+          git merge origin/main
+          git push origin backup --force
+

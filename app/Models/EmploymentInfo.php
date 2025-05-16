@@ -67,16 +67,22 @@ class EmploymentInfo extends Model
         return $this->belongsTo(User::class);
     }
 
-    // app/Models/EmploymentInfo.php
-public function dependents()
+    // EmploymentInfo.php
+public function educations()
 {
-    return $this->hasMany(EmployeeDependent::class, 'employee_number', 'employee_number');
+    return $this->hasMany(EmployeeEducation::class, 'employee_number', 'employee_number');
 }
 
+    public function dependents()
+    {
+        return $this->hasMany(EmployeeDependent::class, 'employee_number', 'employee_number');
+    }
+
+
     public function emergencyContacts()
-{
-    return $this->hasMany(EmployeeEmergencyContact::class, 'employee_number', 'employee_number');
-}
+    {
+        return $this->hasMany(EmployeeEmergencyContact::class, 'employee_number', 'employee_number');
+    }
 
     public function getRouteKeyName()
     {

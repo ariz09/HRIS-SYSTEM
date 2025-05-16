@@ -8,15 +8,22 @@ use Illuminate\Database\Eloquent\Model;
 class EmployeeEducation extends Model
 {
     use HasFactory;
-    protected $table = 'employee_educations';
-
-
+    protected $table = "employee_educations";
     protected $fillable = [
-        'employee_id', 'school_name', 'course_taken', 'inclusive_dates', 'undergraduate_or_graduate'
+        'school_name',
+        'course_taken',
+        'year_finished',
+        'status',
+        'employee_number',
     ];
 
     public function employee()
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(EmploymentInfo::class, 'employee_number', 'employee_number');
+    }
+    
+    public function employmentInfo()
+    {
+        return $this->belongsTo(EmploymentInfo::class, 'employee_number', 'employee_number');
     }
 }

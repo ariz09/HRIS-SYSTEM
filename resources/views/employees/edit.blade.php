@@ -24,9 +24,9 @@
                     <a href="{{ route('employees.dependents.edit', $employee->employee_number) }}" class="btn btn-outline-warning">
                         <i class="fas fa-users me-1"></i> Dependents
                     </a>
-                    <a href="" class="btn btn-outline-success">
+                    <a href="{{ route('employees.educations.edit',  $employee->employee_number) }}" class="btn btn-outline-success">
                         <i class="fas fa-graduation-cap me-1"></i> Education
-                    </a>
+                    </a>   
                     <a href="" class="btn btn-outline-info">
                         <i class="fas fa-briefcase me-1"></i> Employment History
                     </a>

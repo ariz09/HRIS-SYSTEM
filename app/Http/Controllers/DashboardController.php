@@ -47,18 +47,18 @@ class DashboardController extends Controller
         {
             $user = Auth::user();
             $employeeId = $user->employee->id ?? null;
-        
+
             if (!$employeeId) {
                 return response()->json([]);
             }
-        
+
             $records = TimeRecord::where('employee_id', $employeeId)
                 ->whereDate('recorded_at', today())
                 ->get();
-        
+
             return response()->json($records);
         }
-        
+
 
         public function handleAction(Request $request)
         {
@@ -167,5 +167,5 @@ class DashboardController extends Controller
             }
         }
 
-        
+
     }

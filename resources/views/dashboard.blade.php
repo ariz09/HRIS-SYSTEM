@@ -70,6 +70,26 @@
         font-size: 1rem;
         padding: 15px;
     }
+    .btn-block-custom .btn-records {
+        color: #fff !important;
+        font-weight: 500;
+    }
+    .btn-block-custom .btn-primary {
+        background: #007bff;
+        border: none;
+    }
+    .btn-block-custom .btn-primary:hover, .btn-block-custom .btn-primary:focus {
+        background: #0056b3;
+    }
+    .btn-block-custom .btn-warning {
+        background: #ffc107;
+        border: none;
+        color: #222 !important;
+    }
+    .btn-block-custom .btn-warning:hover, .btn-block-custom .btn-warning:focus {
+        background: #e0a800;
+        color: #111 !important;
+    }
     .alert {
         position: fixed;
         top: 70px;
@@ -101,6 +121,8 @@
             <div class="btn-block-custom">
                 <button class="btn btn-success" id="time-in"><i class="fas fa-sign-in-alt mr-1"></i> Time-in</button>
                 <button class="btn btn-danger" id="time-out"><i class="fas fa-sign-out-alt mr-1"></i> Time-out</button>
+                <a href="{{ route('time-records.my') }}" class="btn btn-primary btn-records"><i class="fas fa-clock mr-1"></i> My Time Records</a>
+                <a href="{{ route('time-records.all') }}" class="btn btn-warning btn-records"><i class="fas fa-users mr-1"></i> All Employees Time Records</a>
             </div>
 
             <div class="card shadow mt-4">
@@ -126,8 +148,6 @@
                     </div>
                 </div>
             </div>
-           <a href="{{ route('time-records.index') }}" class="btn btn-primary mt-3">View All Time Records</a>
-
         </div>
 
         <!-- Calendar -->
@@ -197,24 +217,31 @@ document.addEventListener('DOMContentLoaded', function () {
         if (isProcessing) return;
         isProcessing = true;
         timeInBtn.disabled = true;
+        // Add animation to indicate processing
+        timeInBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing...';
+        timeInBtn.classList.add('disabled', 'btn-warning');
 
         try {
             const response = await axios.post('{{ route("time-in") }}');
-            
+
             if (response.data.success) {
                 showAlert('success', 'Time-In recorded successfully!');
+                timeOutBtn.disabled = false; // Enable Time-Out button after successful Time-In
                 await loadTimeRecords();
             } else {
                 showAlert('warning', response.data.message || 'Time-In failed. Please try again.');
             }
         } catch (error) {
-            const errorMsg = error.response?.data?.message || 
-                           error.response?.data?.error || 
+            const errorMsg = error.response?.data?.message ||
+                           error.response?.data?.error ||
                            'An error occurred during Time-In';
             showAlert('danger', errorMsg);
         } finally {
             isProcessing = false;
-            timeInBtn.disabled = false;
+            // Restore button after processing
+            timeInBtn.disabled = !!document.querySelector('#time-records-body tr td:first-child')?.textContent.toLowerCase().includes('time in');
+            timeInBtn.innerHTML = '<i class="fas fa-sign-in-alt mr-1"></i> Time-in';
+            timeInBtn.classList.remove('btn-warning', 'disabled');
         }
     }
 
@@ -222,11 +249,10 @@ document.addEventListener('DOMContentLoaded', function () {
     async function handleTimeOut() {
         if (isProcessing) return;
         isProcessing = true;
-        confirmTimeOutBtn.disabled = true;
 
         try {
             const response = await axios.post('{{ route("dashboard.action") }}', { action: 'time_out' });
-            
+
             if (response.data.success) {
                 showAlert('success', 'Time-Out recorded successfully!');
                 // Force full reload to ensure consistent state
@@ -235,14 +261,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 showAlert('warning', response.data.message || 'Time-Out failed. Please try again.');
             }
         } catch (error) {
-            const errorMsg = error.response?.data?.message || 
-                           error.response?.data?.error || 
+            const errorMsg = error.response?.data?.message ||
+                           error.response?.data?.error ||
                            'An error occurred during Time-Out';
             showAlert('danger', errorMsg);
         } finally {
             isProcessing = false;
             confirmTimeOutBtn.disabled = false;
             timeOutModal.hide();
+            // Restore button after processing
+            timeOutBtn.disabled = true;
+            timeOutBtn.innerHTML = '<i class="fas fa-sign-out-alt mr-1"></i> Time-out';
+            timeOutBtn.classList.remove('btn-warning', 'disabled');
         }
     }
 
@@ -255,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function () {
         recordsBody.innerHTML = '';
 
         const today = new Date().toISOString().split('T')[0];
-        const todayRecords = response.data.filter(record => 
+        const todayRecords = response.data.filter(record =>
             record.recorded_at.startsWith(today)
         );
 
@@ -265,9 +295,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Time-In button: disable if already timed in (regardless of status)
         timeInBtn.disabled = !!timeInRecord;
 
-        // Time-Out button: enable only if Time-In exists and is on-going, and no Time-Out exists
-        timeOutBtn.disabled = !(timeInRecord && timeInRecord.status === 'on-going') || !!timeOutRecord;
-
+        // Time-Out button: enable if Time-In exists (regardless of status) and no Time-Out exists
+        timeOutBtn.disabled = !(timeInRecord) || !!timeOutRecord;
 
         if (todayRecords.length === 0) {
             recordsBody.innerHTML = `
@@ -296,11 +325,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Event listeners
     timeInBtn.addEventListener('click', handleTimeIn);
-    
+
     timeOutBtn.addEventListener('click', () => {
         const alreadyOut = [...document.querySelectorAll('#time-records-body tr td:first-child')]
             .some(td => td.textContent.trim().toLowerCase().includes('time out'));
-        
+
         if (alreadyOut) {
             showAlert('info', 'You have already timed out today');
         } else {
@@ -308,7 +337,46 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    confirmTimeOutBtn.addEventListener('click', handleTimeOut);
+    // Move loading transition to confirmation click
+    confirmTimeOutBtn.addEventListener('click', () => {
+        // Add animation to indicate processing (same as Time-In)
+        timeOutBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing...';
+        timeOutBtn.classList.add('disabled', 'btn-warning');
+        timeOutBtn.disabled = true;
+        confirmTimeOutBtn.disabled = true;
+        handleTimeOut();
+    });
+
+    // Remove loading transition from start of handleTimeOut
+    async function handleTimeOut() {
+        if (isProcessing) return;
+        isProcessing = true;
+
+        try {
+            const response = await axios.post('{{ route("dashboard.action") }}', { action: 'time_out' });
+
+            if (response.data.success) {
+                showAlert('success', 'Time-Out recorded successfully!');
+                // Force full reload to ensure consistent state
+                setTimeout(() => window.location.reload(), 1000);
+            } else {
+                showAlert('warning', response.data.message || 'Time-Out failed. Please try again.');
+            }
+        } catch (error) {
+            const errorMsg = error.response?.data?.message ||
+                           error.response?.data?.error ||
+                           'An error occurred during Time-Out';
+            showAlert('danger', errorMsg);
+        } finally {
+            isProcessing = false;
+            confirmTimeOutBtn.disabled = false;
+            timeOutModal.hide();
+            // Restore button after processing
+            timeOutBtn.disabled = true;
+            timeOutBtn.innerHTML = '<i class="fas fa-sign-out-alt mr-1"></i> Time-out';
+            timeOutBtn.classList.remove('btn-warning', 'disabled');
+        }
+    }
 
     // Initialize calendar
     const events = @json($events);

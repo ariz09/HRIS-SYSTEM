@@ -69,14 +69,28 @@ class EmployeeController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone_number' => [
+                'required',
+                'regex:/^(09|\+639)\d{9}$/'
+            ],
+            'birthday' => 'required|date',
+            'gender' => 'required|in:Male,Female,Other',
+            'civil_status' => 'required|in:Single,Married,Divorced,Widowed,Separated',
             'hiring_date' => 'required|date',
             'basic_pay' => 'required|numeric',
             'employment_type_id' => 'required|exists:employment_types,id',
-            'position_id' => 'required|exists:positions,id', // Add this line
-            'cdm_level_id' => 'required|exists:cdm_levels,id', // Add this line
+            'position_id' => 'required|exists:positions,id',
+            'cdm_level_id' => 'required|exists:cdm_levels,id',
+            'department_id' => 'required|exists:departments,id',
+            'agency_id' => 'required|exists:agencies,id',
+            'atm_account_number' => 'nullable|numeric',
+        ], [
+            'phone_number.regex' => 'The phone number must be a valid Philippine mobile number (e.g., 09171234567 or +639171234567)',
+            'atm_account_number.numeric' => 'The ATM account number must contain only numbers',
         ]);
 
         try {
@@ -164,15 +178,30 @@ class EmployeeController extends Controller
             ]);
         }
 
-
-    public function update(Request $request, EmploymentInfo $employee)
+        public function update(Request $request, EmploymentInfo $employee)
     {
-        $request->validate([
+        $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'phone_number' => [
+                'required',
+                'regex:/^(09|\+639)\d{9}$/'
+            ],
+            'birthday' => 'required|date',
+            'gender' => 'required|in:Male,Female,Other',
+            'civil_status' => 'required|in:Single,Married,Divorced,Widowed,Separated',
             'hiring_date' => 'required|date',
             'basic_pay' => 'required|numeric',
             'employment_type_id' => 'required|exists:employment_types,id',
+            'position_id' => 'required|exists:positions,id',
+            'cdm_level_id' => 'required|exists:cdm_levels,id',
+            'department_id' => 'required|exists:departments,id',
+            'agency_id' => 'required|exists:agencies,id',
+            'atm_account_number' => 'nullable|numeric',
+        ], [
+            'phone_number.regex' => 'The phone number must be a valid Philippine mobile number (e.g., 09171234567 or +639171234567)',
+            'atm_account_number.numeric' => 'The ATM account number must contain only numbers',
         ]);
 
         try {

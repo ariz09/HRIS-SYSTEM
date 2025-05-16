@@ -67,6 +67,12 @@ class EmploymentInfo extends Model
         return $this->belongsTo(User::class);
     }
 
+    // app/Models/EmploymentInfo.php
+public function dependents()
+{
+    return $this->hasMany(EmployeeDependent::class, 'employee_number', 'employee_number');
+}
+
     public function emergencyContacts()
 {
     return $this->hasMany(EmployeeEmergencyContact::class, 'employee_number', 'employee_number');

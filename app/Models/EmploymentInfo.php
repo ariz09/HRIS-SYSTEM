@@ -66,4 +66,14 @@ class EmploymentInfo extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function emergencyContacts()
+{
+    return $this->hasMany(EmployeeEmergencyContact::class, 'employee_number', 'employee_number');
+}
+
+    public function getRouteKeyName()
+    {
+        return 'employee_number';
+    }
 }

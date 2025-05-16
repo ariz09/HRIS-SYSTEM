@@ -67,24 +67,32 @@ Route::prefix('time-records')->group(function () {
     }); */
 
 
-    // Employee Routes
+// Employee Routes
 Route::prefix('employees')->name('employees.')->group(function () {
     Route::get('{employee}/edit', [EmployeeController::class, 'edit'])->name('edit');
-
-      Route::get('/template-download', [EmployeeController::class, 'downloadTemplate'])->name('template.download');
-      Route::post('/bulk-upload', [EmployeeController::class, 'bulkUpload'])->name('bulkUpload');
-
-
+    
+    Route::get('/template-download', [EmployeeController::class, 'downloadTemplate'])->name('template.download');
+    Route::post('/bulk-upload', [EmployeeController::class, 'bulkUpload'])->name('bulkUpload');
+    
+    // Emergency Contacts (moved outside the nested group)
+    Route::prefix('{employee}')->group(function () {
+        Route::get('emergency-contacts/edit', [EmployeeEmergencyContactController::class, 'edit'])
+            ->name('emergency-contacts.edit');
+        
+        Route::put('emergency-contacts', [EmployeeEmergencyContactController::class, 'update'])
+            ->name('emergency-contacts.update');
+        
+        Route::delete('emergency-contacts/{contact}', [EmployeeEmergencyContactController::class, 'destroy'])
+            ->name('emergency-contacts.destroy');
+    });
     
     Route::resource('personal_infos', PersonalInfoController::class);
-    Route::resource('emergency-contact', EmployeeEmergencyContactController::class)->except(['show']);
     Route::resource('dependent', EmployeeDependentController::class)->except(['show']);
     Route::resource('education', EmployeeEducationController::class)->except(['show']);
     Route::resource('employment-history', EmployeeEmploymentHistoryController::class)->except(['show']);
 });
 
-
-// Main employees resource route (this already includes the delete route)
+// Main employees resource route
 Route::resource('employees', EmployeeController::class);
     // Leave Management
     Route::resource('leaves', LeaveController::class)->names('leaves');

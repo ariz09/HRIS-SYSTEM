@@ -1,55 +1,89 @@
 @extends('layouts.app')
 
+@push('styles')
+    <link href="{{ asset('css/validation.css') }}" rel="stylesheet">
+@endpush
+
 @section('content')
     <x-success-alert :message="session('success')" />
     <x-error-alert :message="session('error')" />
+    
+    <div class="container-fluid px-4">
+        <h1 class="mt-4">Employee Management</h1>
+        <ol class="breadcrumb mb-4">
+            <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
+            <li class="breadcrumb-item"><a href="{{ route('employees.index') }}">Employees</a></li>
+            <li class="breadcrumb-item active">Edit Employee</li>
+        </ol>
 
-  <div class="container-fluid px-4">
-    <h1 class="mt-4">Employee Management</h1>
-    <ol class="breadcrumb mb-4">
-        <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-        <li class="breadcrumb-item"><a href="{{ route('employees.index') }}">Employees</a></li>
-        <li class="breadcrumb-item active">Edit Employee</li>
-    </ol>
             <div class="card-body">
-                <form action="{{ route('employees.update', $employee->id) }}" method="POST">
+                <div class="d-flex justify-content-end flex-wrap gap-2 mb-3">
+                    <a href="{{ route('employees.emergency-contacts.edit', $employee->employee_number) }}" class="btn btn-outline-primary">
+                        <i class="fas fa-address-book me-1"></i> Emergency Contacts
+                    </a>
+                    <a href="" class="btn btn-outline-secondary">
+                        <i class="fas fa-users me-1"></i> Dependents
+                    </a>
+                    <a href="" class="btn btn-outline-success">
+                        <i class="fas fa-graduation-cap me-1"></i> Education
+                    </a>
+                    <a href="" class="btn btn-outline-info">
+                        <i class="fas fa-briefcase me-1"></i> Employment History
+                    </a>
+                </div>
+
+            <form novalidate action="{{ route('employees.update', $employee) }}" method="POST">
                     @csrf
                     @method('PUT')
 
                     <!-- Personal Information Card -->
                     <div class="card mb-4 shadow-sm border-0">
-                        <div class="card-header bg-light">
-                            <h6 class="mb-0 text-primary fw-bold">Personal Information</h6>
+                        <div class="card-header bg-danger">
+                            <h6 class="mb-0 text-white fw-bold">Personal Information</h6>
                         </div>
                         <div class="card-body row g-3">
                             <div class="col-md-3">
                                 <label for="employee_number" class="form-label">Employee ID</label>
-                                <input type="text" name="employee_number" id="employee_number" class="form-control rounded-2 shadow-sm" 
+                                <input type="text" name="employee_number" id="employee_number" class="form-control rounded-2 shadow-sm" style="text-transform: uppercase;" 
                                     value="{{ old('employee_number', $employee->employee_number) }}" readonly required>
                             </div>
                             <div class="col-md-3">
                                 <label for="first_name" class="form-label">First Name</label>
-                                <input type="text" name="first_name" id="first_name" class="form-control" 
-                                    value="{{ old('first_name', $employee->personalInfo->first_name) }}" required>
+                                <input type="text" 
+                                    name="first_name" 
+                                    id="first_name" 
+                                    class="form-control rounded-2 shadow-sm @error('first_name') is-invalid @enderror"
+                                    value="{{ old('first_name', $employee->personalInfo->first_name) }}" 
+                                    style="text-transform: uppercase;" 
+                                    required>
+                                @error('first_name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             <div class="col-md-3">
                                 <label for="middle_name" class="form-label">Middle Name</label>
-                                <input type="text" name="middle_name" id="middle_name" class="form-control rounded-2 shadow-sm"
+                                <input type="text" name="middle_name" id="middle_name" class="form-control rounded-2 shadow-sm" style="text-transform: uppercase;"
                                     value="{{ old('middle_name', $employee->personalInfo->middle_name) }}">
+                                <div class="invalid-feedback">
+                                    Please provide a middle name.
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <label for="last_name" class="form-label">Last Name</label>
-                                <input type="text" name="last_name" id="last_name" class="form-control rounded-2 shadow-sm"
+                                <input type="text" name="last_name" id="last_name" class="form-control rounded-2 shadow-sm" style="text-transform: uppercase;"
                                     value="{{ old('last_name', $employee->personalInfo->last_name) }}" required>
+                                    <div class="invalid-feedback">
+                                    Please provide a last name.
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <label for="name_suffix" class="form-label">Name Suffix</label>
-                                <input type="text" name="name_suffix" id="name_suffix" class="form-control rounded-2 shadow-sm" 
+                                <input type="text" name="name_suffix" id="name_suffix" class="form-control rounded-2 shadow-sm" style="text-transform: uppercase;" 
                                     value="{{ old('name_suffix', $employee->personalInfo->name_suffix) }}">
                             </div>
                             <div class="col-md-3">
                                 <label for="preferred_name" class="form-label">Preferred Name</label>
-                                <input type="text" name="preferred_name" id="preferred_name" class="form-control rounded-2 shadow-sm"
+                                <input type="text" name="preferred_name" id="preferred_name" class="form-control rounded-2 shadow-sm" style="text-transform: uppercase;"
                                     value="{{ old('preferred_name', $employee->personalInfo->preferred_name) }}">
                             </div>
                             <div class="col-md-3">
@@ -59,6 +93,9 @@
                                     <option value="Female" {{ $employee->personalInfo->gender == 'Female' ? 'selected' : '' }}>Female</option>
                                     <option value="Other" {{ $employee->personalInfo->gender == 'Other' ? 'selected' : '' }}>Other</option>
                                 </select>
+                                <div class="invalid-feedback">
+                                    Please provide a gender.
+                                </div>
                             </div>
                             <div class="col-md-3">
                                 <label for="birthday" class="form-label">Birthday</label>
@@ -67,13 +104,26 @@
                             </div>
                             <div class="col-md-3">
                                 <label for="email" class="form-label">Email</label>
-                                <input type="email" name="email" id="email" class="form-select rounded-2 shadow-sm"
+                                <input type="email" name="email" id="email" class="form-control rounded-2 shadow-sm"
                                     value="{{ old('email', $employee->personalInfo->email) }}" required>
+                                <div class="invalid-feedback">
+                                    Please provide an email.
+                                </div>
                             </div>
-                            <div class="col-md-3">
+                           <div class="col-md-3">
                                 <label for="phone_number" class="form-label">Phone Number</label>
-                                <input type="text" name="phone_number" id="phone_number" class="form-select rounded-2 shadow-sm"
-                                    value="{{ old('phone_number', $employee->personalInfo->phone_number) }}" required>
+                                <input type="text" 
+                                    name="phone_number" 
+                                    id="phone_number" 
+                                    class="form-control rounded-2 shadow-sm phone-number"
+                                    value="{{ old('phone_number', $employee->personalInfo->phone_number) }}" 
+                                    required
+                                    pattern="^(09|\+639)\d{9}$">
+                                <div class="invalid-feedback">
+                                    Please enter a valid Philippine mobile number (e.g., 09171234567 or +639171234567)
+                                </div>
+                            </div>
+
                             </div>
                             <div class="col-md-3">
                                 <label for="civil_status" class="form-label">Civil Status</label>
@@ -92,8 +142,8 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="card mb-4 shadow-sm border-0">
-                                <div class="card-header bg-light">
-                                    <h6 class="mb-0 text-primary fw-bold">Employment Information</h6>
+                                <div class="card-header bg-danger">
+                                    <h6 class="mb-0 text-white fw-bold">Employment Information</h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-3">
@@ -161,8 +211,8 @@
                         <!-- Compensation Package Card -->
                         <div class="col-md-6">
                             <div class="card mb-4 shadow-sm border-0">
-                                <div class="card-header bg-light">
-                                    <h6 class="mb-0 text-primary fw-bold">Compensation Package</h6>
+                                <div class="card-header bg-danger">
+                                    <h6 class="mb-0 text-white fw-bold">Compensation Package</h6>
                                 </div>
                                 <div class="card-body">
                                     <div class="mb-3">
@@ -195,14 +245,17 @@
                                         <input type="number" name="clothing_allowance" id="clothing_allowance" class="form-control rounded-2 shadow-sm"
                                             value="{{ old('clothing_allowance', $employee->compensationPackage->clothing_allowance) }}">
                                     </div>
-                                    <div class="mb-3">
+                                   <div class="mb-3">
                                         <label for="atm_account_number" class="form-label">ATM Account Number</label>
-                                        <input type="text" name="atm_account_number" id="atm_account_number" class="form-control rounded-2 shadow-sm"
+                                        <input type="text" 
+                                            name="atm_account_number" 
+                                            id="atm_account_number" 
+                                            class="form-control rounded-2 shadow-sm numeric-only"
                                             value="{{ old('atm_account_number', $employee->compensationPackage->atm_account_number) }}">
                                     </div>
                                     <div class="mb-3">
                                         <label for="bank_name" class="form-label">Bank Name</label>
-                                        <input type="text" name="bank_name" id="bank_name" class="form-control rounded-2 shadow-sm"
+                                        <input type="text" name="bank_name" id="bank_name" class="form-control rounded-2 shadow-sm" style="text-transform: uppercase;"
                                             value="{{ old('bank_name', $employee->compensationPackage->bank_name) }}">
                                     </div>
                                 </div>
@@ -210,22 +263,48 @@
                         </div>
                     </div>
 
+
+
                     <!-- Submit -->
-                    <div class="d-grid">
-                        <button type="submit" class="btn btn-primary rounded-pill shadow-sm">Update Employee</button>
+                    <div class="text-end mt-4 mb-4">
+                        
+                        <button type="submit" class="btn btn-success rounded-pill shadow-sm px-4">
+                            <i class="fas fa-save me-1"></i> Update Employee
+                        </button>
+                        <a href="{{ route('employees.index') }}" class="btn btn-dark me-2 rounded-pill shadow-sm "><i class="fas fa-times"></i> Cancel</a>
                     </div>
+
+
+
                 </form>
             </div>
         </div>
     </div>
 @endsection
-
 @push('scripts')
-<script>
+    <script src="{{ asset('js/validation.js') }}"></script>
+    <script>
     document.addEventListener('DOMContentLoaded', function () {
+        // Initialize form validation
+        setupFormValidation('form');
+        
+        // Uppercase formatting for specific fields
+        const uppercaseFields = ['first_name', 'middle_name', 'last_name', 'name_suffix', 
+                               'preferred_name', 'bank_name'];
+        uppercaseFields.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('input', () => {
+                    input.value = input.value.toUpperCase();
+                });
+            }
+        });
+
+ 
+        // CDM Level and Position dynamic loading
         const cdmSelect = document.getElementById('cdm_level_id');
         const positionSelect = document.getElementById('position_id');
-        const selectedPositionId = "{{ $employee->position_id }}"; // Preserve selected position
+        const selectedPositionId = "{{ $employee->position_id }}";
 
         if (cdmSelect) {
             cdmSelect.addEventListener('change', function () {
@@ -245,7 +324,7 @@
                         data.positions.forEach(function (position) {
                             const option = new Option(position.name, position.id);
                             if (position.id == selectedPositionId) {
-                                option.selected = true; // Re-select
+                                option.selected = true;
                             }
                             positionSelect.add(option);
                         });
@@ -256,11 +335,29 @@
                     });
             });
 
-            // Trigger initial load
             if (cdmSelect.value) {
                 cdmSelect.dispatchEvent(new Event('change'));
             }
         }
+
+        // Back button validation
+        const backButton = document.querySelector('a[href="{{ route('employees.index') }}"]');
+        if (backButton) {
+            backButton.addEventListener('click', function(e) {
+                let isValid = true;
+                document.querySelectorAll('[required]').forEach(field => {
+                    if (!field.value.trim()) {
+                        field.classList.add('is-invalid');
+                        isValid = false;
+                    }
+                });
+                
+                if (!isValid) {
+                    e.preventDefault();
+                    showAlert('warning', 'Please fill in all required fields before going back.');
+                }
+            });
+        }
     });
-</script>
-@endpush
+    </script>
+

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Database\Factories\EmployeeInfoFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -17,8 +18,15 @@ class EmployeeEmergencyContact extends Model
         'address'
     ];
 
+    
+
     public function employee()
     {
-        return $this->belongsTo(EmployeeInfo::class, 'employee_number', 'employee_number');
+        return $this->belongsTo(EmploymentInfo::class, 'employee_number', 'employee_number');
     }
+    
+    public function employmentInfo()
+{
+    return $this->belongsTo(EmploymentInfo::class, 'employee_number', 'employee_number');
+}
 }

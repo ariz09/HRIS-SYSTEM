@@ -10,11 +10,15 @@ class EmployeeEmergencyContact extends Model
     use HasFactory;
 
     protected $fillable = [
-        'employee_id', 'name', 'relationship', 'mobile_number', 'present_address'
+        'employee_number',
+        'fullname',
+        'relationship',
+        'contact_number',
+        'address'
     ];
 
     public function employee()
     {
-        return $this->belongsTo(Employee::class);
+        return $this->belongsTo(EmployeeInfo::class, 'employee_number', 'employee_number');
     }
 }

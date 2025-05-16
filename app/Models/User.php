@@ -30,8 +30,17 @@ class User extends Authenticatable
         'password_changed' => 'boolean',
     ];
 
-    public function employeeInfo(): HasOne
-    {
-        return $this->hasOne(EmployeeInfo::class);
-    }
+    public function personalInfo()
+{
+    return $this->hasOne(\App\Models\PersonalInfo::class, 'user_id');
 }
+
+
+    public function employmentInfo()
+    {
+        return $this->hasOne(\App\Models\EmploymentInfo::class, 'user_id');
+    }
+    
+
+}
+ 

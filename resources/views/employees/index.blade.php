@@ -124,20 +124,13 @@
 
                     <div class="mb-3">
                         <a href="{{ route('employees.template.download') }}"
-                        class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg shadow-md transition"
-                        target="_blank"
-                        download>
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2"
-                                viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                                <path stroke-linecap="round" stroke-linejoin="round"
-                                    d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12v8m0 0l-3-3m3 3l3-3M12 4v8"/>
-                            </svg>
+                            class="btn btn-primary btn-sm" target="_blank"  download>
                             Download Template
                         </a>
                     </div>
 
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Upload</button>
+                    <button type="submit" class="btn btn-success">Upload</button>
                 </div>
             </div>
         </form>

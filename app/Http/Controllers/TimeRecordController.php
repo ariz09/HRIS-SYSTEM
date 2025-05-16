@@ -127,7 +127,9 @@ class TimeRecordController extends Controller
     public function myTimeRecords(Request $request)
     {
         $user = Auth::user();
-        $query = \App\Models\TimeRecord::where('user_id', $user->id);
+        $query = \App\Models\TimeRecord::where('user_id', $user->id)
+            ->with(['employee.department', 'employee.position', 'employee.agency']);
+
         if ($request->filled('start_date')) {
             $query->whereDate('recorded_at', '>=', $request->start_date);
         }
@@ -143,7 +145,7 @@ class TimeRecordController extends Controller
                 'Content-Type' => 'text/csv',
                 'Content-Disposition' => "attachment; filename=\"$filename\"",
             ];
-            $columns = ['Date', 'Type', 'Time', 'Status'];
+            $columns = ['Date', 'Type', 'Time', 'Department', 'Position', 'Company', 'Status'];
             $callback = function() use ($timeRecords, $columns) {
                 $file = fopen('php://output', 'w');
                 fputcsv($file, $columns);
@@ -152,6 +154,9 @@ class TimeRecordController extends Controller
                         \Carbon\Carbon::parse($record->recorded_at)->format('Y-m-d'),
                         ucfirst(str_replace('_', ' ', $record->type)),
                         \Carbon\Carbon::parse($record->recorded_at)->format('h:i:s A'),
+                        optional($record->employee)->department->name ?? 'N/A',
+                        optional($record->employee)->position->name ?? 'N/A',
+                        optional($record->employee)->agency->name ?? 'N/A',
                         ucfirst($record->status),
                     ]);
                 }
@@ -165,7 +170,13 @@ class TimeRecordController extends Controller
 
     public function allTimeRecords(Request $request)
     {
-        $query = \App\Models\TimeRecord::with(['employee.user']);
+        $query = \App\Models\TimeRecord::with([
+            'employee.user',
+            'employee.department',
+            'employee.position',
+            'employee.agency'
+        ]);
+
         if ($request->filled('start_date')) {
             $query->whereDate('recorded_at', '>=', $request->start_date);
         }
@@ -181,7 +192,7 @@ class TimeRecordController extends Controller
                 'Content-Type' => 'text/csv',
                 'Content-Disposition' => "attachment; filename=\"$filename\"",
             ];
-            $columns = ['Employee', 'Date', 'Type', 'Time', 'Status'];
+            $columns = ['Employee', 'Date', 'Type', 'Time', 'Department', 'Position', 'Company', 'Status'];
             $callback = function() use ($timeRecords, $columns) {
                 $file = fopen('php://output', 'w');
                 fputcsv($file, $columns);
@@ -192,6 +203,9 @@ class TimeRecordController extends Controller
                         \Carbon\Carbon::parse($record->recorded_at)->format('Y-m-d'),
                         ucfirst(str_replace('_', ' ', $record->type)),
                         \Carbon\Carbon::parse($record->recorded_at)->format('h:i:s A'),
+                        optional($record->employee)->department->name ?? 'N/A',
+                        optional($record->employee)->position->name ?? 'N/A',
+                        optional($record->employee)->agency->name ?? 'N/A',
                         ucfirst($record->status),
                     ]);
                 }

@@ -42,6 +42,9 @@
                             <th>Date</th>
                             <th>Type</th>
                             <th>Time</th>
+                            <th>Department</th>
+                            <th>Position</th>
+                            <th>Company</th>
                             <th>Status</th>
                         </tr>
                     </thead>
@@ -51,11 +54,14 @@
                             <td>{{ \Carbon\Carbon::parse($record->recorded_at)->format('Y-m-d') }}</td>
                             <td>{{ ucfirst(str_replace('_', ' ', $record->type)) }}</td>
                             <td>{{ \Carbon\Carbon::parse($record->recorded_at)->format('h:i:s A') }}</td>
+                            <td>{{ optional($record->employee)->department->name ?? 'N/A' }}</td>
+                            <td>{{ optional($record->employee)->position->name ?? 'N/A' }}</td>
+                            <td>{{ optional($record->employee)->agency->name ?? 'N/A' }}</td>
                             <td>{{ ucfirst($record->status) }}</td>
                         </tr>
                         @empty
                         <tr>
-                            <td colspan="4" class="text-center text-muted">No time records found.</td>
+                            <td colspan="7" class="text-center text-muted">No time records found.</td>
                         </tr>
                         @endforelse
                     </tbody>

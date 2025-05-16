@@ -19,7 +19,7 @@ use App\Http\Controllers\{
     LeaveApplicationController,
     EmployeeInfoController,
     PersonalInfoController,
-    EmployeeController
+    EmployeeController,
 };
 
 use App\Http\Controllers\EmployeePersonalInfoController;
@@ -97,6 +97,14 @@ Route::prefix('employees')->name('employees.')->group(function () {
             
         Route::delete('dependents/{dependent}', [EmployeeDependentController::class, 'destroy'])
             ->name('dependents.destroy');
+
+        Route::get('educations/edit', [EmployeeEducationController::class, 'edit'])
+        ->name('educations.edit');
+        Route::put('educations/', [EmployeeEducationController::class, 'update'])
+        ->name('educations.update');
+        Route::delete('educations/{education}', [EmployeeEducationController::class, 'destroy'])
+        ->name('educations.destroy');
+           
     });
 
     

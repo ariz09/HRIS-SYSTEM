@@ -35,12 +35,12 @@
                 </div>
             @endif
 
-            <div class="d-flex justify-content-between mt-4">
-                <button type="button" id="add-contact-btn" class="btn btn-outline-primary rounded-pill">
+            <div class="d-flex justify-content-between mt-1">
+                <button type="button" id="add-contact-btn" class="btn btn-outline-primary rounded-pill mb-3">
                     <i class="fas fa-plus me-1"></i> Add Contact
                 </button>
 
-                <button type="submit" class="btn btn-primary rounded-pill">
+                <button type="submit" class="btn btn-success rounded-pill mb-3">
                     <i class="fas fa-save me-1"></i> Save Changes
                 </button>
             </div>

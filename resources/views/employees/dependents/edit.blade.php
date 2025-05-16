@@ -35,12 +35,12 @@
             </div>
         @endif
 
-        <div class="d-flex justify-content-between mt-4">
-            <button type="button" id="add-dependent-btn" class="btn btn-outline-primary rounded-pill">
+        <div class="d-flex justify-content-between mt-1">
+            <button type="button" id="add-dependent-btn" class="btn btn-outline-primary rounded-pill mb-3">
                 <i class="fas fa-plus me-1"></i> Add Dependent
             </button>
 
-            <button type="submit" class="btn btn-primary rounded-pill">
+            <button type="submit" class="btn btn-success rounded-pill mb-3">
                 <i class="fas fa-save me-1"></i> Save Changes
             </button>
         </div>
@@ -51,11 +51,11 @@
 <template id="dependent-template">
     <div class="dependent-card col-md-6">
         <div class="card mb-3 shadow-sm border-0">
-            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center py-2" style="font-size: 0.875rem;">
+            <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center py-2" style="font-size: 0.875rem;">
                 <h6 class="mb-0 text-white" style="font-size: 0.875rem;">
                     Dependent #<span class="dependent-number"></span>
                 </h6>
-                <button type="button" class="btn btn-sm btn-light delete-dependent-btn text-primary rounded-circle" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" style="width: 24px; height: 24px; line-height: 1;">
+                <button type="button" class="btn btn-sm btn-light delete-dependent-btn text-danger rounded-circle" data-bs-toggle="modal" data-bs-target="#deleteConfirmModal" style="width: 24px; height: 24px; line-height: 1;">
                     <i class="fas fa-times" style="font-size: 0.75rem;"></i>
                 </button>
             </div>

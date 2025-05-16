@@ -87,7 +87,18 @@ Route::prefix('employees')->name('employees.')->group(function () {
         
         Route::delete('emergency-contacts/{contact}', [EmployeeEmergencyContactController::class, 'destroy'])
             ->name('emergency-contacts.destroy');
+                    
+        // Dependents
+        Route::get('dependents/edit', [EmployeeDependentController::class, 'edit'])
+            ->name('dependents.edit');
+            
+        Route::put('dependents', [EmployeeDependentController::class, 'update'])
+            ->name('dependents.update');
+            
+        Route::delete('dependents/{dependent}', [EmployeeDependentController::class, 'destroy'])
+            ->name('dependents.destroy');
     });
+
     
     Route::resource('personal_infos', PersonalInfoController::class);
     Route::resource('dependent', EmployeeDependentController::class)->except(['show']);

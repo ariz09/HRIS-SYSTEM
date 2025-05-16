@@ -21,7 +21,7 @@
                     <a href="{{ route('employees.emergency-contacts.edit', $employee->employee_number) }}" class="btn btn-outline-primary">
                         <i class="fas fa-address-book me-1"></i> Emergency Contacts
                     </a>
-                    <a href="" class="btn btn-outline-secondary">
+                    <a href="{{ route('employees.dependents.edit', $employee->employee_number) }}" class="btn btn-outline-warning">
                         <i class="fas fa-users me-1"></i> Dependents
                     </a>
                     <a href="" class="btn btn-outline-success">

@@ -1,0 +1,42 @@
+/* Employment History Specific Styles */
+.history-card .card-header {
+    font-weight: 600;
+}
+
+.uppercase {
+    text-transform: uppercase;
+}
+
+/* Date input icons */
+.input-group-text {
+    min-width: 40px;
+    justify-content: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .history-card {
+        margin-bottom: 1.5rem;
+    }
+}
+
+.delete-history-btn {
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    padding: 0;
+}
+
+#confirmDeleteBtn {
+    cursor: pointer;
+}
+
+/* Add smooth transition for card removal */
+.history-card {
+    transition: all 0.3s ease;
+}
+
+.history-card.removing {
+    opacity: 0;
+    transform: translateX(100%);
+}

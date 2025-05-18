@@ -20,7 +20,10 @@ class EmploymentInfo extends Model
         'position_id',
         'employment_type_id'
     ];
-
+    public function getRouteKeyName()
+    {
+        return 'employee_number';
+    }
 
     public function department()
     {
@@ -67,11 +70,11 @@ class EmploymentInfo extends Model
         return $this->belongsTo(User::class);
     }
 
-    // EmploymentInfo.php
-public function educations()
-{
-    return $this->hasMany(EmployeeEducation::class, 'employee_number', 'employee_number');
-}
+
+    public function educations()
+    {
+        return $this->hasMany(EmployeeEducation::class, 'employee_number', 'employee_number');
+    }
 
     public function dependents()
     {
@@ -84,8 +87,9 @@ public function educations()
         return $this->hasMany(EmployeeEmergencyContact::class, 'employee_number', 'employee_number');
     }
 
-    public function getRouteKeyName()
+    
+    public function employmentHistories()
     {
-        return 'employee_number';
+        return $this->hasMany(EmployeeEmploymentHistory::class, 'employee_number', 'employee_number');
     }
 }

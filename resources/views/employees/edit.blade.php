@@ -27,9 +27,10 @@
                     <a href="{{ route('employees.educations.edit',  $employee->employee_number) }}" class="btn btn-outline-success">
                         <i class="fas fa-graduation-cap me-1"></i> Education
                     </a>   
-                    <a href="" class="btn btn-outline-info">
-                        <i class="fas fa-briefcase me-1"></i> Employment History
-                    </a>
+
+                    <a href="{{ route('employees.employment-histories.edit', $employee->employee_number) }}" class="btn btn-outline-info">
+                    <i class="fas fa-briefcase me-1"></i> Edit Employment History
+                </a>
                 </div>
 
             <form novalidate action="{{ route('employees.update', $employee) }}" method="POST">

@@ -20,18 +20,15 @@ use App\Http\Controllers\{
     EmployeeInfoController,
     PersonalInfoController,
     EmployeeController,
+    EmployeePersonalInfoController,
+    EmployeeEmergencyContactController,
+    EmployeeDependentController,
+    EmployeeEducationController,
+    EmployeeEmploymentHistoryController,
+    TimeRecordController
 };
 
-use App\Http\Controllers\EmployeePersonalInfoController;
-use App\Http\Controllers\EmployeeEmergencyContactController;
-use App\Http\Controllers\EmployeeDependentController;
-use App\Http\Controllers\EmployeeEducationController;
-use App\Http\Controllers\EmployeeEmploymentHistoryController;
-use App\Http\Controllers\TimeRecordController;
-
-use App\Http\Controllers\Auth\{
-    AuthenticatedSessionController
-};
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
 // Redirect root to login
 Route::redirect('/', '/login');
@@ -44,78 +41,64 @@ Route::middleware('guest')->group(function () {
 
 // Authenticated User Routes
 Route::middleware(['auth'])->group(function () {
+
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard/action', [DashboardController::class, 'handleAction'])->name('dashboard.action');
 
-    // Remove this if you're grouping everything:
-    Route::get('/time-records', [TimeRecordController::class, 'index'])->name('time-records.index');
-
-    // Inside the group — make sure the route name is correct
+    // Time Records
     Route::prefix('time-records')->group(function () {
-        Route::get('/', [TimeRecordController::class, 'index'])->name('time-records.index'); // <-- Fixed here
+        Route::get('/', [TimeRecordController::class, 'index'])->name('time-records.index');
         Route::post('/time-in', [TimeRecordController::class, 'timeIn'])->name('time-in');
         Route::post('/time-out', [TimeRecordController::class, 'timeOut'])->name('time-out');
         Route::post('/time-out/update-status', [TimeRecordController::class, 'updateTimeInStatus'])->name('time-out.update-status');
-        // View for current user's time records
         Route::get('/my', [TimeRecordController::class, 'myTimeRecords'])->name('time-records.my');
-        // View for all employees' time records (admin only)
         Route::get('/all', [TimeRecordController::class, 'allTimeRecords'])->name('time-records.all');
     });
 
-    // Profile
-    /* Route::prefix('profile')->group(function () {
-        Route::get('/', [ProfileController::class, 'edit'])->name('profile.edit');
-        Route::patch('/', [ProfileController::class, 'update'])->name('profile.update');
-        Route::delete('/', [ProfileController::class, 'destroy'])->name('profile.destroy');
-    }); */
-
-// Employee Routes
-Route::prefix('employees')->name('employees.')->group(function () {
-    Route::get('{employee}/edit', [EmployeeController::class, 'edit'])->name('edit');
-    
-    Route::get('/template-download', [EmployeeController::class, 'downloadTemplate'])->name('template.download');
-    Route::post('/bulk-upload', [EmployeeController::class, 'bulkUpload'])->name('bulkUpload');
-    
-    // Emergency Contacts (moved outside the nested group)
-    Route::prefix('{employee}')->group(function () {
-        Route::get('emergency-contacts/edit', [EmployeeEmergencyContactController::class, 'edit'])
-            ->name('emergency-contacts.edit');
-        
-        Route::put('emergency-contacts', [EmployeeEmergencyContactController::class, 'update'])
-            ->name('emergency-contacts.update');
-        
-        Route::delete('emergency-contacts/{contact}', [EmployeeEmergencyContactController::class, 'destroy'])
-            ->name('emergency-contacts.destroy');
-                    
-        // Dependents
-        Route::get('dependents/edit', [EmployeeDependentController::class, 'edit'])
-            ->name('dependents.edit');
-            
-        Route::put('dependents', [EmployeeDependentController::class, 'update'])
-            ->name('dependents.update');
-            
-        Route::delete('dependents/{dependent}', [EmployeeDependentController::class, 'destroy'])
-            ->name('dependents.destroy');
-
-        Route::get('educations/edit', [EmployeeEducationController::class, 'edit'])
-        ->name('educations.edit');
-        Route::put('educations/', [EmployeeEducationController::class, 'update'])
-        ->name('educations.update');
-        Route::delete('educations/{education}', [EmployeeEducationController::class, 'destroy'])
-        ->name('educations.destroy');
-           
+    Route::prefix('employees/{employee}/employment-histories')->group(function () {
+        Route::get('edit', [EmployeeEmploymentHistoryController::class, 'edit'])
+            ->name('employees.employment-histories.edit');
+        Route::put('update', [EmployeeEmploymentHistoryController::class, 'update'])
+            ->name('employees.employment-histories.update');
+        Route::delete('{history}', [EmployeeEmploymentHistoryController::class, 'destroy'])
+            ->name('employees.employment-histories.destroy');
     });
 
-    
-    Route::resource('personal_infos', PersonalInfoController::class);
-    Route::resource('dependent', EmployeeDependentController::class)->except(['show']);
-    Route::resource('education', EmployeeEducationController::class)->except(['show']);
-    Route::resource('employment-history', EmployeeEmploymentHistoryController::class)->except(['show']);
-});
+    // Employee Routes
+    Route::prefix('employees')->name('employees.')->group(function () {
+        Route::get('{employee}/edit', [EmployeeController::class, 'edit'])->name('edit');
+        Route::get('/template-download', [EmployeeController::class, 'downloadTemplate'])->name('template.download');
+        Route::post('/bulk-upload', [EmployeeController::class, 'bulkUpload'])->name('bulkUpload');
 
-// Main employees resource route
-Route::resource('employees', EmployeeController::class);
+        // Nested Modules for Each Employee
+        Route::prefix('{employee}')->group(function () {
+            // Emergency Contacts
+            Route::get('emergency-contacts/edit', [EmployeeEmergencyContactController::class, 'edit'])->name('emergency-contacts.edit');
+            Route::put('emergency-contacts', [EmployeeEmergencyContactController::class, 'update'])->name('emergency-contacts.update');
+            Route::delete('emergency-contacts/{contact}', [EmployeeEmergencyContactController::class, 'destroy'])->name('emergency-contacts.destroy');
+
+            // Dependents
+            Route::get('dependents/edit', [EmployeeDependentController::class, 'edit'])->name('dependents.edit');
+            Route::put('dependents', [EmployeeDependentController::class, 'update'])->name('dependents.update');
+            Route::delete('dependents/{dependent}', [EmployeeDependentController::class, 'destroy'])->name('dependents.destroy');
+
+            // Educations
+            Route::get('educations/edit', [EmployeeEducationController::class, 'edit'])->name('educations.edit');
+            Route::put('educations', [EmployeeEducationController::class, 'update'])->name('educations.update');
+            Route::delete('educations/{education}', [EmployeeEducationController::class, 'destroy'])->name('educations.destroy');
+
+          
+        });        
+        Route::resource('personal_infos', PersonalInfoController::class);
+        Route::resource('dependent', EmployeeDependentController::class)->except(['show']);
+        Route::resource('education', EmployeeEducationController::class)->except(['show']);
+        
+    });
+
+    // Main Employee resource route
+    Route::resource('employees', EmployeeController::class);
+
     // Leave Management
     Route::resource('leaves', LeaveController::class)->names('leaves');
     Route::resource('leave-types', LeaveTypeController::class)->parameters(['leave-types' => 'leave_type'])->names('leave_types');
@@ -133,6 +116,7 @@ Route::resource('employees', EmployeeController::class);
     Route::resource('role_permissions', RolePermissionController::class)->names('role_permissions');
     Route::resource('employment_types', EmploymentTypeController::class)->names('employment_types');
 
+    // Position Utilities
     Route::get('/positions/by-cdm-level/{cdmLevel}', [PositionController::class, 'getByCdmLevel'])->name('positions.by-cdm-level');
     Route::get('/positions/{position}/cdm-level', [PositionController::class, 'getCdmLevel'])->name('positions.cdm-level');
 
@@ -143,7 +127,7 @@ Route::resource('employees', EmployeeController::class);
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 });
 
-// API endpoint for all time records with user name
+// API endpoint
 Route::get('/api/all-time-records', function () {
     return \App\Models\TimeRecord::with('user')
         ->orderBy('recorded_at', 'desc')

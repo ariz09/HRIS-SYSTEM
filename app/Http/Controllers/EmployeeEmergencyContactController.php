@@ -37,6 +37,7 @@ class EmployeeEmergencyContactController extends Controller
             ]
         ]);
     }
+
     public function update(Request $request, EmploymentInfo $employee)
     {
         $validated = $request->validate([
@@ -85,14 +86,14 @@ class EmployeeEmergencyContactController extends Controller
             ->with('success', 'Emergency contacts updated successfully.');
     }
 
-    public function destroy(EmploymentInfo $employee, EmployeeEmergencyContact $contact)
-    {
-        $contact->delete();
-        
-        if (request()->ajax()) {
-            return response()->json(['success' => true]);
+    public function destroy($employeeNumber, $contactId)
+        {
+            $contact = EmployeeEmergencyContact::where('id', $contactId)
+                ->where('employee_number', $employeeNumber)
+                ->firstOrFail();
+
+            $contact->delete();
+
+            return redirect()->back()->with('success', 'Emergency contact deleted successfully.');
         }
-        
-        return back()->with('success', 'Contact deleted successfully.');
-    }
 }

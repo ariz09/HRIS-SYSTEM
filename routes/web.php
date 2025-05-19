@@ -77,6 +77,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('emergency-contacts/edit', [EmployeeEmergencyContactController::class, 'edit'])->name('emergency-contacts.edit');
             Route::put('emergency-contacts', [EmployeeEmergencyContactController::class, 'update'])->name('emergency-contacts.update');
             Route::delete('emergency-contacts/{contact}', [EmployeeEmergencyContactController::class, 'destroy'])->name('emergency-contacts.destroy');
+            
 
             // Dependents
             Route::get('dependents/edit', [EmployeeDependentController::class, 'edit'])->name('dependents.edit');

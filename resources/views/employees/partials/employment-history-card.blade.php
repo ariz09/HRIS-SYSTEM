@@ -16,7 +16,7 @@
                 value="{{ old("histories.$index.id", $history->id ?? '') }}">
 
             <div class="row">
-                <div class="col-md-6 mb-3">
+                <div class="mb-3">
                     <label class="form-label fw-semibold">Job Title <span class="text-danger">*</span></label>
                     <div class="input-group">
                         <span class="input-group-text"><i class="fas fa-user-tie"></i></span>

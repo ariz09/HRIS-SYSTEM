@@ -58,7 +58,7 @@
                                         data-bs-toggle="tooltip" title="Edit Employee">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    {{-- <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
+                                 {{--    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal"
                                         data-bs-target="#deleteModal" data-employee="{{ $employee->id }}"
                                         title="Delete Employee">
                                         <i class="fas fa-trash-alt"></i>
@@ -126,23 +126,36 @@
     </div>
 </div>
 @endsection
-
 @section('scripts')
-<script src="{{ asset('js/validation.js') }}"></script>
+@push('scripts')
+<!-- Ensure jQuery is loaded first -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- DataTables CSS and JS (Bootstrap 5 + Responsive + Buttons) -->
+<link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css" rel="stylesheet">
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        // Initialize DataTable with buttons and loading state
+    $(document).ready(function () {
         $('#employeesTable').DataTable({
             responsive: true,
-            dom: '<"top"<"d-flex justify-content-between align-items-center"lfB>>rt<"bottom"ip><"clear">',
+            dom: '<"top d-flex justify-content-between align-items-center"lfB>rt<"bottom d-flex justify-content-between align-items-center"ip><"clear">',
             buttons: [
                 {
                     extend: 'csv',
                     text: '<i class="fas fa-file-csv me-1"></i> Export CSV',
                     className: 'btn btn-success btn-sm',
-                    title: 'Employees_List',
+                    title: 'Employment_Types',
                     exportOptions: {
-                        columns: ':not(:last-child)' // Exclude actions column
+                        columns: ':visible'
                     }
                 },
                 {
@@ -150,32 +163,35 @@
                     text: '<i class="fas fa-copy me-1"></i> Copy',
                     className: 'btn btn-info btn-sm',
                     exportOptions: {
-                        columns: ':not(:last-child)' // Exclude actions column
+                        columns: ':visible'
                     }
                 }
             ],
-            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
             pageLength: 10,
             processing: true,
             language: {
                 processing: '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div> Loading...'
             },
             initComplete: function() {
-                $('.dataTables_filter input').addClass('form-control-sm');
-                $('.dataTables_length select').addClass('form-select-sm');
+                $('.dataTables_filter input').addClass('form-control form-control-sm');
+                $('.dataTables_length select').addClass('form-select form-select-sm');
                 $('.dt-buttons').addClass('btn-group');
                 $('.dt-buttons button').removeClass('btn-secondary');
             }
         });
+    });
 
-        // Delete modal handler remains the same
+
+        /* // Delete modal handler remains the same
         const deleteModal = document.getElementById('deleteModal');
         deleteModal.addEventListener('show.bs.modal', function (event) {
             const button = event.relatedTarget;
             const employeeId = button.getAttribute('data-employee');
             const form = document.getElementById('deleteForm');
             form.action = "{{ route('employees.destroy', ':id') }}".replace(':id', employeeId);
-        });
-    });
+        }); */
 </script>
-@endsection
+@endpush
+
+

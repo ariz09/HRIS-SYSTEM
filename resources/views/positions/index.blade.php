@@ -9,7 +9,7 @@
         <li class="breadcrumb-item active">Positions</li>
     </ol>
     <div class="card mb-4">
-        <div class="card-header">
+        <div class="card-header  bg-danger text-white">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <i class="fas fa-table me-1"></i>
@@ -70,7 +70,7 @@
 <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="createModalLabel">Create New Position</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -108,10 +108,72 @@
 </div>
 
 <!-- Edit Modal -->
-<!-- The Edit Modal stays the same as in your code. -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="editModalLabel">Edit Position</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="editForm" method="POST">
+                @csrf
+                @method('PUT')
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="edit-name" class="form-label">Position Name</label>
+                        <input type="text" class="form-control" id="edit-name" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-cdm-level" class="form-label">CDM Level</label>
+                        <select class="form-select" id="edit-cdm-level" name="cdm_level_id" required>
+                            <option value="">Select CDM Level</option>
+                            @foreach($cdmLevels as $cdm)
+                                <option value="{{ $cdm->id }}">{{ $cdm->name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit-status" class="form-label">Status</label>
+                        <select class="form-select" id="edit-status" name="status">
+                            <option value="1">Active</option>
+                            <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success">Update Position</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 
 <!-- Delete Modal -->
-<!-- The Delete Modal stays the same as in your code. -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">Delete Position</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="deleteForm" method="POST">
+                @csrf
+                @method('DELETE')
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this position?</p>
+                    <p class="text-danger fw-bold mb-0">This action cannot be undone.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 
 @endsection
 

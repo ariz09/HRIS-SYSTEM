@@ -16,7 +16,7 @@
     </ol>
 
     <div class="card mb-4">
-        <div class="card-header">
+        <div class="card-header bg-danger text-white">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <i class="fas fa-table me-1"></i>
@@ -76,7 +76,7 @@
 <div class="modal fade" id="createModal" tabindex="-1" aria-labelledby="createModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header  bg-danger text-white">
                 <h5 class="modal-title" id="createModalLabel">Create New Agency</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -111,7 +111,7 @@
             @csrf
             @method('PUT')
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="editModalLabel">Edit Agency</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -145,7 +145,7 @@
             @csrf
             @method('DELETE')
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>

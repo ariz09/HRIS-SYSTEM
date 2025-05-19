@@ -9,7 +9,7 @@
         <li class="breadcrumb-item active">CDM Levels</li>
     </ol>
     <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="card-header  bg-danger text-white d-flex justify-content-between align-items-center">
             <div><i class="fas fa-layer-group me-1"></i> CDM Level List</div>
             <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createModal">
                 <i class="fas fa-plus"></i> Add CDM Level
@@ -50,7 +50,7 @@
     <div class="modal-dialog">
         <form action="{{ route('cdmlevels.store') }}" method="POST" class="modal-content">
             @csrf
-            <div class="modal-header">
+            <div class="modal-header  bg-danger text-white">
                 <h5 class="modal-title" id="createModalLabel">Create New CDM Level</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -78,7 +78,7 @@
         <form method="POST" id="editForm" class="modal-content">
             @csrf
             @method('PUT')
-            <div class="modal-header">
+            <div class="modal-header  bg-danger text-white">
                 <h5 class="modal-title" id="editModalLabel">Edit CDM Level</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
@@ -102,7 +102,7 @@
         <form id="deleteForm" method="POST" class="modal-content">
             @csrf
             @method('DELETE')
-            <div class="modal-header">
+            <div class="modal-header  bg-danger text-white">
                 <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>

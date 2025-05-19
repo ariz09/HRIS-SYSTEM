@@ -11,7 +11,7 @@
     </ol>
 
     <div class="card mb-4">
-        <div class="card-header bg-info text-white">
+        <div class="card-header bg-danger text-white">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <i class="fas fa-users me-1"></i>
@@ -64,7 +64,7 @@
         <form action="{{ route('role_permissions.store') }}" method="POST">
             @csrf
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="createRoleModalLabel">Create New Role</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -99,7 +99,7 @@
             @csrf
             @method('PUT')
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="editRoleModalLabel">Edit Role Permissions</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>

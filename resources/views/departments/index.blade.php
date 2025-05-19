@@ -11,7 +11,7 @@
     </ol>
 
     <div class="card mb-4">
-        <div class="card-header">
+        <div class="card-header  bg-danger text-white">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <i class="fas fa-table me-1"></i>
@@ -30,7 +30,7 @@
                     <thead>
                         <tr>
                             <th class="d-none">#</th>
-                            <th>Department Code</th>
+                  
                             <th>Department Name</th>
                             <th>Status</th>
                             <th>Actions</th>
@@ -40,7 +40,7 @@
                         @foreach($departments as $department)
                         <tr>
                             <td class="d-none">{{ $loop->iteration }}</td>
-                            <td>{{ $department->code }}</td>
+          
                             <td>{{ $department->name }}</td>
                             <td>
                                 @if($department->status)
@@ -72,7 +72,7 @@
         <div class="modal-content">
             <form action="{{ route('departments.store') }}" method="POST">
                 @csrf
-                <div class="modal-header">
+                <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="createModalLabel">Create New Department</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -105,15 +105,12 @@
             @csrf
             @method('PUT')
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="editModalLabel">Edit Department</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="edit-code" class="form-label">Department Code</label>
-                        <input type="text" class="form-control" id="edit-code" name="code" readonly>
-                    </div>
+
                     <div class="mb-3">
                         <label for="edit-name" class="form-label">Department Name</label>
                         <input type="text" class="form-control" id="edit-name" name="name" required>
@@ -142,7 +139,7 @@
             @csrf
             @method('DELETE')
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>

@@ -16,8 +16,8 @@
                 @csrf
                 <!-- Personal Information -->
                 <div class="card mb-4 shadow-sm border-0">
-                    <div class="card-header bg-light">
-                        <h6 class="mb-0 text-primary fw-bold">Personal Information</h6>
+                    <div class="card-header bg-danger">
+                        <h6 class="mb-0 text-white fw-bold">Personal Information</h6>
                     </div>
                     <div class="card-body row g-3">
                     <div class="col-md-3">
@@ -84,8 +84,8 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="card mb-4 shadow-sm border-0">
-                            <div class="card-header bg-light">
-                                <h6 class="mb-0 text-primary fw-bold">Employment Information</h6>
+                            <div class="card-header bg-danger">
+                                <h6 class="mb-0 text-white fw-bold">Employment Information</h6>
                             </div>
                             <div class="card-body">
 
@@ -150,8 +150,8 @@
 
                     <div class="col-md-6">
                         <div class="card mb-4 shadow-sm border-0">
-                            <div class="card-header bg-light">
-                                <h6 class="mb-0 text-primary fw-bold">Compensation Package</h6>
+                            <div class="card-header bg-danger">
+                                <h6 class="mb-0 text-white fw-bold">Compensation Package</h6>
                             </div>
                             <div class="card-body">
                                 <div class="mb-3">
@@ -191,26 +191,14 @@
                     </div>
                 </div>
 
-                <!-- Additional Sections -->
-                <div class="d-flex flex-wrap gap-2 mb-4">
-                    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#emergencyContactModal">
-                        Add Emergency Contact
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#dependentsModal">
-                        Add Dependents
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#employmentHistoryModal">
-                        Add Employment History
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#educationModal">
-                        Add Educational Background
-                    </button>
-                </div>
-
-                <!-- Submit Button -->
-                <div class="d-grid">
-                    <button type="submit" class="btn btn-success btn-lg rounded-pill shadow-sm">Create Employee</button>
-                </div>
+                <!-- Submit -->
+                    <div class="text-end mt-4 mb-4">
+                        
+                        <button type="submit" class="btn btn-success rounded-pill shadow-sm px-4">
+                            <i class="fas fa-save me-1"></i> Create Employee
+                        </button>
+                        <a href="{{ route('employees.index') }}" class="btn btn-dark me-2 rounded-pill shadow-sm "><i class="fas fa-times"></i> Cancel</a>
+                    </div>
             </form>
         </div>
     </div>

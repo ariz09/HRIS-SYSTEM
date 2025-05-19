@@ -18,17 +18,17 @@
 
             <div class="card-body">
                 <div class="d-flex justify-content-end flex-wrap gap-2 mb-3">
-                    <a href="{{ route('employees.emergency-contacts.edit', $employee->employee_number) }}" class="btn btn-outline-primary">
+                    <a href="{{ route('employees.emergency-contacts.edit', $employee->employee_number) }}" class="btn btn-outline-danger">
                         <i class="fas fa-address-book me-1"></i> Emergency Contacts
                     </a>
-                    <a href="{{ route('employees.dependents.edit', $employee->employee_number) }}" class="btn btn-outline-warning">
+                    <a href="{{ route('employees.dependents.edit', $employee->employee_number) }}" class="btn btn-outline-danger">
                         <i class="fas fa-users me-1"></i> Dependents
                     </a>
-                    <a href="{{ route('employees.educations.edit',  $employee->employee_number) }}" class="btn btn-outline-success">
+                    <a href="{{ route('employees.educations.edit',  $employee->employee_number) }}" class="btn btn-outline-danger">
                         <i class="fas fa-graduation-cap me-1"></i> Education
                     </a>   
 
-                    <a href="{{ route('employees.employment-histories.edit', $employee->employee_number) }}" class="btn btn-outline-info">
+                    <a href="{{ route('employees.employment-histories.edit', $employee->employee_number) }}" class="btn btn-outline-danger">
                     <i class="fas fa-briefcase me-1"></i> Edit Employment History
                 </a>
                 </div>

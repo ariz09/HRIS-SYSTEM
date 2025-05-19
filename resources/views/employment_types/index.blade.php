@@ -2,6 +2,7 @@
 
 @section('content')
 <x-success-alert :message="session('success')" />
+<x-error-alert :message="session('error')" />
 
 <div class="container-fluid px-4">
     <h1 class="mt-4">Employment Type Management</h1>
@@ -11,7 +12,7 @@
     </ol>
 
     <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <div class="card-header  bg-danger text-white d-flex justify-content-between align-items-center">
             <div><i class="fas fa-table me-1"></i> Employment Type List</div>
             <div>
                 <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createModal">
@@ -57,7 +58,7 @@
     <form method="POST" action="{{ route('employment_types.store') }}">
       @csrf
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header  bg-danger text-white">
           <h5 class="modal-title" id="createModalLabel">Add Employment Type</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
@@ -83,7 +84,7 @@
       @csrf
       @method('PUT')
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header  bg-danger text-white">
           <h5 class="modal-title" id="editModalLabel">Edit Employment Type</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
@@ -109,7 +110,7 @@
       @csrf
       @method('DELETE')
       <div class="modal-content">
-        <div class="modal-header">
+        <div class="modal-header  bg-danger text-white">
           <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
@@ -126,20 +127,60 @@
 </div>
 
 @endsection
-
+@section('scripts')
 @push('scripts')
 <!-- Ensure jQuery is loaded first -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- DataTables CSS and JS (Bootstrap 5) -->
-<link href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+<!-- DataTables CSS and JS (Bootstrap 5 + Responsive + Buttons) -->
+<link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+<link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css" rel="stylesheet">
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
 <script>
     $(document).ready(function() {
-        // Initialize DataTable
-        $('#employmentTypesTable').DataTable();
+        $('#employmentTypesTable').DataTable({
+            responsive: true,
+            dom: '<"top d-flex justify-content-between align-items-center"lfB>rt<"bottom d-flex justify-content-between align-items-center"ip><"clear">',
+            buttons: [
+                {
+                    extend: 'csv',
+                    text: '<i class="fas fa-file-csv me-1"></i> Export CSV',
+                    className: 'btn btn-success btn-sm',
+                    title: 'Employment_Types',
+                    exportOptions: {
+                        columns: [1] // Only export the name column
+                    }
+                },
+                {
+                    extend: 'copy',
+                    text: '<i class="fas fa-copy me-1"></i> Copy',
+                    className: 'btn btn-info btn-sm',
+                    exportOptions: {
+                        columns: [1]
+                    }
+                }
+            ],
+            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
+            pageLength: 10,
+            processing: true,
+            language: {
+                processing: '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div> Loading...'
+            },
+            initComplete: function() {
+                $('.dataTables_filter input').addClass('form-control form-control-sm');
+                $('.dataTables_length select').addClass('form-select form-select-sm');
+                $('.dt-buttons').addClass('btn-group');
+                $('.dt-buttons button').removeClass('btn-secondary');
+            }
+        });
 
         // Edit button
         $('.edit-btn').click(function() {
@@ -148,7 +189,7 @@
                 $('#edit-name').val(response.employmentType.name);
                 $('#editForm').attr('action', '/employment_types/' + id);
                 $('#editModal').modal('show');
-            }).fail(function(xhr) {
+            }).fail(function() {
                 alert('Error fetching data.');
             });
         });

@@ -9,8 +9,8 @@
     </ol>
 
     <div class="card mb-4">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <div>
+        <div class="card-header d-flex bg-danger justify-content-between align-items-center">
+            <div class="text-white">
                 <i class="fas fa-table me-1"></i>
                 Leave Type List
             </div>

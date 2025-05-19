@@ -68,7 +68,7 @@
         <div class="modal-content">
             <form action="{{ route('holidays.store') }}" method="POST">
                 @csrf
-                <div class="modal-header">
+                <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="addHolidayModalLabel">Add New Holiday</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -113,7 +113,7 @@
             @csrf
             @method('PUT')
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="editHolidayModalLabel">Edit Holiday</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -159,7 +159,7 @@
             @csrf
             @method('DELETE')
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="deleteHolidayModalLabel">Delete Holiday</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>

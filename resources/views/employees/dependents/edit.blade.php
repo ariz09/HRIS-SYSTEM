@@ -7,10 +7,10 @@
 @section('content')
 <div class="container-fluid px-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3 class="mt-4">
+        <h5 class="mt-4">
             <i class="fas fa-users me-2"></i>
             Dependents for {{ $employeeName }}
-        </h3>
+        </h5>
         <a href="{{ route('employees.edit', $employee) }}" 
             class="btn btn-outline-secondary rounded-pill" 
             id="back-button">
@@ -122,16 +122,18 @@
             @csrf
             @method('DELETE')
             <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title" id="deleteConfirmModalLabel">Delete Dependent</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                <div class="modal-header bg-danger text-white">
+                    <h6 class="modal-title" id="deleteConfirmModalLabel">Delete Dependent</h6>
+                    <button type="button" class="btn btn-sm btn-light delete-dependent-btn text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
+                        <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+                    </button>
                 </div>
                 <div class="modal-body">
                     Are you sure you want to delete this dependent?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Yes, Delete</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger btn-sm">Yes, Delete</button>
                 </div>
             </div>
         </form>

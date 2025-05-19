@@ -163,11 +163,15 @@
                 const deleteBtn = e.target.closest('.delete-contact-btn');
                 if (deleteBtn) {
                     const contactCard = deleteBtn.closest('.contact-card');
-                    const contactId = contactCard.querySelector('input[name$="[id]"]')?.value;
+                    const contactIdInput = contactCard.querySelector('input[name$="[id]"]');
+                    const contactId = contactIdInput?.value;
 
                     if (contactId) {
-                        deleteForm.action = `/employees/${@json($employee->employee_number)}/emergency-contacts/${contactId}`;
+                        // Existing contact: set form action to actual delete route
+                        deleteForm.action = `/employees/{{ $employee->employee_number }}/emergency-contacts/${contactId}`;
+                        deleteForm.onsubmit = null; // Allow regular form submission
                     } else {
+                        // New contact: prevent server submission and remove card locally
                         deleteForm.action = '';
                         deleteForm.onsubmit = function(e) {
                             e.preventDefault();
@@ -179,6 +183,7 @@
                     }
                 }
             });
+
 
             const backButton = document.getElementById('back-button');
             backButton.addEventListener('click', function(e) {

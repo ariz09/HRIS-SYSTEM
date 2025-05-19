@@ -11,14 +11,14 @@
     </ol>
 
     <div class="card mb-4">
-        <div class="card-header bg-primary text-white">
+        <div class="card-header  bg-danger text-white">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
                     <i class="fas fa-user-tag me-1"></i>
                     Role List
                 </div>
                 <div>
-                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#addRoleModal">
+                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addRoleModal">
                         <i class="fas fa-plus"></i> Add Role
                     </button>
                 </div>
@@ -60,7 +60,7 @@
         <form action="{{ route('roles.store') }}" method="POST">
             @csrf
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="addRoleModalLabel">Add New Role</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -87,7 +87,7 @@
             @csrf
             @method('PUT')
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="editRoleModalLabel">Edit Role</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -115,7 +115,7 @@
             @csrf
             @method('DELETE')
             <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="deleteRoleModalLabel">Delete Role</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>

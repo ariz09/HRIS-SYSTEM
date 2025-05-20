@@ -44,6 +44,17 @@ class DepartmentController extends Controller
             ->with('success', 'Department added successfully.');
     }
 
+    // DepartmentController.php
+
+public function edit($id)
+{
+    $department = Department::findOrFail($id);
+    return response()->json(['department' => $department]);
+}
+
+
+
+
     // Update an existing department
     public function update(Request $request, $id)
     {

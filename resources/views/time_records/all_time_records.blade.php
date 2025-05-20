@@ -26,30 +26,95 @@
                         <tr>
                             <th>Employee</th>
                             <th>Date</th>
-                            <th>Type</th>
-                            <th>Time</th>
+                            <th>Time In</th>
+                            <th>Time Out</th>
                             <th>Department</th>
                             <th>Position</th>
                             <th>Company</th>
                             <th>Status</th>
+                            <th>Total Working Hours</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($timeRecords as $record)
-                        <tr>
-                            <td>{{ $record->employee && $record->employee->user ? $record->employee->user->name : 'N/A' }}</td>
-                            <td>{{ \Carbon\Carbon::parse($record->recorded_at)->format('Y-m-d') }}</td>
-                            <td>{{ ucfirst(str_replace('_', ' ', $record->type)) }}</td>
-                            <td>{{ \Carbon\Carbon::parse($record->recorded_at)->format('h:i:s A') }}</td>
-                            <td>{{ optional($record->employee)->department->name ?? 'N/A' }}</td>
-                            <td>{{ optional($record->employee)->position->name ?? 'N/A' }}</td>
-                            <td>{{ optional($record->employee)->agency->name ?? 'N/A' }}</td>
-                            <td>{{ ucfirst($record->status) }}</td>
-                        </tr>
+                        @php
+                            // Get records for the selected date range or today if no dates selected
+                            $startDate = request('start_date') ? Carbon\Carbon::parse(request('start_date'))->startOfDay() : now()->startOfDay();
+                            $endDate = request('end_date') ? Carbon\Carbon::parse(request('end_date'))->endOfDay() : now()->endOfDay();
+
+                            $groupedRecords = $timeRecords
+                                ->whereBetween('recorded_at', [$startDate, $endDate])
+                                ->groupBy(['user_id', function($record) {
+                                    return Carbon\Carbon::parse($record->recorded_at)->format('Y-m-d');
+                                }]);
+                        @endphp
+                        @forelse($groupedRecords as $userId => $dateRecords)
+                            @foreach($dateRecords as $date => $records)
+                                @php
+                                    $employee = $records->first()->employee ?? null;
+                                    $timeIn = $records->where('type', 'time_in')->sortBy('recorded_at')->first();
+                                    $timeOut = $records->where('type', 'time_out')->sortByDesc('recorded_at')->first();
+                                    $totalHours = '';
+
+                                    if ($timeIn && $timeOut) {
+                                        $start = Carbon\Carbon::parse($timeIn->recorded_at);
+                                        $end = Carbon\Carbon::parse($timeOut->recorded_at);
+
+                                        // Only calculate if end time is after start time
+                                        if ($end->greaterThan($start)) {
+                                            // Calculate total minutes
+                                            $diffInMinutes = $start->diffInMinutes($end);
+
+                                            // Handle overnight shifts (if end time is before start time on the same day)
+                                            if ($end->format('Y-m-d') === $start->format('Y-m-d') && $end->lt($start)) {
+                                                $diffInMinutes = 24 * 60 - $diffInMinutes;
+                                            }
+
+                                            // Convert to hours and minutes
+                                            $hours = floor($diffInMinutes / 60);
+                                            $minutes = $diffInMinutes % 60;
+
+                                            // Format with leading zeros for minutes
+                                            $totalHours = sprintf('%d:%02d', $hours, $minutes);
+
+                                            // Add warning for unusually long shifts (>12 hours)
+                                            if ($hours > 12) {
+                                                $totalHours .= ' <span class="text-warning" title="Unusually long shift">⚠️</span>';
+                                            }
+                                        } else {
+                                            $totalHours = 'Invalid';
+                                        }
+                                    } elseif ($timeIn) {
+                                        $totalHours = 'No Time Out';
+                                    } elseif ($timeOut) {
+                                        $totalHours = 'No Time In';
+                                    } else {
+                                        $totalHours = 'N/A';
+                                    }
+
+                                    // Get the status based on the latest record
+                                    $status = 'N/A';
+                                    if ($timeOut) {
+                                        $status = ucfirst($timeOut->status);
+                                    } elseif ($timeIn) {
+                                        $status = ucfirst($timeIn->status);
+                                    }
+                                @endphp
+                                <tr>
+                                    <td>{{ optional($employee->user)->name ?? 'N/A' }}</td>
+                                    <td>{{ $date }}</td>
+                                    <td>{{ $timeIn ? Carbon\Carbon::parse($timeIn->recorded_at)->format('h:i:s A') : 'N/A' }}</td>
+                                    <td>{{ $timeOut ? Carbon\Carbon::parse($timeOut->recorded_at)->format('h:i:s A') : 'N/A' }}</td>
+                                    <td>{{ optional($employee)->department->name ?? 'N/A' }}</td>
+                                    <td>{{ optional($employee)->position->name ?? 'N/A' }}</td>
+                                    <td>{{ optional($employee)->agency->name ?? 'N/A' }}</td>
+                                    <td>{{ $status }}</td>
+                                    <td>{{ $totalHours }}</td>
+                                </tr>
+                            @endforeach
                         @empty
-                        <tr>
-                            <td colspan="8" class="text-center text-muted">No time records found.</td>
-                        </tr>
+                            <tr>
+                                <td colspan="9" class="text-center text-muted">No time records found for the selected period.</td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>

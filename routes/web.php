@@ -30,7 +30,7 @@ use App\Http\Controllers\{
     OvertimeController,
     PeriodTypeController,
     CutOffTypeController
-    
+
 };
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -85,7 +85,7 @@ Route::middleware(['auth'])->group(function () {
             Route::get('emergency-contacts/edit', [EmployeeEmergencyContactController::class, 'edit'])->name('emergency-contacts.edit');
             Route::put('emergency-contacts', [EmployeeEmergencyContactController::class, 'update'])->name('emergency-contacts.update');
             Route::delete('emergency-contacts/{contact}', [EmployeeEmergencyContactController::class, 'destroy'])->name('emergency-contacts.destroy');
-            
+
 
             // Dependents
             Route::get('dependents/edit', [EmployeeDependentController::class, 'edit'])->name('dependents.edit');
@@ -97,12 +97,12 @@ Route::middleware(['auth'])->group(function () {
             Route::put('educations', [EmployeeEducationController::class, 'update'])->name('educations.update');
             Route::delete('educations/{education}', [EmployeeEducationController::class, 'destroy'])->name('educations.destroy');
 
-          
-        });        
+
+        });
         Route::resource('personal_infos', PersonalInfoController::class);
         Route::resource('dependent', EmployeeDependentController::class)->except(['show']);
         Route::resource('education', EmployeeEducationController::class)->except(['show']);
-        
+
     });
 
     // Main Employee resource route
@@ -142,7 +142,7 @@ Route::middleware(['auth'])->group(function () {
         Route::delete('/{id}', [OvertimeController::class, 'destroy'])->name('destroy');
     });
 
- 
+
 
     // Search
     Route::get('/search', [SearchController::class, 'index'])->name('search');

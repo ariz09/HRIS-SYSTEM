@@ -21,18 +21,18 @@ use Illuminate\Support\Facades\Response;
 class EmployeeController extends Controller
 {
 
-    private function generateEmployeeNumber()
-{
-    $latestEmployee = EmploymentInfo::orderBy('employee_number', 'desc')->first();
-    $defaultEmployeeNumber = '000001';
+    public static function generateEmployeeNumber()
+    {
+        $latestEmployee = EmploymentInfo::orderBy('employee_number', 'desc')->first();
+        $defaultEmployeeNumber = '000001';
 
-    if ($latestEmployee) {
-        $latestNumber = (int)$latestEmployee->employee_number;
-        $defaultEmployeeNumber = str_pad($latestNumber + 1, 6, '0', STR_PAD_LEFT);
+        if ($latestEmployee) {
+            $latestNumber = (int)$latestEmployee->employee_number;
+            $defaultEmployeeNumber = str_pad($latestNumber + 1, 6, '0', STR_PAD_LEFT);
+        }
+
+        return $defaultEmployeeNumber;
     }
-
-    return $defaultEmployeeNumber;
-}
 
     public function index()
     {
@@ -54,7 +54,7 @@ class EmployeeController extends Controller
 
     public function create()
     {
-        
+
         return view('employees.create', [
             'agencies' => Agency::all(),
             'positions' => Position::all(),
@@ -293,29 +293,29 @@ class EmployeeController extends Controller
         $request->validate([
             'file' => 'required|file|mimes:csv,txt',
         ]);
-    
+
         $path = $request->file('file')->getRealPath();
         $data = array_map('str_getcsv', file($path));
         $header = array_map('trim', array_shift($data));
-    
+
         // Get the latest number only once
         $latestEmployee = EmploymentInfo::orderBy('employee_number', 'desc')->first();
         $latestNumber = $latestEmployee ? (int)$latestEmployee->employee_number : 0;
-    
+
         foreach ($data as $row) {
             $row = array_combine($header, $row);
-    
+
             // Generate employee number
             $latestNumber++;
             $newEmployeeNumber = str_pad($latestNumber, 6, '0', STR_PAD_LEFT);
-    
+
             // Create user
             $user = User::create([
                 'name' => $row['first_name'] . ' ' . $row['last_name'],
                 'email' => $row['email'],
                 'password' => bcrypt('PassW0rd@2025'),
             ]);
-    
+
             // Create personal info
             PersonalInfo::create([
                 'user_id' => $user->id,
@@ -330,7 +330,7 @@ class EmployeeController extends Controller
                 'phone_number' => $row['phone_number'],
                 'civil_status' => $row['civil_status'],
             ]);
-    
+
             // Create employment info
             EmploymentInfo::create([
                 'user_id' => $user->id,
@@ -343,7 +343,7 @@ class EmployeeController extends Controller
                 'position_id' => $row['position_id'],
                 'employment_type_id' => $row['employment_type_id'],
             ]);
-    
+
             // Compensation info
             CompensationPackage::create([
                 'employee_number' => $newEmployeeNumber,
@@ -357,7 +357,7 @@ class EmployeeController extends Controller
                 'bank_name' => $row['bank_name'],
             ]);
         }
-    
+
         return redirect()->back()->with('success', 'Bulk upload successful.');
     }
 
@@ -396,6 +396,6 @@ public function downloadTemplate()
         "Content-Disposition" => "attachment; filename=employee_upload_template.csv",
     ]);
 }
-    
+
 
 }

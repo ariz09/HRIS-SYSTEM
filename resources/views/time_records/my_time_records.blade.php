@@ -37,39 +37,92 @@
             </form>
         </div>
         <div class="card-body">
-            <div class="mb-3">
-                {{-- <a href="{{ route('time-records.my', array_merge(request()->all(), ['report' => '1'])) }}" class="btn btn-success">
-                    <i class="fas fa-file-excel"></i> Generate Report
-                </a> --}}
-            </div>
             <div class="table-responsive">
                 <table id="myTimeRecordsTable" class="table table-bordered table-striped">
                     <thead class="thead-light">
                         <tr>
                             <th>Date</th>
-                            <th>Type</th>
-                            <th>Time</th>
+                            <th>Time In</th>
+                            <th>Time Out</th>
                             <th>Department</th>
                             <th>Position</th>
                             <th>Company</th>
                             <th>Status</th>
+                            <th>Total Working Hours</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($timeRecords as $record)
-                        <tr>
-                            <td>{{ \Carbon\Carbon::parse($record->recorded_at)->format('Y-m-d') }}</td>
-                            <td>{{ ucfirst(str_replace('_', ' ', $record->type)) }}</td>
-                            <td>{{ \Carbon\Carbon::parse($record->recorded_at)->format('h:i:s A') }}</td>
-                            <td>{{ optional($record->employee)->department->name ?? 'N/A' }}</td>
-                            <td>{{ optional($record->employee)->position->name ?? 'N/A' }}</td>
-                            <td>{{ optional($record->employee)->agency->name ?? 'N/A' }}</td>
-                            <td>{{ ucfirst($record->status) }}</td>
-                        </tr>
+                        @php
+                            $groupedRecords = $timeRecords->groupBy(function($record) {
+                                return \Carbon\Carbon::parse($record->recorded_at)->format('Y-m-d');
+                            });
+                        @endphp
+                        @forelse($groupedRecords as $date => $records)
+                            @php
+                                // Get the first time-in and last time-out for the day
+                                $timeIn = $records->where('type', 'time_in')->sortBy('recorded_at')->first();
+                                $timeOut = $records->where('type', 'time_out')->sortByDesc('recorded_at')->first();
+                                $employee = $records->first()->employee ?? null;
+                                $totalHours = '';
+
+                                if ($timeIn && $timeOut) {
+                                    $start = \Carbon\Carbon::parse($timeIn->recorded_at);
+                                    $end = \Carbon\Carbon::parse($timeOut->recorded_at);
+
+                                    // Only calculate if end time is after start time
+                                    if ($end->greaterThan($start)) {
+                                        // Calculate total minutes
+                                        $diffInMinutes = $start->diffInMinutes($end);
+
+                                        // Handle overnight shifts (if end time is before start time on the same day)
+                                        if ($end->format('Y-m-d') === $start->format('Y-m-d') && $end->lt($start)) {
+                                            $diffInMinutes = 24 * 60 - $diffInMinutes;
+                                        }
+
+                                        // Convert to hours and minutes
+                                        $hours = floor($diffInMinutes / 60);
+                                        $minutes = $diffInMinutes % 60;
+
+                                        // Format with leading zeros for minutes
+                                        $totalHours = sprintf('%d:%02d', $hours, $minutes);
+
+                                        // Add warning for unusually long shifts (>12 hours)
+                                        if ($hours > 12) {
+                                            $totalHours .= ' <span class="text-warning" title="Unusually long shift">⚠️</span>';
+                                        }
+                                    } else {
+                                        $totalHours = 'Invalid';
+                                    }
+                                } elseif ($timeIn) {
+                                    $totalHours = 'No Time Out';
+                                } elseif ($timeOut) {
+                                    $totalHours = 'No Time In';
+                                } else {
+                                    $totalHours = 'N/A';
+                                }
+
+                                // Get the status based on the latest record
+                                $status = 'N/A';
+                                if ($timeOut) {
+                                    $status = ucfirst($timeOut->status);
+                                } elseif ($timeIn) {
+                                    $status = ucfirst($timeIn->status);
+                                }
+                            @endphp
+                            <tr>
+                                <td>{{ $date }}</td>
+                                <td>{{ $timeIn ? \Carbon\Carbon::parse($timeIn->recorded_at)->format('h:i:s A') : 'N/A' }}</td>
+                                <td>{{ $timeOut ? \Carbon\Carbon::parse($timeOut->recorded_at)->format('h:i:s A') : 'N/A' }}</td>
+                                <td>{{ optional($employee)->department->name ?? 'N/A' }}</td>
+                                <td>{{ optional($employee)->position->name ?? 'N/A' }}</td>
+                                <td>{{ optional($employee)->agency->name ?? 'N/A' }}</td>
+                                <td>{{ $status }}</td>
+                                <td>{{ $totalHours }}</td>
+                            </tr>
                         @empty
-                        <tr>
-                            <td colspan="7" class="text-center text-muted">No time records found.</td>
-                        </tr>
+                            <tr>
+                                <td colspan="8" class="text-center text-muted">No time records found.</td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -130,7 +183,7 @@ $(document).ready(function() {
                 title: fileName
             }
         ],
-        order: [[0, 'desc'], [2, 'desc']], // Sort by date and time by default
+        order: [[0, 'desc']], // Sort by date by default
         pageLength: 25,
         language: {
             search: "Search records:",

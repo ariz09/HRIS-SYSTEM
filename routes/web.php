@@ -26,7 +26,9 @@ use App\Http\Controllers\{
     EmployeeEducationController,
     EmployeeEmploymentHistoryController,
     TimeRecordController,
-    File201Controller
+    File201Controller,
+    OvertimeController,
+    
 };
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -127,6 +129,16 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/201-files/{id}', [File201Controller::class, 'destroy'])->name('file201.destroy');
     Route::get('/file201/{id}/attachment', [File201Controller::class, 'showAttachment'])
      ->name('file201.attachment');
+
+     Route::prefix('overtimes')->name('overtimes.')->middleware(['auth'])->group(function () {
+        Route::get('/', [OvertimeController::class, 'index'])->name('index');
+        Route::post('/', [OvertimeController::class, 'store'])->name('store'); // <-- POST not GET
+        Route::put('/{id}', [OvertimeController::class, 'update'])->name('update');
+        Route::delete('/{id}', [OvertimeController::class, 'destroy'])->name('destroy');
+    });
+
+ 
+
     // Search
     Route::get('/search', [SearchController::class, 'index'])->name('search');
 

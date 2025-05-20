@@ -66,8 +66,8 @@
                                 $totalHours = '';
 
                                 if ($timeIn && $timeOut) {
-                                    $start = \Carbon\Carbon::parse($timeIn->recorded_at);
-                                    $end = \Carbon\Carbon::parse($timeOut->recorded_at);
+                                    $start = \Carbon\Carbon::parse($timeIn->recorded_at)->setTimezone(config('app.timezone'))->locale('en');
+                                    $end = \Carbon\Carbon::parse($timeOut->recorded_at)->setTimezone(config('app.timezone'))->locale('en');
 
                                     // Only calculate if end time is after start time
                                     if ($end->greaterThan($start)) {
@@ -111,8 +111,8 @@
                             @endphp
                             <tr>
                                 <td>{{ $date }}</td>
-                                <td>{{ $timeIn ? \Carbon\Carbon::parse($timeIn->recorded_at)->format('h:i:s A') : 'N/A' }}</td>
-                                <td>{{ $timeOut ? \Carbon\Carbon::parse($timeOut->recorded_at)->format('h:i:s A') : 'N/A' }}</td>
+                                <td>{{ $timeIn ? \Carbon\Carbon::parse($timeIn->recorded_at)->setTimezone(config('app.timezone'))->locale('en')->format('g:i:s A') : 'N/A' }}</td>
+                                <td>{{ $timeOut ? \Carbon\Carbon::parse($timeOut->recorded_at)->setTimezone(config('app.timezone'))->locale('en')->format('g:i:s A') : 'N/A' }}</td>
                                 <td>{{ optional($employee)->department->name ?? 'N/A' }}</td>
                                 <td>{{ optional($employee)->position->name ?? 'N/A' }}</td>
                                 <td>{{ optional($employee)->agency->name ?? 'N/A' }}</td>

@@ -107,7 +107,7 @@
 
 <div class="container-fluid px-4">
     <div class="d-sm-flex align-items-center justify-content-between mb-4 flex-wrap">
-        <h1 class="h1 mb-2 text-gray-800">My Dashboard</h1>
+        <h1 class="h1 mb-2 text-gray-800">Dashboard</h1>
     </div>
 
     <div class="row">
@@ -119,15 +119,14 @@
             </div>
 
             <div class="btn-block-custom">
-                <button class="btn btn-success" id="time-in"><i class="fas fa-sign-in-alt mr-1"></i> Time-in</button>
-                <button class="btn btn-danger" id="time-out"><i class="fas fa-sign-out-alt mr-1"></i> Time-out</button>
-                <a href="{{ route('time-records.my') }}" class="btn btn-primary btn-records"><i class="fas fa-clock mr-1"></i> My Time Records</a>
-                <a href="{{ route('time-records.all') }}" class="btn btn-warning btn-records"><i class="fas fa-users mr-1"></i> All Employees Time Records</a>
+                <button class="btn btn-outline-success" id="time-in"><i class="fas fa-sign-in-alt mr-1"></i> Time-in</button>
+                <button class="btn btn-outline-secondary" id="time-out"><i class="fas fa-sign-out-alt mr-1"></i> Time-out</button>
             </div>
+          
 
             <div class="card shadow mt-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Today's Time Transactions</h6>
+                <div class="card-header bg-danger py-3">
+                    <h6 class="m-0 font-weight-bold text-white">Today's Time Transactions</h6>
                 </div>
                 <div class="card-body p-2">
                     <div class="table-responsive">
@@ -147,14 +146,22 @@
                         </table>
                     </div>
                 </div>
+                 
             </div>
+            <div class="col-md-12 mb-1 mt-1">
+                    <a href="{{ route('time-records.my') }}" class="btn btn-outline-primary btn-sm w-100 btn-records mb-1 mt-1">
+                        <i class="fas fa-clock mr-1"></i> My Time Records</a>
+                    <a href="{{ route('time-records.all') }}" class="btn btn-outline-primary btn-sm w-100 btn-records mb-1 mt-1">
+                        <i class="fas fa-users mr-1"></i> All Employees Time Records</a>
+                </div>
         </div>
+         
 
         <!-- Calendar -->
         <div class="col-md-8">
             <div class="card shadow mb-4">
-                <div class="card-header py-3">
-                    <h6 class="m-0 font-weight-bold text-primary">Holiday Calendar</h6>
+                <div class="card-header bg-danger py-3">
+                    <h6 class="m-0 font-weight-bold text-white">Holiday Calendar</h6>
                 </div>
                 <div class="card-body">
                     <div id="holiday-calendar"></div>

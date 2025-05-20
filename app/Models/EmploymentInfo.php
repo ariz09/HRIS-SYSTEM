@@ -55,9 +55,21 @@ class EmploymentInfo extends Model
         return $this->belongsTo(EmploymentType::class, 'employment_type_id');
     }
 
-    public function personalInfo()
+/*     public function personalInfo()
     {
         return $this->hasOne(PersonalInfo::class, 'user_id', 'user_id');
+    } */
+
+    public function personalInfo()
+    {
+        return $this->hasOneThrough(
+            PersonalInfo::class,
+            User::class,
+            'id', // Foreign key on users table
+            'user_id', // Foreign key on personal_infos table
+            'user_id', // Local key on employment_infos table
+            'id' // Local key on users table
+        );
     }
 
     public function compensationPackage()

@@ -54,6 +54,9 @@
                     <nav class="sb-sidenav-menu-nested nav">
                          <a class="nav-link" href="{{ route('employment_types.index') }}">Employment Type Management</a>
                     </nav>
+                    <nav class="sb-sidenav-menu-nested nav">
+                         <a class="nav-link" href="{{ route('file201.index') }}">201 File</a>
+                    </nav>
 
                      <!--End Employees -->
 

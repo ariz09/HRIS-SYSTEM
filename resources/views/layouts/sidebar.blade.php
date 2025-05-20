@@ -55,8 +55,12 @@
                          <a class="nav-link" href="{{ route('employment_types.index') }}">Employment Type Management</a>
                     </nav>
                     <nav class="sb-sidenav-menu-nested nav">
-                         <a class="nav-link" href="{{ route('file201.index') }}">201 File</a>
+                         <a class="nav-link" href="{{ route('file201.index') }}">201 File Management</a>
                     </nav>
+                    <nav class="sb-sidenav-menu-nested nav">
+                         <a class="nav-link" href="{{ route('overtimes.index') }}">Overtime Management</a>
+                    </nav>
+  
 
                      <!--End Employees -->
 

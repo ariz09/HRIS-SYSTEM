@@ -18,7 +18,7 @@
                     Department List
                 </div>
                 <div>
-                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createModal">
+                    <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#createModal">
                         <i class="fas fa-plus"></i> Add Department
                     </button>
                 </div>
@@ -125,7 +125,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Update Department</button>
+                    <button type="submit" class="btn btn-success">Update Department</button>
                 </div>
             </div>
         </form>
@@ -172,18 +172,16 @@
         }
     }, 3000);
 
-    $(document).ready(function() {
-        // Initialize DataTable
+   $(document).ready(function() {
         $('#departmentsTable').DataTable();
 
-        // Edit department modal
-        $('.edit-btn').click(function() {
+        $(document).on('click', '.edit-btn', function(e) {
+            e.preventDefault();
             var departmentId = $(this).data('id');
             $.ajax({
                 url: '/departments/' + departmentId + '/edit',
                 method: 'GET',
                 success: function(response) {
-                    $('#edit-code').val(response.department.code);
                     $('#edit-name').val(response.department.name);
                     $('#edit-status').val(response.department.status);
                     $('#editForm').attr('action', '/departments/' + departmentId);
@@ -192,12 +190,13 @@
             });
         });
 
-        // Delete department modal
-        $('.delete-btn').click(function() {
+        $(document).on('click', '.delete-btn', function(e) {
+            e.preventDefault();
             var departmentId = $(this).data('id');
             $('#deleteForm').attr('action', '/departments/' + departmentId);
             $('#deleteModal').modal('show');
         });
     });
+
 </script>
 @endpush

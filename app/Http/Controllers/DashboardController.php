@@ -115,10 +115,10 @@ class DashboardController extends Controller
                     ]);
 
                     // Update the earlier time_in record status to completed (if not already)
-                    if ($timeInRecord->status !== 'completed') {
-                        $timeInRecord->status = 'completed';
-                        $timeInRecord->save();
-                    }
+                    // if ($timeInRecord->status !== 'completed') {
+                    //     $timeInRecord->status = 'completed';
+                    //     $timeInRecord->save();
+                    // }
 
                     return response()->json([
                         'success' => true,

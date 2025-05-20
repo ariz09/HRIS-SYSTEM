@@ -32,6 +32,7 @@
                             <th>Position</th>
                             <th>Company</th>
                             <th>Status</th>
+                            <th>Total Working Hours</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -57,14 +58,37 @@
                                     if ($timeIn && $timeOut) {
                                         $start = Carbon\Carbon::parse($timeIn->recorded_at);
                                         $end = Carbon\Carbon::parse($timeOut->recorded_at);
+
+                                        // Only calculate if end time is after start time
                                         if ($end->greaterThan($start)) {
+                                            // Calculate total minutes
                                             $diffInMinutes = $start->diffInMinutes($end);
+
+                                            // Handle overnight shifts (if end time is before start time on the same day)
+                                            if ($end->format('Y-m-d') === $start->format('Y-m-d') && $end->lt($start)) {
+                                                $diffInMinutes = 24 * 60 - $diffInMinutes;
+                                            }
+
+                                            // Convert to hours and minutes
                                             $hours = floor($diffInMinutes / 60);
                                             $minutes = $diffInMinutes % 60;
-                                            $totalHours = $hours . ':' . str_pad($minutes, 2, '0', STR_PAD_LEFT);
+
+                                            // Format with leading zeros for minutes
+                                            $totalHours = sprintf('%d:%02d', $hours, $minutes);
+
+                                            // Add warning for unusually long shifts (>12 hours)
+                                            if ($hours > 12) {
+                                                $totalHours .= ' <span class="text-warning" title="Unusually long shift">⚠️</span>';
+                                            }
                                         } else {
-                                            $totalHours = 'N/A';
+                                            $totalHours = 'Invalid';
                                         }
+                                    } elseif ($timeIn) {
+                                        $totalHours = 'No Time Out';
+                                    } elseif ($timeOut) {
+                                        $totalHours = 'No Time In';
+                                    } else {
+                                        $totalHours = 'N/A';
                                     }
 
                                     // Get the status based on the latest record

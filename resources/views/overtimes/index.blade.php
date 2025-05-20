@@ -85,16 +85,25 @@
                             <th>Status</th>
                             <th>Start</th>
                             <th>End</th>
-                            <th>Employee Type</th>          
+                            <th>Total Hours</th>                                    
                             <th>Department</th>
-                            <th>Position</th>    
+                            <th>Position</th>   
+                            <th>Employee Type</th>   
                             <th>Reason</th>
                             <th>Remarks</th>
                             <th class="text-end">Action</th>
                         </tr>
                     </thead>
+                        @php
+                            use Carbon\Carbon;
+                        @endphp
                     <tbody>
                         @forelse($overtimes as $index => $overtime)
+                            @php
+                                $start = Carbon::parse($overtime->start);
+                                $end = Carbon::parse($overtime->end);
+                                $totalHours = $start->diffInMinutes($end) / 60;
+                            @endphp
                             <tr>
                                 <td>{{ $index + 1 }}</td>
                                 <td>
@@ -119,29 +128,30 @@
                               
                                 <td>{{ $overtime->start->format('Y-m-d H:i') }}</td>
                                 <td>{{ $overtime->end->format('Y-m-d H:i') }}</td>
+                                <td>{{ number_format($totalHours, 2) }}
                                 <td>{{ $overtime->employee->department->name ?? 'N/A' }}</td>
                                 <td>{{ $overtime->employee->position->name ?? 'N/A' }}</td>
                                 <td>{{ $overtime->employee->employmentType->name ?? 'N/A' }}</td>
 
                                 <td>{{ Str::limit($overtime->reason, 50) }}</td>
                                 <td>{{ Str::limit($overtime->remarks, 50) }}</td>
-                                <td class="text-end">
-                                  <button class="btn btn-sm btn-primary me-1" data-bs-toggle="modal" data-bs-target="#actionModal{{ $overtime->id }}">
-                                    Take Action
+                                <td class="text-start">
+                                  <button class="btn btn-sm btn-primary text-white me-1" data-bs-toggle="modal" data-bs-target="#actionModal{{ $overtime->id }}">
+                                    Approve/Decline
                                  </button>
                                     <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
                                             data-bs-target="#deleteModal{{ $overtime->id }}">
-                                        Delete
+                                        <i class="fas fa-trash"></i>
                                     </button>
 
                                      <!-- Take Action Modal -->
-                                    <div class="modal fade " id="actionModal{{ $overtime->id }}" tabindex="-1" aria-labelledby="actionModalLabel{{ $overtime->id }}" aria-hidden="true">
+                                    <div class="modal fade modal-lg " id="actionModal{{ $overtime->id }}" tabindex="-1" aria-labelledby="actionModalLabel{{ $overtime->id }}" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered modal-lg">
                                            <form method="POST" action="{{ route('overtimes.update', $overtime->id) }}">
 
                                                 @csrf
                                                 @method('PUT')
-                                                <div class="modal-content">
+                                                <div class="modal-content ">
                                                     <div class="modal-header bg-danger text-white">
                                                         <h5 class="modal-title" id="actionModalLabel{{ $overtime->id }}">Take Action on Overtime</h5>
                                                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>

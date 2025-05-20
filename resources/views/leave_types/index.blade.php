@@ -14,7 +14,7 @@
                 <i class="fas fa-table me-1"></i>
                 Leave Type List
             </div>
-            <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createModal">
+            <button type="button" class="btn btn-light  text-danger btn-sm" data-bs-toggle="modal" data-bs-target="#createModal">
                 <i class="fas fa-plus"></i> Add Leave Type
             </button>
         </div>
@@ -63,9 +63,11 @@
     <div class="modal-dialog">
         <form class="modal-content" action="{{ route('leave_types.store') }}" method="POST">
             @csrf
-            <div class="modal-header">
+            <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title">Create Leave Type</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn btn-sm btn-light delete-dependent-btn text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
+                    <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+                </button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
@@ -98,9 +100,11 @@
         <form class="modal-content" id="editForm" method="POST">
             @csrf
             @method('PUT')
-            <div class="modal-header">
+            <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title">Edit Leave Type</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn btn-sm btn-light delete-dependent-btn text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
+                    <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+                </button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
@@ -120,8 +124,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button class="btn btn-primary" type="submit">Update</button>
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn btn-success btn-sm" type="submit">Update</button>
             </div>
         </form>
     </div>
@@ -133,16 +137,18 @@
         <form class="modal-content" id="deleteForm" method="POST">
             @csrf
             @method('DELETE')
-            <div class="modal-header">
+            <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title">Delete Confirmation</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn btn-sm btn-light delete-dependent-btn text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
+                    <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+                </button>
             </div>
             <div class="modal-body">
                 <p>Are you sure you want to delete this leave type?</p>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" data-bs-dismiss="modal" type="button">Cancel</button>
-                <button class="btn btn-danger" type="submit">Delete</button>
+                <button class="btn btn-secondary btn-sm" data-bs-dismiss="modal" type="button">Cancel</button>
+                <button class="btn btn-danger btn-sm" type="submit">Delete</button>
             </div>
         </form>
     </div>

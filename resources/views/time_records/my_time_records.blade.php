@@ -6,27 +6,16 @@
 <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
 <link href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" rel="stylesheet">
 <link href="https://cdn.datatables.net/select/1.7.0/css/select.bootstrap5.min.css" rel="stylesheet">
-<style>
-    .custom-table thead th {
-        background-color: #f5f5f5 !important;
-        color: #333 !important;
-        border-bottom: 2px solid #dee2e6 !important;
-        font-weight: 600;
-    }
-    .custom-table {
-        border: 1px solid #dee2e6;
-    }
-</style>
 @endpush
 
 <div class="container-fluid px-4">
     <div class="d-sm-flex align-items-center justify-content-between mb-4 flex-wrap">
-        <h1 class="h1 mb-2 text-gray-800">My DTR Report</h1>
+        <h1 class="h1 mb-2 text-gray-800">My Time Records</h1>
     </div>
     <div class="card shadow mb-4">
-        <div class="card-header bg-white text-dark py-3 align-items-center d-flex justify-content-between flex-wrap">
+        <div class="card-header bg-danger text-white py-3 align-items-center">
             <h6 class="m-0 font-weight-bold ">Time Records</h6>
-            <form method="GET" class="row g-2 align-items-center mt-2 ms-auto" action="">
+            <form method="GET" class="row g-2 align-items-center mt-2" action="">
                 <div class="col-auto">
                     <label for="start_date" class="col-form-label">Start Date</label>
                 </div>
@@ -49,8 +38,8 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table id="myTimeRecordsTable" class="table table-bordered table-striped custom-table">
-                    <thead>
+                <table id="myTimeRecordsTable" class="table table-bordered table-striped">
+                    <thead class="thead-light">
                         <tr>
                             <th>Date</th>
                             <th>Time In</th>
@@ -59,7 +48,6 @@
                             <th>Position</th>
                             <th>Company</th>
                             <th>Status</th>
-                            <th>Total Working Hours</th>
                         </tr>
                     </thead>
                     <tbody>

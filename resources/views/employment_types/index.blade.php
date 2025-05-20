@@ -15,7 +15,7 @@
         <div class="card-header  bg-danger text-white d-flex justify-content-between align-items-center">
             <div><i class="fas fa-table me-1"></i> Employment Type List</div>
             <div>
-                <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createModal">
+                <button type="button" class="btn btn-light text-danger btn-sm" data-bs-toggle="modal" data-bs-target="#createModal">
                     <i class="fas fa-plus"></i> Add Employment Type
                 </button>
             </div>
@@ -60,7 +60,9 @@
       <div class="modal-content">
         <div class="modal-header  bg-danger text-white">
           <h5 class="modal-title" id="createModalLabel">Add Employment Type</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn btn-sm btn-light text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
+                <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+            </button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
@@ -69,8 +71,8 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save</button>
+          <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-sm btn-success">Save</button>
         </div>
       </div>
     </form>
@@ -86,7 +88,9 @@
       <div class="modal-content">
         <div class="modal-header  bg-danger text-white">
           <h5 class="modal-title" id="editModalLabel">Edit Employment Type</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn btn-sm btn-light text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
+                <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+            </button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
@@ -95,8 +99,8 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-primary">Update</button>
+          <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-sm btn-primary">Update</button>
         </div>
       </div>
     </form>
@@ -112,14 +116,16 @@
       <div class="modal-content">
         <div class="modal-header  bg-danger text-white">
           <h5 class="modal-title" id="deleteModalLabel">Confirm Delete</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn btn-sm btn-light text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
+                <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+            </button>
         </div>
         <div class="modal-body">
           Are you sure you want to delete this employment type?
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-          <button type="submit" class="btn btn-danger">Delete</button>
+          <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
         </div>
       </div>
     </form>

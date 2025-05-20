@@ -3,46 +3,16 @@
 @section('content')
 
 @push('styles')
-<style>
-    .custom-table thead th {
-        background-color: #f5f5f5 !important;
-        color: #333 !important;
-        border-bottom: 2px solid #dee2e6 !important;
-        font-weight: 600;
-    }
-    .custom-table {
-        border: 1px solid #dee2e6;
-    }
-</style>
+
 @endpush
 
 <div class="container-fluid px-4">
     <div class="d-sm-flex align-items-center justify-content-between mb-4 flex-wrap">
-        <h1 class="h1 mb-2 text-gray-800">General DTR Report</h1>
+        <h1 class="h1 mb-2 text-gray-800">All Employees Time Records</h1>
     </div>
     <div class="card shadow mb-4">
-        <div class="card-header bg-white text-dark py-3 d-flex justify-content-between align-items-center flex-wrap">
+        <div class="card-header bg-danger text-white py-3">
             <h6 class="m-0 font-weight-bold">Time Records</h6>
-            <form method="GET" class="row g-2 align-items-center mt-2 ms-auto" action="">
-                <div class="col-auto">
-                    <label for="start_date" class="col-form-label">Start Date</label>
-                </div>
-                <div class="col-auto">
-                    <input type="date" id="start_date" name="start_date" class="form-control" value="{{ request('start_date') }}">
-                </div>
-                <div class="col-auto">
-                    <label for="end_date" class="col-form-label">End Date</label>
-                </div>
-                <div class="col-auto">
-                    <input type="date" id="end_date" name="end_date" class="form-control" value="{{ request('end_date') }}">
-                </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">Filter</button>
-                </div>
-                <div class="col-auto">
-                    <a href="{{ route('time-records.all') }}" class="btn btn-secondary">Reset</a>
-                </div>
-            </form>
         </div>
         <div class="card-body">
             <div class="mb-3">
@@ -51,8 +21,8 @@
                 </a> --}}
             </div>
             <div class="table-responsive">
-                <table id="allTimeRecordsTable" class="table table-bordered table-striped custom-table">
-                    <thead>
+                <table id="allTimeRecordsTable" class="table table-bordered table-striped">
+                    <thead class="thead-light">
                         <tr>
                             <th>Employee</th>
                             <th>Date</th>
@@ -62,7 +32,6 @@
                             <th>Position</th>
                             <th>Company</th>
                             <th>Status</th>
-                            <th>Total Working Hours</th>
                         </tr>
                     </thead>
                     <tbody>

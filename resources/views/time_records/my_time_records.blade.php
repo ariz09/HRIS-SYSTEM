@@ -13,8 +13,8 @@
         <h1 class="h1 mb-2 text-gray-800">My Time Records</h1>
     </div>
     <div class="card shadow mb-4">
-        <div class="card-header py-3">
-            <h6 class="m-0 font-weight-bold text-primary">Time Records</h6>
+        <div class="card-header bg-danger text-white py-3 align-items-center">
+            <h6 class="m-0 font-weight-bold ">Time Records</h6>
             <form method="GET" class="row g-2 align-items-center mt-2" action="">
                 <div class="col-auto">
                     <label for="start_date" class="col-form-label">Start Date</label>
@@ -38,9 +38,9 @@
         </div>
         <div class="card-body">
             <div class="mb-3">
-                <a href="{{ route('time-records.my', array_merge(request()->all(), ['report' => '1'])) }}" class="btn btn-success">
+                {{-- <a href="{{ route('time-records.my', array_merge(request()->all(), ['report' => '1'])) }}" class="btn btn-success">
                     <i class="fas fa-file-excel"></i> Generate Report
-                </a>
+                </a> --}}
             </div>
             <div class="table-responsive">
                 <table id="myTimeRecordsTable" class="table table-bordered table-striped">

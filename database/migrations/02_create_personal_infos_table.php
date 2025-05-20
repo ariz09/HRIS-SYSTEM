@@ -14,12 +14,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
 
-            $table->string('first_name')->nullable();
+            $table->string('first_name');
             $table->string('middle_name')->nullable();
-            $table->string('last_name')->nullable();
+            $table->string('last_name');
             $table->string('name_suffix')->nullable();
             $table->string('preferred_name')->nullable();
-            $table->enum('gender', ['Male', 'Female', 'Other'])->nullable();
+            $table->enum('gender', ['Male', 'Female', 'Other']);
             $table->date('birthday')->nullable();
             $table->string('email')->nullable(); // optional secondary email
             $table->string('phone_number')->nullable();

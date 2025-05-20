@@ -3,46 +3,16 @@
 @section('content')
 
 @push('styles')
-<style>
-    .custom-table thead th {
-        background-color: #f5f5f5 !important;
-        color: #333 !important;
-        border-bottom: 2px solid #dee2e6 !important;
-        font-weight: 600;
-    }
-    .custom-table {
-        border: 1px solid #dee2e6;
-    }
-</style>
+
 @endpush
 
 <div class="container-fluid px-4">
     <div class="d-sm-flex align-items-center justify-content-between mb-4 flex-wrap">
-        <h1 class="h1 mb-2 text-gray-800">General DTR Report</h1>
+        <h1 class="h1 mb-2 text-gray-800">All Employees Time Records</h1>
     </div>
     <div class="card shadow mb-4">
-        <div class="card-header bg-white text-dark py-3 d-flex justify-content-between align-items-center flex-wrap">
+        <div class="card-header bg-danger text-white py-3">
             <h6 class="m-0 font-weight-bold">Time Records</h6>
-            <form method="GET" class="row g-2 align-items-center mt-2 ms-auto" action="">
-                <div class="col-auto">
-                    <label for="start_date" class="col-form-label">Start Date</label>
-                </div>
-                <div class="col-auto">
-                    <input type="date" id="start_date" name="start_date" class="form-control" value="{{ request('start_date') }}">
-                </div>
-                <div class="col-auto">
-                    <label for="end_date" class="col-form-label">End Date</label>
-                </div>
-                <div class="col-auto">
-                    <input type="date" id="end_date" name="end_date" class="form-control" value="{{ request('end_date') }}">
-                </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">Filter</button>
-                </div>
-                <div class="col-auto">
-                    <a href="{{ route('time-records.all') }}" class="btn btn-secondary">Reset</a>
-                </div>
-            </form>
         </div>
         <div class="card-body">
             <div class="mb-3">
@@ -51,8 +21,8 @@
                 </a> --}}
             </div>
             <div class="table-responsive">
-                <table id="allTimeRecordsTable" class="table table-bordered table-striped custom-table">
-                    <thead>
+                <table id="allTimeRecordsTable" class="table table-bordered table-striped">
+                    <thead class="thead-light">
                         <tr>
                             <th>Employee</th>
                             <th>Date</th>
@@ -62,46 +32,19 @@
                             <th>Position</th>
                             <th>Company</th>
                             <th>Status</th>
-                            <th>Total Working Hours</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($timeRecords as $record)
-                        @php
-                            $date = \Carbon\Carbon::parse($record->recorded_at)->format('Y-m-d');
-                            $employeeId = $record->employee_id;
-
-                            // Get all records for this employee on this date
-                            $dayRecords = $timeRecords->filter(function($r) use ($date, $employeeId) {
-                                return \Carbon\Carbon::parse($r->recorded_at)->format('Y-m-d') === $date
-                                    && $r->employee_id === $employeeId;
-                            });
-
-                            // Find first time_in and last time_out
-                            $firstTimeIn = $dayRecords->where('type', 'time_in')->min('recorded_at');
-                            $lastTimeOut = $dayRecords->where('type', 'time_out')->max('recorded_at');
-
-                            $totalHours = '';
-                            if ($record->type === 'time_out' && $firstTimeIn && $lastTimeOut) {
-                                $start = \Carbon\Carbon::parse($firstTimeIn);
-                                $end = \Carbon\Carbon::parse($lastTimeOut);
-                                if ($end->greaterThan($start)) {
-                                    $totalHours = $start->diffInHours($end) . ':' . str_pad($start->diffInMinutes($end) % 60, 2, '0', STR_PAD_LEFT);
-                                } else {
-                                    $totalHours = 'N/A';
-                                }
-                            }
-                        @endphp
                         <tr>
                             <td>{{ $record->employee && $record->employee->user ? $record->employee->user->name : 'N/A' }}</td>
-                            <td>{{ $date }}</td>
+                            <td>{{ \Carbon\Carbon::parse($record->recorded_at)->format('Y-m-d') }}</td>
                             <td>{{ ucfirst(str_replace('_', ' ', $record->type)) }}</td>
                             <td>{{ \Carbon\Carbon::parse($record->recorded_at)->format('h:i:s A') }}</td>
                             <td>{{ optional($record->employee)->department->name ?? 'N/A' }}</td>
                             <td>{{ optional($record->employee)->position->name ?? 'N/A' }}</td>
                             <td>{{ optional($record->employee)->agency->name ?? 'N/A' }}</td>
                             <td>{{ ucfirst($record->status) }}</td>
-                            <td>{{ $totalHours }}</td>
                         </tr>
                         @empty
                         <tr>

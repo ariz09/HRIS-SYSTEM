@@ -295,8 +295,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 record.recorded_at.startsWith(today)
             );
 
-            const timeInRecord = todayRecords.find(r => r.type === 'time_in');
-            const timeOutRecord = todayRecords.find(r => r.type === 'time_out');
+            // Get the earliest time_in and latest time_out
+            const timeInRecord = todayRecords
+                .filter(r => r.type === 'time_in')
+                .sort((a, b) => new Date(a.recorded_at) - new Date(b.recorded_at))[0];
+
+            const timeOutRecord = todayRecords
+                .filter(r => r.type === 'time_out')
+                .sort((a, b) => new Date(b.recorded_at) - new Date(a.recorded_at))[0];
 
             // Time-In button: disable if already timed in (regardless of status)
             timeInBtn.disabled = !!timeInRecord;
@@ -304,7 +310,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Time-Out button: enable if Time-In exists (regardless of status) and no Time-Out exists
             timeOutBtn.disabled = !(timeInRecord) || !!timeOutRecord;
 
-            if (todayRecords.length === 0) {
+            if (!timeInRecord && !timeOutRecord) {
                 recordsBody.innerHTML = `
                     <tr>
                         <td colspan="4" class="text-center text-muted">No time records today</td>
@@ -326,7 +332,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
 
-            // Format time to 12-hour format with AM/PM
             function formatTime(dateString) {
                 if (!dateString) return 'N/A';
                 const date = new Date(dateString);

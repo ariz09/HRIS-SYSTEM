@@ -67,39 +67,60 @@
                     </thead>
                     <tbody>
                         @php
-                            $today = now()->format('Y-m-d');
-                            $grouped = $timeRecords->where('recorded_at', '>=', $today.' 00:00:00')
-                                ->where('recorded_at', '<=', $today.' 23:59:59')
-                                ->groupBy('user_id');
+                            // Get records for the selected date range or today if no dates selected
+                            $startDate = request('start_date') ? Carbon\Carbon::parse(request('start_date'))->startOfDay() : now()->startOfDay();
+                            $endDate = request('end_date') ? Carbon\Carbon::parse(request('end_date'))->endOfDay() : now()->endOfDay();
+
+                            $groupedRecords = $timeRecords
+                                ->whereBetween('recorded_at', [$startDate, $endDate])
+                                ->groupBy(['user_id', function($record) {
+                                    return Carbon\Carbon::parse($record->recorded_at)->format('Y-m-d');
+                                }]);
                         @endphp
-                        @forelse($grouped as $userId => $records)
-                            @php
-                                $employee = $records->first()->employee ?? null;
-                                $timeIn = $records->where('type', 'time_in')->sortBy('recorded_at')->first();
-                                $timeOut = $records->where('type', 'time_out')->sortByDesc('recorded_at')->first();
-                                $totalHours = '';
-                                if ($timeIn && $timeOut) {
-                                    $start = \Carbon\Carbon::parse($timeIn->recorded_at);
-                                    $end = \Carbon\Carbon::parse($timeOut->recorded_at);
-                                    $totalHours = $end->greaterThan($start)
-                                        ? $start->diffInHours($end) . ':' . str_pad($start->diffInMinutes($end) % 60, 2, '0', STR_PAD_LEFT)
-                                        : 'N/A';
-                                }
-                            @endphp
-                            <tr>
-                                <td>{{ optional($employee->user)->name ?? 'N/A' }}</td>
-                                <td>{{ $today }}</td>
-                                <td>{{ $timeIn ? \Carbon\Carbon::parse($timeIn->recorded_at)->format('h:i:s A') : 'N/A' }}</td>
-                                <td>{{ $timeOut ? \Carbon\Carbon::parse($timeOut->recorded_at)->format('h:i:s A') : 'N/A' }}</td>
-                                <td>{{ optional($employee)->department->name ?? 'N/A' }}</td>
-                                <td>{{ optional($employee)->position->name ?? 'N/A' }}</td>
-                                <td>{{ optional($employee)->agency->name ?? 'N/A' }}</td>
-                                <td>{{ $timeOut ? ucfirst($timeOut->status) : ($timeIn ? ucfirst($timeIn->status) : 'N/A') }}</td>
-                                <td>{{ $totalHours }}</td>
-                            </tr>
+                        @forelse($groupedRecords as $userId => $dateRecords)
+                            @foreach($dateRecords as $date => $records)
+                                @php
+                                    $employee = $records->first()->employee ?? null;
+                                    $timeIn = $records->where('type', 'time_in')->sortBy('recorded_at')->first();
+                                    $timeOut = $records->where('type', 'time_out')->sortByDesc('recorded_at')->first();
+                                    $totalHours = '';
+
+                                    if ($timeIn && $timeOut) {
+                                        $start = Carbon\Carbon::parse($timeIn->recorded_at);
+                                        $end = Carbon\Carbon::parse($timeOut->recorded_at);
+                                        if ($end->greaterThan($start)) {
+                                            $diffInMinutes = $start->diffInMinutes($end);
+                                            $hours = floor($diffInMinutes / 60);
+                                            $minutes = $diffInMinutes % 60;
+                                            $totalHours = $hours . ':' . str_pad($minutes, 2, '0', STR_PAD_LEFT);
+                                        } else {
+                                            $totalHours = 'N/A';
+                                        }
+                                    }
+
+                                    // Get the status based on the latest record
+                                    $status = 'N/A';
+                                    if ($timeOut) {
+                                        $status = ucfirst($timeOut->status);
+                                    } elseif ($timeIn) {
+                                        $status = ucfirst($timeIn->status);
+                                    }
+                                @endphp
+                                <tr>
+                                    <td>{{ optional($employee->user)->name ?? 'N/A' }}</td>
+                                    <td>{{ $date }}</td>
+                                    <td>{{ $timeIn ? Carbon\Carbon::parse($timeIn->recorded_at)->format('h:i:s A') : 'N/A' }}</td>
+                                    <td>{{ $timeOut ? Carbon\Carbon::parse($timeOut->recorded_at)->format('h:i:s A') : 'N/A' }}</td>
+                                    <td>{{ optional($employee)->department->name ?? 'N/A' }}</td>
+                                    <td>{{ optional($employee)->position->name ?? 'N/A' }}</td>
+                                    <td>{{ optional($employee)->agency->name ?? 'N/A' }}</td>
+                                    <td>{{ $status }}</td>
+                                    <td>{{ $totalHours }}</td>
+                                </tr>
+                            @endforeach
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center text-muted">No time records found for today.</td>
+                                <td colspan="9" class="text-center text-muted">No time records found for the selected period.</td>
                             </tr>
                         @endforelse
                     </tbody>

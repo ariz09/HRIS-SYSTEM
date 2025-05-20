@@ -70,6 +70,7 @@
                         @endphp
                         @forelse($groupedRecords as $date => $records)
                             @php
+                                // Get the first time-in and last time-out for the day
                                 $timeIn = $records->where('type', 'time_in')->sortBy('recorded_at')->first();
                                 $timeOut = $records->where('type', 'time_out')->sortByDesc('recorded_at')->first();
                                 $employee = $records->first()->employee ?? null;
@@ -87,6 +88,14 @@
                                         $totalHours = 'N/A';
                                     }
                                 }
+
+                                // Get the status based on the latest record
+                                $status = 'N/A';
+                                if ($timeOut) {
+                                    $status = ucfirst($timeOut->status);
+                                } elseif ($timeIn) {
+                                    $status = ucfirst($timeIn->status);
+                                }
                             @endphp
                             <tr>
                                 <td>{{ $date }}</td>
@@ -95,7 +104,7 @@
                                 <td>{{ optional($employee)->department->name ?? 'N/A' }}</td>
                                 <td>{{ optional($employee)->position->name ?? 'N/A' }}</td>
                                 <td>{{ optional($employee)->agency->name ?? 'N/A' }}</td>
-                                <td>{{ $timeOut ? ucfirst($timeOut->status) : ($timeIn ? ucfirst($timeIn->status) : 'N/A') }}</td>
+                                <td>{{ $status }}</td>
                                 <td>{{ $totalHours }}</td>
                             </tr>
                         @empty

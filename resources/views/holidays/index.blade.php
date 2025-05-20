@@ -18,7 +18,7 @@
                     Holiday List
                 </div>
                 <div>
-                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addHolidayModal">
+                    <button type="button" class="btn btn-light text-danger btn-sm" data-bs-toggle="modal" data-bs-target="#addHolidayModal">
                         <i class="fas fa-plus"></i> Add Holiday
                     </button>
                 </div>
@@ -70,7 +70,9 @@
                 @csrf
                 <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="addHolidayModalLabel">Add New Holiday</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn btn-sm btn-light text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
+                        <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+                    </button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
@@ -97,8 +99,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Add Holiday</button>
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-sm btn-success">Add Holiday</button>
                 </div>
             </form>
         </div>
@@ -115,7 +117,9 @@
             <div class="modal-content">
                 <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="editHolidayModalLabel">Edit Holiday</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn btn-sm btn-light text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
+                        <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+                    </button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
@@ -142,8 +146,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-sm btn-success">Save Changes</button>
                 </div>
             </div>
         </form>
@@ -161,14 +165,16 @@
             <div class="modal-content">
                 <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="deleteHolidayModalLabel">Delete Holiday</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn btn-sm btn-light text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
+                        <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+                    </button>
                 </div>
                 <div class="modal-body">
                     Are you sure you want to delete the holiday "{{ $holiday->name }}"?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                 </div>
             </div>
         </form>

@@ -18,7 +18,7 @@
                     Role Permissions
                 </div>
                 <div>
-                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createRoleModal">
+                    <button type="button" class="btn btn-light text-danger btn-sm" data-bs-toggle="modal" data-bs-target="#createRoleModal">
                         <i class="fas fa-plus"></i> Add Role
                     </button>
                 </div>
@@ -66,7 +66,9 @@
             <div class="modal-content">
                 <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="createRoleModalLabel">Create New Role</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn btn-sm btn-light text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
+                <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+            </button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
@@ -83,8 +85,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Create Role</button>
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-sm btn-primary">Create Role</button>
                 </div>
             </div>
         </form>
@@ -101,7 +103,9 @@
             <div class="modal-content">
                 <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="editRoleModalLabel">Edit Role Permissions</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn btn-sm btn-light text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
+                <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+            </button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
@@ -120,8 +124,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-sm btn-primary">Save Changes</button>
                 </div>
             </div>
         </form>

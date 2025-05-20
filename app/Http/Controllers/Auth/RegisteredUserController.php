@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\EmployeeController;
+use App\Models\EmploymentInfo;
 use App\Models\PersonalInfo;
 use App\Models\User;
 use Illuminate\Auth\Events\Registered;
@@ -44,6 +46,12 @@ class RegisteredUserController extends Controller
 
         PersonalInfo::create([
             'user_id' => $user->id,
+        ]);
+
+        EmploymentInfo::create([
+            'user_id' => $user->id,
+            'employee_number' => EmployeeController::generateEmployeeNumber(),
+            'hiring_date' => now()->toDateString(),
         ]);
 
         event(new Registered($user));

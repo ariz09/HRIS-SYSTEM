@@ -29,10 +29,10 @@
                     <input type="date" id="end_date" name="end_date" class="form-control" value="{{ request('end_date') }}">
                 </div>
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <button type="submit" class="btn btn-light">Filter</button>
                 </div>
                 <div class="col-auto">
-                    <a href="{{ route('time-records.my') }}" class="btn btn-secondary">Reset</a>
+                    <a href="{{ route('time-records.my') }}" class="btn btn-light">Reset</a>
                 </div>
             </form>
         </div>
@@ -66,8 +66,8 @@
                                 $totalHours = '';
 
                                 if ($timeIn && $timeOut) {
-                                    $start = \Carbon\Carbon::parse($timeIn->recorded_at);
-                                    $end = \Carbon\Carbon::parse($timeOut->recorded_at);
+                                    $start = \Carbon\Carbon::parse($timeIn->recorded_at)->setTimezone(config('app.timezone'))->locale('en');
+                                    $end = \Carbon\Carbon::parse($timeOut->recorded_at)->setTimezone(config('app.timezone'))->locale('en');
 
                                     // Only calculate if end time is after start time
                                     if ($end->greaterThan($start)) {
@@ -111,8 +111,8 @@
                             @endphp
                             <tr>
                                 <td>{{ $date }}</td>
-                                <td>{{ $timeIn ? \Carbon\Carbon::parse($timeIn->recorded_at)->format('h:i:s A') : 'N/A' }}</td>
-                                <td>{{ $timeOut ? \Carbon\Carbon::parse($timeOut->recorded_at)->format('h:i:s A') : 'N/A' }}</td>
+                                <td>{{ $timeIn ? \Carbon\Carbon::parse($timeIn->recorded_at)->setTimezone(config('app.timezone'))->locale('en')->format('g:i:s A') : 'N/A' }}</td>
+                                <td>{{ $timeOut ? \Carbon\Carbon::parse($timeOut->recorded_at)->setTimezone(config('app.timezone'))->locale('en')->format('g:i:s A') : 'N/A' }}</td>
                                 <td>{{ optional($employee)->department->name ?? 'N/A' }}</td>
                                 <td>{{ optional($employee)->position->name ?? 'N/A' }}</td>
                                 <td>{{ optional($employee)->agency->name ?? 'N/A' }}</td>

@@ -28,6 +28,8 @@ use App\Http\Controllers\{
     TimeRecordController,
     File201Controller,
     OvertimeController,
+    PeriodTypeController,
+    CutOffTypeController
     
 };
 
@@ -48,6 +50,9 @@ Route::middleware(['auth'])->group(function () {
     // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard/action', [DashboardController::class, 'handleAction'])->name('dashboard.action');
+    Route::resource('period_types', PeriodTypeController::class);
+    Route::resource('cut_off_types', CutOffTypeController::class);
+
 
     // Time Records
     Route::prefix('time-records')->group(function () {

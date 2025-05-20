@@ -56,8 +56,8 @@
                         <tr>
                             <th>Employee</th>
                             <th>Date</th>
-                            <th>Type</th>
-                            <th>Time</th>
+                            <th>Time In</th>
+                            <th>Time Out</th>
                             <th>Department</th>
                             <th>Position</th>
                             <th>Company</th>
@@ -66,47 +66,41 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @forelse($timeRecords as $record)
                         @php
-                            $date = \Carbon\Carbon::parse($record->recorded_at)->format('Y-m-d');
-                            $employeeId = $record->employee_id;
-
-                            // Get all records for this employee on this date
-                            $dayRecords = $timeRecords->filter(function($r) use ($date, $employeeId) {
-                                return \Carbon\Carbon::parse($r->recorded_at)->format('Y-m-d') === $date
-                                    && $r->employee_id === $employeeId;
-                            });
-
-                            // Find first time_in and last time_out
-                            $firstTimeIn = $dayRecords->where('type', 'time_in')->min('recorded_at');
-                            $lastTimeOut = $dayRecords->where('type', 'time_out')->max('recorded_at');
-
-                            $totalHours = '';
-                            if ($record->type === 'time_out' && $firstTimeIn && $lastTimeOut) {
-                                $start = \Carbon\Carbon::parse($firstTimeIn);
-                                $end = \Carbon\Carbon::parse($lastTimeOut);
-                                if ($end->greaterThan($start)) {
-                                    $totalHours = $start->diffInHours($end) . ':' . str_pad($start->diffInMinutes($end) % 60, 2, '0', STR_PAD_LEFT);
-                                } else {
-                                    $totalHours = 'N/A';
-                                }
-                            }
+                            $today = now()->format('Y-m-d');
+                            $grouped = $timeRecords->where('recorded_at', '>=', $today.' 00:00:00')
+                                ->where('recorded_at', '<=', $today.' 23:59:59')
+                                ->groupBy('user_id');
                         @endphp
-                        <tr>
-                            <td>{{ $record->employee && $record->employee->user ? $record->employee->user->name : 'N/A' }}</td>
-                            <td>{{ $date }}</td>
-                            <td>{{ ucfirst(str_replace('_', ' ', $record->type)) }}</td>
-                            <td>{{ \Carbon\Carbon::parse($record->recorded_at)->format('h:i:s A') }}</td>
-                            <td>{{ optional($record->employee)->department->name ?? 'N/A' }}</td>
-                            <td>{{ optional($record->employee)->position->name ?? 'N/A' }}</td>
-                            <td>{{ optional($record->employee)->agency->name ?? 'N/A' }}</td>
-                            <td>{{ ucfirst($record->status) }}</td>
-                            <td>{{ $totalHours }}</td>
-                        </tr>
+                        @forelse($grouped as $userId => $records)
+                            @php
+                                $employee = $records->first()->employee ?? null;
+                                $timeIn = $records->where('type', 'time_in')->sortBy('recorded_at')->first();
+                                $timeOut = $records->where('type', 'time_out')->sortByDesc('recorded_at')->first();
+                                $totalHours = '';
+                                if ($timeIn && $timeOut) {
+                                    $start = \Carbon\Carbon::parse($timeIn->recorded_at);
+                                    $end = \Carbon\Carbon::parse($timeOut->recorded_at);
+                                    $totalHours = $end->greaterThan($start)
+                                        ? $start->diffInHours($end) . ':' . str_pad($start->diffInMinutes($end) % 60, 2, '0', STR_PAD_LEFT)
+                                        : 'N/A';
+                                }
+                            @endphp
+                            <tr>
+                                <td>{{ optional($employee->user)->name ?? 'N/A' }}</td>
+                                <td>{{ $today }}</td>
+                                <td>{{ $timeIn ? \Carbon\Carbon::parse($timeIn->recorded_at)->format('h:i:s A') : 'N/A' }}</td>
+                                <td>{{ $timeOut ? \Carbon\Carbon::parse($timeOut->recorded_at)->format('h:i:s A') : 'N/A' }}</td>
+                                <td>{{ optional($employee)->department->name ?? 'N/A' }}</td>
+                                <td>{{ optional($employee)->position->name ?? 'N/A' }}</td>
+                                <td>{{ optional($employee)->agency->name ?? 'N/A' }}</td>
+                                <td>{{ $timeOut ? ucfirst($timeOut->status) : ($timeIn ? ucfirst($timeIn->status) : 'N/A') }}</td>
+                                <td>{{ $totalHours }}</td>
+                            </tr>
                         @empty
-                        <tr>
-                            <td colspan="8" class="text-center text-muted">No time records found.</td>
-                        </tr>
+                            <tr>
+                                <td colspan="9" class="text-center text-muted">No time records found for today.</td>
+                            </tr>
                         @endforelse
                     </tbody>
                 </table>

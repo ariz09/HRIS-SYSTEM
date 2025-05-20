@@ -122,7 +122,7 @@
                 <button class="btn btn-outline-success" id="time-in"><i class="fas fa-sign-in-alt mr-1"></i> Time-in</button>
                 <button class="btn btn-outline-secondary" id="time-out"><i class="fas fa-sign-out-alt mr-1"></i> Time-out</button>
             </div>
-          
+
 
             <div class="card shadow mt-4">
                 <div class="card-header bg-danger py-3">
@@ -133,20 +133,20 @@
                         <table class="table table-bordered table-sm">
                             <thead class="thead-light">
                                 <tr>
-                                    <th>Type</th>
-                                    <th>Time</th>
+                                    <th>Time In</th>
+                                    <th>Time Out</th>
                                     <th>Status</th>
+                                    <th>Total Hours</th>
                                 </tr>
                             </thead>
                             <tbody id="time-records-body">
                                 <tr>
-                                    <td colspan="3" class="text-center text-muted">Loading...</td>
+                                    <td colspan="4" class="text-center text-muted">Loading...</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-                 
             </div>
             <div class="col-md-12 mb-1 mt-1">
                     <a href="{{ route('time-records.my') }}" class="btn btn-outline-primary btn-sm w-100 btn-records mb-1 mt-1">
@@ -155,7 +155,7 @@
                         <i class="fas fa-users mr-1"></i> All Employees Time Records</a>
                 </div>
         </div>
-         
+
 
         <!-- Calendar -->
         <div class="col-md-8">
@@ -285,108 +285,100 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Load time records
     async function loadTimeRecords() {
-    try {
-        const response = await axios.get('{{ route("time-records.index") }}');
+        try {
+            const response = await axios.get('{{ route("time-records.index") }}');
+            const recordsBody = document.getElementById('time-records-body');
+            recordsBody.innerHTML = '';
 
-        const recordsBody = document.getElementById('time-records-body');
-        recordsBody.innerHTML = '';
+            const today = new Date().toISOString().split('T')[0];
+            const todayRecords = response.data.filter(record =>
+                record.recorded_at.startsWith(today)
+            );
 
-        const today = new Date().toISOString().split('T')[0];
-        const todayRecords = response.data.filter(record =>
-            record.recorded_at.startsWith(today)
-        );
+            const timeInRecord = todayRecords.find(r => r.type === 'time_in');
+            const timeOutRecord = todayRecords.find(r => r.type === 'time_out');
 
-        const timeInRecord = todayRecords.find(r => r.type === 'time_in');
-        const timeOutRecord = todayRecords.find(r => r.type === 'time_out');
+            // Time-In button: disable if already timed in (regardless of status)
+            timeInBtn.disabled = !!timeInRecord;
 
-        // Time-In button: disable if already timed in (regardless of status)
-        timeInBtn.disabled = !!timeInRecord;
+            // Time-Out button: enable if Time-In exists (regardless of status) and no Time-Out exists
+            timeOutBtn.disabled = !(timeInRecord) || !!timeOutRecord;
 
-        // Time-Out button: enable if Time-In exists (regardless of status) and no Time-Out exists
-        timeOutBtn.disabled = !(timeInRecord) || !!timeOutRecord;
+            if (todayRecords.length === 0) {
+                recordsBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="text-center text-muted">No time records today</td>
+                    </tr>
+                `;
+                return;
+            }
 
-        if (todayRecords.length === 0) {
-            recordsBody.innerHTML = `
-                <tr>
-                    <td colspan="3" class="text-center text-muted">No time records today</td>
-                </tr>
-            `;
-            return;
-        }
+            // Calculate total hours if both records exist
+            let totalHours = 'N/A';
+            if (timeInRecord && timeOutRecord) {
+                const start = new Date(timeInRecord.recorded_at);
+                const end = new Date(timeOutRecord.recorded_at);
+                if (end > start) {
+                    const diffInMinutes = Math.floor((end - start) / (1000 * 60));
+                    const hours = Math.floor(diffInMinutes / 60);
+                    const minutes = diffInMinutes % 60;
+                    totalHours = `${hours}:${minutes.toString().padStart(2, '0')}`;
+                }
+            }
 
-        todayRecords.forEach(record => {
+            // Format time to 12-hour format with AM/PM
+            function formatTime(dateString) {
+                if (!dateString) return 'N/A';
+                const date = new Date(dateString);
+                return date.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: true
+                });
+            }
+
             const row = document.createElement('tr');
             row.innerHTML = `
-                <td>${record.type.replace('_', ' ')}</td>
-                <td>${new Date(record.recorded_at).toLocaleTimeString()}</td>
-                <td>${record.status}</td>
+                <td>${formatTime(timeInRecord?.recorded_at)}</td>
+                <td>${formatTime(timeOutRecord?.recorded_at)}</td>
+                <td>${timeOutRecord ? timeOutRecord.status : (timeInRecord ? timeInRecord.status : 'N/A')}</td>
+                <td>${totalHours}</td>
             `;
             recordsBody.appendChild(row);
-        });
-    } catch (error) {
-        console.error('Failed to load time records:', error);
-        showAlert('warning', 'Failed to load time records');
-    }
-}
 
-
-    // Event listeners
-    timeInBtn.addEventListener('click', handleTimeIn);
-
-    timeOutBtn.addEventListener('click', () => {
-        const alreadyOut = [...document.querySelectorAll('#time-records-body tr td:first-child')]
-            .some(td => td.textContent.trim().toLowerCase().includes('time out'));
-
-        if (alreadyOut) {
-            showAlert('info', 'You have already timed out today');
-        } else {
-            timeOutModal.show();
-        }
-    });
-
-    // Move loading transition to confirmation click
-    confirmTimeOutBtn.addEventListener('click', () => {
-        // Add animation to indicate processing (same as Time-In)
-        timeOutBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span> Processing...';
-        timeOutBtn.classList.add('disabled', 'btn-warning');
-        timeOutBtn.disabled = true;
-        confirmTimeOutBtn.disabled = true;
-        handleTimeOut();
-    });
-
-    // Remove loading transition from start of handleTimeOut
-    async function handleTimeOut() {
-        if (isProcessing) return;
-        isProcessing = true;
-
-        try {
-            const response = await axios.post('{{ route("dashboard.action") }}', { action: 'time_out' });
-
-            if (response.data.success) {
-                showAlert('success', 'Time-Out recorded successfully!');
-                // Force full reload to ensure consistent state
-                setTimeout(() => window.location.reload(), 1000);
-            } else {
-                showAlert('warning', response.data.message || 'Time-Out failed. Please try again.');
+            // Update button states based on records
+            if (timeInRecord) {
+                timeInBtn.disabled = true;
+                timeInBtn.classList.add('disabled');
+            }
+            if (timeOutRecord) {
+                timeOutBtn.disabled = true;
+                timeOutBtn.classList.add('disabled');
+            } else if (timeInRecord) {
+                timeOutBtn.disabled = false;
+                timeOutBtn.classList.remove('disabled');
             }
         } catch (error) {
-            const errorMsg = error.response?.data?.message ||
-                           error.response?.data?.error ||
-                           'An error occurred during Time-Out';
-            showAlert('danger', errorMsg);
-        } finally {
-            isProcessing = false;
-            confirmTimeOutBtn.disabled = false;
-            timeOutModal.hide();
-            // Restore button after processing
-            timeOutBtn.disabled = true;
-            timeOutBtn.innerHTML = '<i class="fas fa-sign-out-alt mr-1"></i> Time-out';
-            timeOutBtn.classList.remove('btn-warning', 'disabled');
+            console.error('Failed to load time records:', error);
+            showAlert('warning', 'Failed to load time records');
+            recordsBody.innerHTML = `
+                <tr>
+                    <td colspan="4" class="text-center text-danger">Failed to load records</td>
+                </tr>
+            `;
         }
     }
 
+    // Event listeners
+    document.getElementById('time-in').addEventListener('click', handleTimeIn);
+    document.getElementById('time-out').addEventListener('click', () => {
+        timeOutModal.show();
+        confirmTimeOutBtn.addEventListener('click', handleTimeOut);
+    });
+
     // Initialize calendar
-    const events = @json($events);
+    const events = JSON.parse(`{!! addslashes(json_encode($events)) !!}`);
     new FullCalendar.Calendar(document.getElementById('holiday-calendar'), {
         initialView: 'dayGridMonth',
         events: events.map(event => ({

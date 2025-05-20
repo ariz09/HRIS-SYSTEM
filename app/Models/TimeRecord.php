@@ -10,10 +10,10 @@ class TimeRecord extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 
-        'type', 
-        'recorded_at', 
-        'status', 
+        'user_id',
+        'type',
+        'recorded_at',
+        'status',
         'ip_address'
     ];
 
@@ -25,8 +25,9 @@ class TimeRecord extends Model
     {
         return $this->belongsTo(User::class);
     }
+
     public function employee()
     {
-        return $this->belongsTo(PersonalInfo::class);
+        return $this->belongsTo(EmploymentInfo::class, 'user_id', 'user_id');
     }
 }

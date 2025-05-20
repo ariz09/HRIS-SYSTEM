@@ -25,7 +25,8 @@ use App\Http\Controllers\{
     EmployeeDependentController,
     EmployeeEducationController,
     EmployeeEmploymentHistoryController,
-    TimeRecordController
+    TimeRecordController,
+    File201Controller
 };
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -121,6 +122,11 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/positions/by-cdm-level/{cdmLevel}', [PositionController::class, 'getByCdmLevel'])->name('positions.by-cdm-level');
     Route::get('/positions/{position}/cdm-level', [PositionController::class, 'getCdmLevel'])->name('positions.cdm-level');
 
+    Route::get('/201-files', [File201Controller::class, 'index'])->name('file201.index');
+    Route::post('/201-files', [File201Controller::class, 'store'])->name('file201.store');
+    Route::delete('/201-files/{id}', [File201Controller::class, 'destroy'])->name('file201.destroy');
+    Route::get('/file201/{id}/attachment', [File201Controller::class, 'showAttachment'])
+     ->name('file201.attachment');
     // Search
     Route::get('/search', [SearchController::class, 'index'])->name('search');
 

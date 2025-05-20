@@ -18,7 +18,7 @@
                     Role List
                 </div>
                 <div>
-                    <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addRoleModal">
+                    <button type="button" class="btn btn-light text-danger btn-sm" data-bs-toggle="modal" data-bs-target="#addRoleModal">
                         <i class="fas fa-plus"></i> Add Role
                     </button>
                 </div>
@@ -62,7 +62,9 @@
             <div class="modal-content">
                 <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="addRoleModalLabel">Add New Role</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn btn-sm btn-light text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
+                <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+            </button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
@@ -71,8 +73,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Add Role</button>
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-sm btn-primary">Add Role</button>
                 </div>
             </div>
         </form>
@@ -89,7 +91,9 @@
             <div class="modal-content">
                 <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="editRoleModalLabel">Edit Role</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn btn-sm btn-light text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
+                <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+            </button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
@@ -98,8 +102,8 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-sm btn-primary">Save Changes</button>
                 </div>
             </div>
         </form>
@@ -117,14 +121,16 @@
             <div class="modal-content">
                 <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="deleteRoleModalLabel">Delete Role</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <button type="button" class="btn btn-sm btn-light text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
+                <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+            </button>
                 </div>
                 <div class="modal-body">
                     Are you sure you want to delete the role "{{ $role->name }}"?
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                 </div>
             </div>
         </form>

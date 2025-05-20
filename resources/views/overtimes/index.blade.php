@@ -145,16 +145,18 @@
                                     </button>
 
                                      <!-- Take Action Modal -->
-                                    <div class="modal fade modal-lg " id="actionModal{{ $overtime->id }}" tabindex="-1" aria-labelledby="actionModalLabel{{ $overtime->id }}" aria-hidden="true">
+                                    <div class="modal fade" id="actionModal{{ $overtime->id }}" tabindex="-1" aria-labelledby="actionModalLabel{{ $overtime->id }}" aria-hidden="true" >
                                         <div class="modal-dialog modal-dialog-centered modal-lg">
                                            <form method="POST" action="{{ route('overtimes.update', $overtime->id) }}">
-
                                                 @csrf
                                                 @method('PUT')
                                                 <div class="modal-content ">
                                                     <div class="modal-header bg-danger text-white">
                                                         <h5 class="modal-title" id="actionModalLabel{{ $overtime->id }}">Take Action on Overtime</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                        
+                                                        <button type="button" class="btn btn-sm btn-light delete-dependent-btn text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
+                                                            <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+                                                        </button>
                                                     </div>
                                                     <div class="modal-body">
                                                         <div class="mb-3">
@@ -185,7 +187,9 @@
                                             <div class="modal-content">
                                                 <div class="modal-header bg-danger text-white">
                                                     <h5 class="modal-title" id="deleteModalLabel{{ $overtime->id }}">Confirm Delete</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                   <button type="button" class="btn btn-sm btn-light delete-dependent-btn text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
+                                                        <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+                                                    </button>
                                                 </div>
                                                 <div class="modal-body">
                                                     Are you sure you want to delete this overtime request?

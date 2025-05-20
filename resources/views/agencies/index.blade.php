@@ -36,6 +36,7 @@
                         <tr>
                             <th class="d-none">#</th>
                             <th>Agency Name</th>
+                            <th>Logo</th>
                             <th>Status</th>
                             <th>Actions</th>
                         </tr>
@@ -45,6 +46,13 @@
                         <tr>
                             <td class="d-none">{{ $loop->iteration }}</td>
                             <td>{{ $agency->name }}</td>
+                            <td>
+                                @if($agency->logo)
+                                    <img src="{{ asset('storage/' . $agency->logo) }}" alt="Agency Logo" width="40" height="40">
+                                @else
+                                    <span class="text-muted">N/A</span>
+                                @endif
+                            </td>
                             <td>
                                 @if($agency->status)
                                     <span class="badge bg-success">Active</span>
@@ -82,7 +90,8 @@
                         <i class="fas fa-times" style="font-size: 0.75rem;"></i>
                     </button>
             </div>
-            <form action="{{ route('agencies.store') }}" method="POST">
+            <form action="{{ route('agencies.store') }}" method="POST" enctype="multipart/form-data">
+
                 @csrf
                 <div class="modal-body">
                     <div class="mb-3">
@@ -96,10 +105,15 @@
                             <option value="0">Inactive</option>
                         </select>
                     </div>
+                    <div class="mb-3">
+                        <label for="create-logo" class="form-label">Upload Logo (optional)</label>
+                        <input type="file" class="form-control" id="create-logo" name="logo" accept="image/*">
+                    </div>
+
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-success">Save Agency</button>
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-sm btn-success">Save Agency</button>
                 </div>
             </form>
         </div>
@@ -109,13 +123,15 @@
 <!-- Edit Modal -->
 <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form method="POST" id="editForm">
+        <form method="POST" id="editForm" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             <div class="modal-content">
                 <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="editModalLabel">Edit Agency</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn btn-sm btn-light delete-dependent-btn text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
+                        <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+                    </button>
                 </div>
                 <div class="modal-body">
                     <input type="hidden" name="id" id="editId">
@@ -130,10 +146,15 @@
                             <option value="0">Inactive</option>
                         </select>
                     </div>
+                    <div class="mb-3">
+                        <label for="edit-logo" class="form-label">Change Logo (optional)</label>
+                        <input type="file" class="form-control" id="edit-logo" name="logo" accept="image/*">
+                    </div>
+
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Update Agency</button>
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-sm btn-success">Update Agency</button>
                 </div>
             </div>
         </form>
@@ -149,14 +170,16 @@
             <div class="modal-content">
                 <div class="modal-header  bg-danger text-white">
                     <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn btn-sm btn-light delete-dependent-btn text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
+                        <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+                    </button>
                 </div>
                 <div class="modal-body">
                     Are you sure you want to delete this agency? This action cannot be undone.
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
                 </div>
             </div>
         </form>
@@ -166,14 +189,7 @@
 @endsection
 
 @push('scripts')
-<!-- DataTables CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.bootstrap5.min.css">
-<!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.3.0/js/responsive.bootstrap5.min.js"></script>
+
 
 <script>
     // Auto-dismiss success alert after 3 seconds
@@ -185,23 +201,6 @@
         }
     }, 3000);
 
-    $(document).ready(function() {
-        // Initialize DataTable with responsive plugin
-        $('#agenciesTable').DataTable({
-            responsive: {
-                details: {
-                    display: $.fn.dataTable.Responsive.display.modal({
-                        header: function(row) {
-                            var data = row.data();
-                            return 'Details for ' + data[1]; // Agency Name
-                        }
-                    }),
-                    renderer: $.fn.dataTable.Responsive.renderer.tableAll({
-                        tableClass: 'table'
-                    })
-                }
-            }
-        });
 
         // Edit button click handler
         $('.edit-btn').click(function() {
@@ -219,6 +218,6 @@
             $('#deleteForm').attr('action', '/agencies/' + agencyId);
             $('#deleteModal').modal('show');
         });
-    });
+   
 </script>
 @endpush

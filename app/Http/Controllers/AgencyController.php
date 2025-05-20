@@ -16,38 +16,47 @@ class AgencyController extends Controller
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
-            'status' => 'boolean'
+            'status' => 'required|boolean',
+            'logo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
-
-        // Auto-generate the agency code
-        $validated['code'] = 'AG' . strtoupper(Str::random(4)); // Prefix 'AG' and generate 4 random characters
-
-        // Create the agency with the generated code
-        Agency::create($validated);
-
-        return redirect()->route('agencies.index')
-            ->with('success', 'Agency created successfully');
+    
+        $data = $request->only('name', 'status');
+    
+        if ($request->hasFile('logo')) {
+            $data['logo'] = $request->file('logo')->store('agency_logos', 'public');
+        }
+    
+        Agency::create($data);
+    
+        return redirect()->route('agencies.index')->with('success', 'Agency created successfully.');
     }
-
+    
     public function update(Request $request, Agency $agency)
     {
-        $validated = $request->validate([
+        $request->validate([
             'name' => 'required|string|max:255',
-            'status' => 'boolean'
+            'status' => 'required|boolean',
+            'logo' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ]);
-
-        // If you want to allow updating of the code, uncomment the line below:
-        // $validated['code'] = 'AG' . strtoupper(Str::random(4));
-
-        $agency->update($validated);
-
-        return redirect()->route('agencies.index')
-            ->with('success', 'Agency updated successfully');
+    
+        $data = $request->only('name', 'status');
+    
+        if ($request->hasFile('logo')) {
+            // Optionally delete old image
+            if ($agency->logo && Storage::disk('public')->exists($agency->logo)) {
+                Storage::disk('public')->delete($agency->logo);
+            }
+    
+            $data['logo'] = $request->file('logo')->store('agency_logos', 'public');
+        }
+    
+        $agency->update($data);
+    
+        return redirect()->route('agencies.index')->with('success', 'Agency updated successfully.');
     }
-
-    public function destroy(Agency $agency)
+        public function destroy(Agency $agency)
     {
         $agency->delete();
 

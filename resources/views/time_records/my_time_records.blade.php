@@ -29,10 +29,10 @@
                     <input type="date" id="end_date" name="end_date" class="form-control" value="{{ request('end_date') }}">
                 </div>
                 <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">Filter</button>
+                    <button type="submit" class="btn btn-light">Filter</button>
                 </div>
                 <div class="col-auto">
-                    <a href="{{ route('time-records.my') }}" class="btn btn-secondary">Reset</a>
+                    <a href="{{ route('time-records.my') }}" class="btn btn-light">Reset</a>
                 </div>
             </form>
         </div>

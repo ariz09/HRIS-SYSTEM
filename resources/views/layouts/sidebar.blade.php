@@ -60,6 +60,12 @@
                     <nav class="sb-sidenav-menu-nested nav">
                          <a class="nav-link" href="{{ route('overtimes.index') }}">Overtime Management</a>
                     </nav>
+                    <nav class="sb-sidenav-menu-nested nav">
+                         <a class="nav-link" href="{{ route('period_types.index') }}">Period Type Management</a>
+                    </nav>
+                    <nav class="sb-sidenav-menu-nested nav">
+                         <a class="nav-link" href="{{ route('cut_off_types.index') }}">Cut-off Type Management</a>
+                    </nav>
   
 
                      <!--End Employees -->

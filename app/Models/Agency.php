@@ -10,11 +10,12 @@ class Agency extends Model
     use HasFactory;
 
     // Add 'status' to the fillable array, since it's being used in the controller
-    protected $fillable = ['name', 'code', 'status'];
+    protected $fillable = ['name', 'status', 'logo'];
+
 
     // Define the relationship with the Employee model
     public function employees()
     {
-        return $this->hasMany(Employee::class);
+        return $this->hasMany(EmploymentInfo::class);
     }
 }

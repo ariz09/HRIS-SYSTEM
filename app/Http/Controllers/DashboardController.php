@@ -73,7 +73,8 @@ class DashboardController extends Controller
             $hasPersonalInfo = $user->personalInfo()->exists();
             $hasEmploymentInfo = $user->employmentInfo()->exists();
 
-            if (!$hasPersonalInfo || !$hasEmploymentInfo) {
+            // if (!$hasPersonalInfo || !$hasEmploymentInfo) {
+            if (!$hasPersonalInfo) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Missing personal or employment information. Please contact HR.'

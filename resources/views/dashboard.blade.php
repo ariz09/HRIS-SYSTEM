@@ -153,11 +153,9 @@
                     <i class="fas fa-clock mr-1"></i> My Time Records
                 </a>
 
-                @hasrole('Admin')
-                    <a href="{{ route('time-records.all') }}" class="btn btn-outline-primary btn-sm w-100 btn-records mb-1 mt-1">
-                        <i class="fas fa-users mr-1"></i> All Employees Time Records
-                    </a>
-                @endhasrole
+                <a href="{{ route('time-records.all') }}" class="btn btn-outline-primary btn-sm w-100 btn-records mb-1 mt-1">
+                    <i class="fas fa-users mr-1"></i> All Employees Time Records
+                </a>
             </div>
         </div>
 

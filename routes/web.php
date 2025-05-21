@@ -46,22 +46,20 @@ Route::middleware('guest')->group(function () {
 
 // Authenticated User Routes
 Route::middleware(['auth'])->group(function () {
-
-    // Dashboard
+    // Dashboard - accessible by all authenticated users
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard/action', [DashboardController::class, 'handleAction'])->name('dashboard.action');
     Route::resource('period_types', PeriodTypeController::class);
     Route::resource('cut_off_types', CutOffTypeController::class);
 
-
-    // Time Records
-    Route::prefix('time-records')->group(function () {
+    // Time Records - accessible by all employees and timekeeper
+    Route::prefix('time-records')->middleware(['role:employee|timekeeper|admin'])->group(function () {
         Route::get('/', [TimeRecordController::class, 'index'])->name('time-records.index');
         Route::post('/time-in', [TimeRecordController::class, 'timeIn'])->name('time-in');
         Route::post('/time-out', [TimeRecordController::class, 'timeOut'])->name('time-out');
         Route::post('/time-out/update-status', [TimeRecordController::class, 'updateTimeInStatus'])->name('time-out.update-status');
         Route::get('/my', [TimeRecordController::class, 'myTimeRecords'])->name('time-records.my');
-        Route::get('/all', [TimeRecordController::class, 'allTimeRecords'])->name('time-records.all');
+        Route::get('/all', [TimeRecordController::class, 'allTimeRecords'])->middleware(['role:timekeeper|admin'])->name('time-records.all');
     });
 
     Route::prefix('employees/{employee}/employment-histories')->group(function () {
@@ -73,8 +71,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('employees.employment-histories.destroy');
     });
 
-    // Employee Routes
-    Route::prefix('employees')->name('employees.')->group(function () {
+    // Employee Management - accessible by admin, manager, and recruiter
+    Route::prefix('employees')->middleware(['role:admin|manager|recruiter'])->name('employees.')->group(function () {
         Route::get('{employee}/edit', [EmployeeController::class, 'edit'])->name('edit');
         Route::get('/template-download', [EmployeeController::class, 'downloadTemplate'])->name('template.download');
         Route::post('/bulk-upload', [EmployeeController::class, 'bulkUpload'])->name('bulkUpload');
@@ -86,7 +84,6 @@ Route::middleware(['auth'])->group(function () {
             Route::put('emergency-contacts', [EmployeeEmergencyContactController::class, 'update'])->name('emergency-contacts.update');
             Route::delete('emergency-contacts/{contact}', [EmployeeEmergencyContactController::class, 'destroy'])->name('emergency-contacts.destroy');
 
-
             // Dependents
             Route::get('dependents/edit', [EmployeeDependentController::class, 'edit'])->name('dependents.edit');
             Route::put('dependents', [EmployeeDependentController::class, 'update'])->name('dependents.update');
@@ -96,59 +93,62 @@ Route::middleware(['auth'])->group(function () {
             Route::get('educations/edit', [EmployeeEducationController::class, 'edit'])->name('educations.edit');
             Route::put('educations', [EmployeeEducationController::class, 'update'])->name('educations.update');
             Route::delete('educations/{education}', [EmployeeEducationController::class, 'destroy'])->name('educations.destroy');
-
-
         });
         Route::resource('personal_infos', PersonalInfoController::class);
         Route::resource('dependent', EmployeeDependentController::class)->except(['show']);
         Route::resource('education', EmployeeEducationController::class)->except(['show']);
-
     });
 
     // Main Employee resource route
     Route::resource('employees', EmployeeController::class);
 
-    // Leave Management
-    Route::resource('leaves', LeaveController::class)->names('leaves');
-    Route::resource('leave-types', LeaveTypeController::class)->parameters(['leave-types' => 'leave_type'])->names('leave_types');
-    Route::resource('assign_leaves', AssignLeaveController::class)->parameters(['assign_leaves' => 'assignLeave'])->names('assign_leaves');
-
-    // Holiday Management
-    Route::resource('holidays', HolidayController::class)->names('holidays');
-
-    // General Management
-    Route::resource('departments', DepartmentController::class)->names('departments');
-    Route::resource('positions', PositionController::class)->names('positions');
-    Route::resource('agencies', AgencyController::class)->names('agencies');
-    Route::resource('cdmlevels', CDMLevelController::class)->names('cdmlevels');
-    Route::resource('roles', RoleController::class)->names('roles');
-    Route::resource('role_permissions', RolePermissionController::class)->names('role_permissions');
-    Route::resource('employment_types', EmploymentTypeController::class)->names('employment_types');
-
-    // Position Utilities
-    Route::get('/positions/by-cdm-level/{cdmLevel}', [PositionController::class, 'getByCdmLevel'])->name('positions.by-cdm-level');
-    Route::get('/positions/{position}/cdm-level', [PositionController::class, 'getCdmLevel'])->name('positions.cdm-level');
-
-    Route::get('/201-files', [File201Controller::class, 'index'])->name('file201.index');
-    Route::post('/201-files', [File201Controller::class, 'store'])->name('file201.store');
-    Route::delete('/201-files/{id}', [File201Controller::class, 'destroy'])->name('file201.destroy');
-    Route::get('/file201/{id}/attachment', [File201Controller::class, 'showAttachment'])
-     ->name('file201.attachment');
-
-     Route::prefix('overtimes')->name('overtimes.')->middleware(['auth'])->group(function () {
-        Route::get('/', [OvertimeController::class, 'index'])->name('index');
-        Route::post('/', [OvertimeController::class, 'store'])->name('store'); // <-- POST not GET
-        Route::put('/{id}', [OvertimeController::class, 'update'])->name('update');
-        Route::delete('/{id}', [OvertimeController::class, 'destroy'])->name('destroy');
+    // Leave Management - accessible by admin, manager, and supervisor
+    Route::middleware(['role:admin|manager|supervisor'])->group(function () {
+        Route::resource('leaves', LeaveController::class)->names('leaves');
+        Route::resource('leave-types', LeaveTypeController::class)->parameters(['leave-types' => 'leave_type'])->names('leave_types');
+        Route::resource('assign_leaves', AssignLeaveController::class)->parameters(['assign_leaves' => 'assignLeave'])->names('assign_leaves');
     });
 
+    // Holiday Management - accessible by admin only
+    Route::middleware(['role:admin'])->group(function () {
+        Route::resource('holidays', HolidayController::class)->names('holidays');
+        Route::resource('departments', DepartmentController::class)->names('departments');
+        Route::resource('positions', PositionController::class)->names('positions');
+        Route::resource('agencies', AgencyController::class)->names('agencies');
+        Route::resource('cdmlevels', CDMLevelController::class)->names('cdmlevels');
+        Route::resource('roles', RoleController::class)->names('roles');
+        Route::resource('role_permissions', RolePermissionController::class)->names('role_permissions');
+        Route::resource('employment_types', EmploymentTypeController::class)->names('employment_types');
+    });
 
+    // Payroll Management - accessible by admin and payroll officer
+    Route::middleware(['role:admin|payroll officer'])->group(function () {
+        Route::prefix('overtimes')->name('overtimes.')->group(function () {
+            Route::get('/', [OvertimeController::class, 'index'])->name('index');
+            Route::post('/', [OvertimeController::class, 'store'])->name('store');
+            Route::put('/{id}', [OvertimeController::class, 'update'])->name('update');
+            Route::delete('/{id}', [OvertimeController::class, 'destroy'])->name('destroy');
+        });
+    });
 
-    // Search
+    // File 201 Management - accessible by admin and HR
+    Route::middleware(['role:admin|recruiter'])->group(function () {
+        Route::get('/201-files', [File201Controller::class, 'index'])->name('file201.index');
+        Route::post('/201-files', [File201Controller::class, 'store'])->name('file201.store');
+        Route::delete('/201-files/{id}', [File201Controller::class, 'destroy'])->name('file201.destroy');
+        Route::get('/file201/{id}/attachment', [File201Controller::class, 'showAttachment'])->name('file201.attachment');
+    });
+
+    // Search - accessible by all authenticated users
     Route::get('/search', [SearchController::class, 'index'])->name('search');
 
-    // Logout
+    // Logout - accessible by all authenticated users
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
+
+    Route::middleware(['role:admin'])->get('/test-role', function () {
+        return 'Role middleware works!';
+    });
+
 });
 
 // API endpoint

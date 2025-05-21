@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->string('employee_number')->unique();
-            $table->date('hiring_date');
+            $table->date('hiring_date')->nullable();
 
             // Make it nullable since you're using `set null`
             $table->foreignId('employment_status_id')->nullable()->constrained('employment_statuses')->onDelete('set null');

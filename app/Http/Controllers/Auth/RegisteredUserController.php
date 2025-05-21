@@ -47,6 +47,8 @@ class RegisteredUserController extends Controller
 
         PersonalInfo::create([
             'user_id' => $user->id,
+            'email' => $request->email,
+            'preferred_name' => $request->name,
         ]);
 
         EmploymentInfo::create([

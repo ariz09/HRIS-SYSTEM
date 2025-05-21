@@ -38,28 +38,30 @@ class EmployeeEmploymentHistoryController extends Controller
     public function update(Request $request, $employeeNumber)
     {
         $employee = EmploymentInfo::where('employee_number', $employeeNumber)->firstOrFail();
-
+    
         $validated = $request->validate([
             'histories' => 'required|array|min:1',
             'histories.*.id' => 'nullable|exists:employee_employment_histories,id',
             'histories.*.job_title' => 'required|string|max:255',
-            'histories.*.job_description' => 'nullable|string',
+            'histories.*.company_name' => 'required|string|max:255',
+            'histories.*.company_address' => 'required|string|max:255',
             'histories.*.start_date' => 'required|date',
             'histories.*.end_date' => 'nullable|date|after:histories.*.start_date',
         ]);
-
+    
         $existingIds = $employee->employmentHistories()->pluck('id')->toArray();
         $updatedIds = [];
-
+    
         foreach ($request->histories as $historyData) {
             $data = [
                 'employee_number' => $employee->employee_number,
                 'job_title' => strtoupper($historyData['job_title']),
-                'job_description' => strtoupper($historyData['job_description'] ?? null),
+                'company_name' => strtoupper($historyData['company_name']),
+                'company_address' => strtoupper($historyData['company_address']),
                 'start_date' => $historyData['start_date'],
                 'end_date' => $historyData['end_date'] ?? null,
             ];
-
+    
             if (!empty($historyData['id'])) {
                 $employee->employmentHistories()
                     ->where('id', $historyData['id'])
@@ -70,17 +72,17 @@ class EmployeeEmploymentHistoryController extends Controller
                 $updatedIds[] = $newHistory->id;
             }
         }
-
+    
         // Delete histories not present in the request
         $toDelete = array_diff($existingIds, $updatedIds);
         if (!empty($toDelete)) {
             EmployeeEmploymentHistory::whereIn('id', $toDelete)->delete();
         }
-
+    
         return redirect()->route('employees.edit', $employee)
             ->with('success', 'Employment histories updated successfully.');
     }
-
+    
     public function destroy($employeeNumber, EmployeeEmploymentHistory $history)
     {
        

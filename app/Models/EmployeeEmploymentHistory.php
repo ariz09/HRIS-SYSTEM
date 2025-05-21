@@ -14,7 +14,8 @@ class EmployeeEmploymentHistory extends Model
     protected $fillable = [
         'employee_number',
         'job_title',
-        'job_description',
+        'company_name',
+        'company_address',
         'start_date',
         'end_date'
     ];

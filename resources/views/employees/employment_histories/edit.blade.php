@@ -66,10 +66,18 @@
                             </div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label fw-semibold">Job Description</label>
-                            <textarea name="histories[__INDEX__][job_description]" class="form-control uppercase"
-                                rows="3"></textarea>
+                            <label class="form-label fw-semibold">Company Name <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="fas fa-building"></i></span>
+                                <input type="text" name="histories[__INDEX__][company_name]" class="form-control uppercase" required>
+                            </div>
                         </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Company Address</label>
+                            <textarea name="histories[__INDEX__][company_address]" class="form-control uppercase" rows="3"></textarea>
+                        </div>
+
                     </div>
 
                     <div class="row">
@@ -122,9 +130,17 @@
 @endsection
 
 @push('scripts')
-     <script src="{{ asset('js/validation.js') }}"></script>
-    <script>
+<script src="{{ asset('js/validation.js') }}"></script>
+<script>
       document.addEventListener('DOMContentLoaded', () => {
+         
+         document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('uppercase')) {
+                e.target.value = e.target.value.toUpperCase();
+            }
+        });
+
+
     let historyIndex = {{ $histories->count() }};
     let currentHistoryCard = null; // Track the card being deleted
 

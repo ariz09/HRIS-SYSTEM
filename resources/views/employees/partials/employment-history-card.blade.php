@@ -25,9 +25,17 @@
                     </div>
                 </div>
                 <div class="mb-3">
-                    <label class="form-label fw-semibold">Job Description</label>
-                    <textarea name="histories[{{ $index }}][job_description]" class="form-control uppercase"
-                        rows="3">{{ old("histories.$index.job_description", $history->job_description ?? '') }}</textarea>
+                    <label class="form-label fw-semibold">Company Name <span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fas fa-building"></i></span>
+                        <input type="text" name="histories[{{ $index }}][company_name]" class="form-control uppercase"
+                            value="{{ old("histories.$index.company_name", $history->company_name ?? '') }}" required>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Company Address <span class="text-danger">*</span></label>
+                    <textarea name="histories[{{ $index }}][company_address]" class="form-control uppercase" rows="2" required>{{ old("histories.$index.company_address", $history->company_address ?? '') }}</textarea>
                 </div>
 
 

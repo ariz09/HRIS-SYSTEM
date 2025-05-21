@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\RoleController;
 use App\Models\EmploymentInfo;
 use App\Models\PersonalInfo;
 use App\Models\User;
@@ -57,6 +58,9 @@ class RegisteredUserController extends Controller
         event(new Registered($user));
 
         Auth::login($user);
+
+        $roleController = new RoleController();
+        $roleController->assignDefaultRole($user);
 
         return redirect(route('dashboard', absolute: false));
     }

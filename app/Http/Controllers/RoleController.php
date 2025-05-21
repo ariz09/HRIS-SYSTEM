@@ -5,6 +5,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class RoleController extends Controller
@@ -42,5 +43,10 @@ class RoleController extends Controller
         $role->delete();
 
         return redirect()->route('roles.index')->with('success', 'Role deleted successfully.');
+    }
+
+    public function assignDefaultRole(User $user)
+    {
+        $user->assignRole('employee');
     }
 }

@@ -35,13 +35,22 @@ class PersonalInfoController extends Controller
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'gender' => 'required|in:Male,Female,Other',
+            'address' => 'nullable|string|max:1000',
+            'profile_picture' => 'nullable|image|max:2048',
         ]);
 
-        PersonalInfo::create($request->all());
+        $data = $request->only(['user_id', 'first_name', 'last_name', 'gender', 'address']);
+
+        if ($request->hasFile('profile_picture')) {
+            $data['profile_picture'] = $request->file('profile_picture')->store('profile_pictures', 'public');
+        }
+
+        PersonalInfo::create($data);
 
         return redirect()->route('personal_infos.index')
             ->with('success', 'Personal information added successfully.');
     }
+
 
     /**
      * Show the form for editing the specified personal info.
@@ -55,18 +64,32 @@ class PersonalInfoController extends Controller
      * Update the specified personal info in storage.
      */
     public function update(Request $request, PersonalInfo $personalInfo)
-    {
-        $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'gender' => 'required|in:Male,Female,Other',
-        ]);
+{
+    $request->validate([
+        'first_name' => 'required|string|max:255',
+        'last_name' => 'required|string|max:255',
+        'gender' => 'required|in:Male,Female,Other',
+        'address' => 'nullable|string|max:1000',
+        'profile_picture' => 'nullable|image|max:2048',
+    ]);
 
-        $personalInfo->update($request->all());
+    $data = $request->only(['first_name', 'last_name', 'gender', 'address']);
 
-        return redirect()->route('personal_infos.index')
-            ->with('success', 'Personal information updated successfully.');
+    if ($request->hasFile('profile_picture')) {
+        if ($personalInfo->profile_picture) {
+            \Storage::disk('public')->delete($personalInfo->profile_picture);
+        }
+
+        $data['profile_picture'] = $request->file('profile_picture')->store('profile_pictures', 'public');
     }
+
+    $personalInfo->update($data);
+
+    return redirect()->route('personal_infos.index')
+        ->with('success', 'Personal information updated successfully.');
+}
+
+    
 
     /**
      * Remove the specified personal info from storage.

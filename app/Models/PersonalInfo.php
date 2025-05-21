@@ -21,6 +21,10 @@ class PersonalInfo extends Model
         'email',
         'phone_number',
         'civil_status',
+        'address',
+        'profile_picture',
+        'address',
+        'profile_picture',
     ];
 
     /**

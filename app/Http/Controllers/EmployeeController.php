@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Response;
+use Illuminate\Support\Facades\Storage;
 
 class EmployeeController extends Controller
 {
@@ -88,34 +89,37 @@ class EmployeeController extends Controller
             'department_id' => 'required|exists:departments,id',
             'agency_id' => 'required|exists:agencies,id',
             'atm_account_number' => 'nullable|numeric',
+            'address' => 'required|string|max:500', // Made address required
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ], [
             'phone_number.regex' => 'The phone number must be a valid Philippine mobile number (e.g., 09171234567 or +639171234567)',
             'atm_account_number.numeric' => 'The ATM account number must contain only numbers',
+            'address.required' => 'The address field is required.',
         ]);
 
         try {
-            // Generate employee number
-            $latestEmployee = EmploymentInfo::orderBy('employee_number', 'desc')->first();
-            $newEmployeeNumber = '000001';
-            if ($latestEmployee) {
-                $latestNumber = (int)$latestEmployee->employee_number;
-                $newEmployeeNumber = str_pad($latestNumber + 1, 6, '0', STR_PAD_LEFT);
+            DB::beginTransaction();
+
+            // Handle profile picture upload
+            $profilePicPath = null;
+            if ($request->hasFile('profile_picture')) {
+                $profilePicPath = $request->file('profile_picture')->store('profile_picture', 'public');
             }
 
-            // Predefined password
-            $predefinedPassword = 'PassW0rd@2025';
+            // Generate employee number
+            $newEmployeeNumber = $this->generateEmployeeNumber();
 
-            // Create User Account with predefined password
+            // Create User Account
             $user = User::create([
-                'email' => $request->email,  // Email is saved but not used for email-related functionality
-                'password' => Hash::make($predefinedPassword), // Hash the predefined password
-                'name' => $request->first_name . ' ' . $request->last_name, // Combine first and last name
-                'role' => 'employee', // Set a role, can be adjusted as needed
+                'email' => $request->email,
+                'password' => Hash::make('PassW0rd@2025'),
+                'name' => $request->first_name . ' ' . $request->last_name,
+                'role' => 'employee',
             ]);
 
-            // Create Personal Info
+            // Create Personal Info - MAKE SURE ALL FIELDS ARE INCLUDED
             $personalInfo = PersonalInfo::create([
-                'user_id' => $user->id, // Link user to personal info
+                'user_id' => $user->id,
                 'first_name' => $request->first_name,
                 'middle_name' => $request->middle_name,
                 'last_name' => $request->last_name,
@@ -123,14 +127,16 @@ class EmployeeController extends Controller
                 'preferred_name' => $request->preferred_name,
                 'gender' => $request->gender,
                 'birthday' => $request->birthday,
-                'email' => $request->email,  // Email kept here for storage purposes
+                'email' => $request->email,
                 'phone_number' => $request->phone_number,
                 'civil_status' => $request->civil_status,
+                'address' => $request->address, // Ensure address is included
+                'profile_picture' => $profilePicPath,
             ]);
 
             // Create Employment Info
             $employmentInfo = EmploymentInfo::create([
-                'user_id' => $user->id, // Link user to employment info
+                'user_id' => $user->id,
                 'employee_number' => $newEmployeeNumber,
                 'hiring_date' => $request->hiring_date,
                 'employment_status_id' => $request->employment_status_id,
@@ -154,13 +160,15 @@ class EmployeeController extends Controller
                 'bank_name' => $request->bank_name,
             ]);
 
+            DB::commit();
             return redirect()->route('employees.index')->with('success', 'Employee created successfully.');
         } catch (\Exception $e) {
-            // Log the error for debugging
+            DB::rollback();
             Log::error("Error creating employee: " . $e->getMessage());
             return redirect()->route('employees.index')->with('error', 'Something went wrong. Please try again.');
         }
     }
+
 
             public function edit(EmploymentInfo $employee)
         {
@@ -181,33 +189,29 @@ class EmployeeController extends Controller
         public function update(Request $request, EmploymentInfo $employee)
     {
         $validated = $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'phone_number' => [
-                'required',
-                'regex:/^(09|\+639)\d{9}$/'
-            ],
-            'birthday' => 'required|date',
-            'gender' => 'required|in:Male,Female,Other',
-            'civil_status' => 'required|in:Single,Married,Divorced,Widowed,Separated',
-            'hiring_date' => 'required|date',
-            'basic_pay' => 'required|numeric',
-            'employment_type_id' => 'required|exists:employment_types,id',
-            'position_id' => 'required|exists:positions,id',
-            'cdm_level_id' => 'required|exists:cdm_levels,id',
-            'department_id' => 'required|exists:departments,id',
-            'agency_id' => 'required|exists:agencies,id',
-            'atm_account_number' => 'nullable|numeric',
+            // ... (keep all your existing validation rules)
+            'address' => 'required|string|max:500', // Ensure address is required
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ], [
-            'phone_number.regex' => 'The phone number must be a valid Philippine mobile number (e.g., 09171234567 or +639171234567)',
-            'atm_account_number.numeric' => 'The ATM account number must contain only numbers',
+            // ... (keep your existing custom messages)
+            'address.required' => 'The address field is required.',
         ]);
 
         try {
             DB::beginTransaction();
 
-            // Update Personal Info
+            $profilePicPath = $employee->personalInfo->profile_picture ?? null;
+            if ($request->hasFile('profile_picture')) {
+                // Delete old profile pic if exists
+                if ($profilePicPath && Storage::disk('public')->exists($profilePicPath)) {
+                    Storage::disk('public')->delete($profilePicPath);
+                }
+                
+                // Store new profile pic
+                $profilePicPath = $request->file('profile_picture')->store('profile_picture', 'public');
+            }
+
+            // Update Personal Info - MAKE SURE TO INCLUDE ADDRESS
             if ($employee->personalInfo) {
                 $employee->personalInfo->update([
                     'first_name' => $request->first_name,
@@ -220,33 +224,12 @@ class EmployeeController extends Controller
                     'email' => $request->email,
                     'phone_number' => $request->phone_number,
                     'civil_status' => $request->civil_status,
+                    'address' => $request->address, // Ensure address is included
+                    'profile_picture' => $profilePicPath,
                 ]);
             }
 
-            // Update Employment Info
-            $employee->update([
-                'hiring_date' => $request->hiring_date,
-                'employment_status_id' => $request->employment_status_id,
-                'agency_id' => $request->agency_id,
-                'department_id' => $request->department_id,
-                'cdm_level_id' => $request->cdm_level_id,
-                'position_id' => $request->position_id,
-                'employment_type_id' => $request->employment_type_id,
-            ]);
-
-            // Update Compensation Info
-            if ($employee->compensationPackage) {
-                $employee->compensationPackage->update([
-                    'basic_pay' => $request->basic_pay,
-                    'rata' => $request->rata,
-                    'comm_allowance' => $request->comm_allowance,
-                    'transpo_allowance' => $request->transpo_allowance,
-                    'parking_toll_allowance' => $request->parking_toll_allowance,
-                    'clothing_allowance' => $request->clothing_allowance,
-                    'atm_account_number' => $request->atm_account_number,
-                    'bank_name' => $request->bank_name,
-                ]);
-            }
+            // ... (rest of your update method remains the same)
 
             DB::commit();
             return redirect()->route('employees.index')->with('success', 'Employee updated successfully.');

@@ -1,8 +1,5 @@
 @extends('layouts.app')
 
-@push('styles')
-    <link href="{{ asset('css/validation.css') }}" rel="stylesheet">
-@endpush
 <style>/* Profile Picture Styles */
 .profile-picture-container {
     width: 150px;
@@ -37,41 +34,6 @@
         height: 150px;
     }
 }
-/* Validation styles */
-.was-validated .form-control:invalid,
-.was-validated .form-select:invalid,
-.form-control.is-invalid,
-.form-select.is-invalid {
-    border-color: #dc3545;
-    padding-right: calc(1.5em + 0.75rem);
-    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
-    background-repeat: no-repeat;
-    background-position: right calc(0.375em + 0.1875rem) center;
-    background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-}
-
-.was-validated .form-control:invalid:focus,
-.was-validated .form-select:invalid:focus,
-.form-control.is-invalid:focus,
-.form-select.is-invalid:focus {
-    border-color: #dc3545;
-    box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
-}
-
-.invalid-feedback {
-    display: none;
-    width: 100%;
-    margin-top: 0.25rem;
-    font-size: 0.875em;
-    color: #dc3545;
-}
-
-.was-validated .form-control:invalid ~ .invalid-feedback,
-.was-validated .form-select:invalid ~ .invalid-feedback,
-.form-control.is-invalid ~ .invalid-feedback,
-.form-select.is-invalid ~ .invalid-feedback {
-    display: block;
-}
 </style>
 @section('content')
 <x-success-alert :message="session('success')" />
@@ -85,7 +47,7 @@
         <li class="breadcrumb-item active">Add New Employee</li>
     </ol>
         <div class="card-body">
-            <form action="{{ route('employees.store') }}" method="POST" enctype="multipart/form-data">
+            <form novalidate action="{{ route('employees.store') }}" method="POST" enctype="multipart/form-data">
                 @csrf
                 <div class="row mb-4">
                     <div class="col-md-6">
@@ -137,11 +99,8 @@
                     <div class="col-md-3">
                         <label for="middle_name" class="form-label">Middle Name</label>
                         <input type="text" name="middle_name" id="middle_name" 
-                            class="form-control rounded-2 shadow-sm @error('first_name') is-invalid @enderror" 
-                            value="{{ old('middle_name') }}" placeholder="Enter middle name">
-                        @error('middle_name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror                 
+                            class="form-control rounded-2 shadow-sm"
+                            value="{{ old('middle_name') }}" placeholder="Enter middle name">                
                     </div>
                     <div class="col-md-3">
                         <label for="last_name" class="form-label">Last Name</label>
@@ -155,29 +114,26 @@
                     <div class="col-md-3">
                         <label for="name_suffix" class="form-label">Name Suffix</label>
                         <input type="text" name="name_suffix" id="name_suffix"  
-                        class="form-control rounded-2 shadow-sm @error('name_suffix') is-invalid @enderror" 
+                        class="form-control rounded-2 shadow-sm"
                             value="{{ old('name_suffix') }}" placeholder="Enter name suffix" >
-                        @error('name_suffix')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror 
                     </div>
                     <div class="col-md-3">
                         <label for="preferred_name" class="form-label">Preferred Name</label>
                         <input type="text" name="preferred_name" id="preferred_name" 
-                            class="form-control rounded-2 shadow-sm @error('preferred_name') is-invalid @enderror" 
+                            class="form-control rounded-2 shadow-sm" 
                             value="{{ old('preferred_name') }}" placeholder="Enter preffered name">
-                        @error('preferred_name')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror  
                     </div>
                     <div class="col-md-3">
                         <label for="gender" class="form-label">Gender</label>
-                        <select name="gender" id="gender" class="form-select rounded-2 shadow-sm">
+                        <select name="gender" id="gender" class="form-select rounded-2 shadow-sm @error('gender') is-invalid @enderror" required>
                             <option value="">Select gender</option>
                             <option value="Male">Male</option>
                             <option value="Female">Female</option>
                             <option value="Other">Other</option>
                         </select>
+                        @error('last_name')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror    
                     </div>
                     <div class="col-md-3">
                         <label for="birthday" class="form-label">Birthday</label>
@@ -208,13 +164,16 @@
                     </div>
                     <div class="col-md-3">
                         <label for="civil_status" class="form-label">Civil Status</label>
-                        <select name="civil_status" id="civil_status" class="form-select rounded-2 shadow-sm">
+                        <select name="civil_status" id="civil_status" class="form-select rounded-2 shadow-sm @error('civil_status') is-invalid @enderror"  required>
                             <option value="">Select status</option>
                             <option value="Single">Single</option>
                             <option value="Married">Married</option>
                             <option value="Separated">Separated</option>
                             <option value="Widowed">Widowed</option>
                         </select>
+                        @error('civil_status')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror 
                     </div>
                     <div class="col-md-12">
                         <label for="address" class="form-label">Address</label>
@@ -321,65 +280,44 @@
                                 <div class="mb-3">
                                     <label for="rata" class="form-label">RATA</label>
                                     <input type="text" name="rata" id="rata" 
-                                        class="form-control rounded-2 shadow-sm @error('rata') is-invalid @enderror" 
+                                        class="form-control rounded-2 shadow-sm"
                                         value="{{ old('rata') }}" placeholder="Enter rata"> 
-                                    @error('rata')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror 
                                 </div>
                                 <div class="mb-3">
                                     <label for="comm_allowance" class="form-label">Commission Allowance</label>
                                     <input type="text" name="comm_allowance" id="comm_allowance" 
-                                       class="form-control rounded-2 shadow-sm @error('comm_allowance') is-invalid @enderror" 
+                                       class="form-control rounded-2 shadow-sm"
                                         value="{{ old('comm_allowance') }}" placeholder="Enter commision allowance"> 
-                                    @error('comm_allowance')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror 
                                 </div>
                                 <div class="mb-3">
                                     <label for="transpo_allowance" class="form-label">Transportation Allowance</label>
                                     <input type="text" name="transpo_allowance" id="transpo_allowance" 
-                                       class="form-control rounded-2 shadow-sm @error('transpo_allowance') is-invalid @enderror" 
+                                       class="form-control rounded-2 shadow-sm"
                                         value="{{ old('transpo_allowance') }}" placeholder="Enter transportation allowance"> 
-                                    @error('transpo_allowance')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror 
                                 </div>
                                 <div class="mb-3">
                                     <label for="parking_toll_allowance" class="form-label">Parking/Toll Allowance</label>
                                     <input type="text" name="parking_toll_allowance" id="parking_toll_allowance" 
-                                       class="form-control rounded-2 shadow-sm @error('parking_toll_allowance') is-invalid @enderror" 
+                                       class="form-control rounded-2 shadow-sm"
                                         value="{{ old('parking_toll_allowance') }}" placeholder="Enter parking toll allowance"> 
-                                    @error('parking_toll_allowance')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror 
                                 </div>
                                 <div class="mb-3">
                                     <label for="clothing_allowance" class="form-label">Clothing Allowance</label>
                                     <input type="text" name="clothing_allowance" id="clothing_allowance" 
-                                       class="form-control rounded-2 shadow-sm @error('clothing_allowance') is-invalid @enderror" 
+                                       class="form-control rounded-2 shadow-sm" 
                                         value="{{ old('clothing_allowance') }}" placeholder="Enter clothing allowance"> 
-                                    @error('clothing_allowance')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror 
                                 </div>
                                 <div class="mb-3">
                                     <label for="atm_account_number" class="form-label">ATM Account Number</label>
                                     <input type="text" name="atm_account_number" id="atm_account_number" 
-                                       class="form-control rounded-2 shadow-sm @error('atm_account_number') is-invalid @enderror" 
+                                       class="form-control rounded-2 shadow-sm"
                                         value="{{ old('atm_account_number') }}" placeholder="Enter ATM Account Number"> 
-                                    @error('atm_account_number')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror 
                                 </div>
                                 <div class="mb-3">
                                     <label for="bank_name" class="form-label">Bank Name</label>
                                     <input type="text" name="bank_name" id="bank_name" 
-                                       class="form-control rounded-2 shadow-sm @error('bank_name') is-invalid @enderror" 
+                                       class="form-control rounded-2 shadow-sm"
                                         value="{{ old('bank_name') }}" placeholder="Enter Bank name"> 
-                                    @error('bank_name')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror 
                                 </div>
                             </div>
                         </div>
@@ -399,60 +337,14 @@
     </div>
 </div>
 
-<!-- Placeholder Modals -->
-@foreach ([
-    ['emergencyContactModal', 'Emergency Contact'],
-    ['dependentsModal', 'Dependents'],
-    ['employmentHistoryModal', 'Employment History'],
-    ['educationModal', 'Educational Background']
-] as [$modalId, $title])
-<div class="modal fade" id="{{ $modalId }}" tabindex="-1" aria-labelledby="{{ $modalId }}Label" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content shadow">
-            <div class="modal-header">
-                <h5 class="modal-title" id="{{ $modalId }}Label">{{ $title }}</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p class="text-muted">Form for {{ strtolower($title) }} goes here...</p>
-            </div>
-        </div>
-    </div>
-</div>
-@endforeach
+
 
 @endsection
 @push('scripts')
-<script src="{{ asset('js/validation.js') }}"></script>
+
 <script>
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Enable Bootstrap validation
-
-            // Uppercase formatting for specific fields
-        const uppercaseFields = ['first_name', 'middle_name', 'last_name', 'name_suffix',
-            'preferred_name', 'bank_name'];
-        uppercaseFields.forEach(id => {
-            const input = document.getElementById(id);
-            if (input) {
-                input.addEventListener('input', () => {
-                    input.value = input.value.toUpperCase();
-                });
-            }
-        });
-
-
-    const forms = document.querySelectorAll('.needs-validation');
-    
-    Array.from(forms).forEach(function(form) {
-        form.addEventListener('submit', function(event) {
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            
-            form.classList.add('was-validated');
-        }, false);
-    });
 
     // Image preview function
     function previewImage(input) {
@@ -566,5 +458,7 @@ function previewImage(input) {
         reader.readAsDataURL(file);
     }
 }
+
+
 
 </script>

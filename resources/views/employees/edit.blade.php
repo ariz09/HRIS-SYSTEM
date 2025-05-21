@@ -1,8 +1,5 @@
 @extends('layouts.app')
 
-@push('styles')
-    <link href="{{ asset('css/validation.css') }}" rel="stylesheet">
-@endpush
 <style>
     /* Profile Picture Styles */
     .profile-picture-container {
@@ -171,9 +168,12 @@
                                 <div class="col-md-3">
                                     <label for="last_name" class="form-label">Last Name</label>
                                     <input type="text" name="last_name" id="last_name"
-                                        class="form-control rounded-2 shadow-sm"
+                                        class="form-control rounded-2 shadow-sm @error('last_name') is-invalid @enderror"
                                         value="{{ old('last_name', $employee->personalInfo->last_name) }}"
                                         style="text-transform: uppercase;" required>
+                                    @error('last_name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="col-md-3">
@@ -195,36 +195,40 @@
                                 <div class="col-md-3">
                                     <label for="gender" class="form-label">Gender</label>
                                     <select name="gender" id="gender" class="form-select rounded-2 shadow-sm" required>
-                                        <option value="Male" {{ $employee->personalInfo->gender == 'Male' ? 'selected' : '' }}>
-                                            Male</option>
-                                        <option value="Female" {{ $employee->personalInfo->gender == 'Female' ? 'selected' : '' }}>Female</option>
-                                        <option value="Other" {{ $employee->personalInfo->gender == 'Other' ? 'selected' : '' }}>
-                                            Other</option>
+                                        <option value="Male" {{ (optional($employee->personalInfo)->gender) == 'Male' ? 'selected' : '' }}>Male</option>
+                                        <option value="Female" {{ (optional($employee->personalInfo)->gender) == 'Female' ? 'selected' : '' }}>Female</option>
+                                        <option value="Other" {{ (optional($employee->personalInfo)->gender) == 'Other' ? 'selected' : '' }}>Other</option>
                                     </select>
                                 </div>
 
                                 <div class="col-md-3">
                                     <label for="birthday" class="form-label">Birthday</label>
                                     <input type="date" name="birthday" id="birthday"
-                                        class="form-control rounded-2 shadow-sm"
+                                        class="form-control rounded-2 shadow-sm @error('birthday') is-invalid @enderror"
                                         value="{{ old('birthday', $employee->personalInfo->birthday ?? '') }}" required>
+                                        @error('birthday')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="col-md-3">
                                     <label for="email" class="form-label">Email</label>
-                                    <input type="email" name="email" id="email" class="form-control rounded-2 shadow-sm"
+                                    <input type="email" name="email" id="email" class="form-control rounded-2 shadow-sm @error('email') is-invalid @enderror"
                                         value="{{ old('email', $employee->personalInfo->email) }}" required>
+                                    @error('email')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="col-md-3">
                                     <label for="phone_number" class="form-label">Phone Number</label>
                                     <input type="text" name="phone_number" id="phone_number"
-                                        class="form-control rounded-2 shadow-sm phone-number"
+                                        class="form-control rounded-2 shadow-sm phone-number @error('phone_number') is-invalid @enderror"
                                         value="{{ old('phone_number', $employee->personalInfo->phone_number) }}"
                                         pattern="^(09|\+639)\d{9}$" required>
-                                    <div class="invalid-feedback">
-                                        Please enter a valid Philippine mobile number.
-                                    </div>
+                                    @error('phone_number')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <div class="col-md-3">
@@ -303,8 +307,11 @@
                                     <div class="mb-3">
                                         <label for="hiring_date" class="form-label">Hiring Date</label>
                                         <input type="date" name="hiring_date" id="hiring_date"
-                                            class="form-control rounded-2 shadow-sm"
+                                            class="form-control rounded-2 shadow-sm @error('hiring_date') is-invalid @enderror"
                                             value="{{ old('hiring_date', $employee->hiring_date) }}" required>
+                                            @error('hiring_date')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                     </div>
                                     <div class="mb-3">
                                         <label for="employment_status_id" class="form-label">Employment Status</label>
@@ -340,51 +347,52 @@
                                     <div class="mb-3">
                                         <label for="basic_pay" class="form-label">Basic Pay</label>
                                         <input type="number" name="basic_pay" id="basic_pay"
-                                            class="form-control rounded-2 shadow-sm"
-                                            value="{{ old('basic_pay', $employee->compensationPackage->basic_pay) }}"
-                                            required>
+                                            class="form-control rounded-2 shadow-sm @error('basic_pay') is-invalid @enderror"
+                                            value="{{ optional($employee->compensationPackage)->basic_pay ?? '' }}" required>
+                                            @error('basic_pay')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                     </div>
                                     <div class="mb-3">
                                         <label for="rata" class="form-label">RATA</label>
                                         <input type="number" name="rata" id="rata" class="form-control rounded-2 shadow-sm"
-                                            value="{{ old('rata', $employee->compensationPackage->rata) }}">
+                                          value="{{ optional($employee->compensationPackage)->rata ?? '' }}">
                                     </div>
                                     <div class="mb-3">
                                         <label for="comm_allowance">Commission Allowance</label>
-                                        <input type="number" name="comm_allowance" id="comm_allowance"
-                                            class="form-control rounded-2 shadow-sm"
-                                            value="{{ old('comm_allowance', $employee->compensationPackage->comm_allowance) }}">
+                                        <input type="number" name="comm_allowance" id="comm_allowance" class="form-control rounded-2 shadow-sm"
+                                            value="{{ optional( $employee->compensationPackage)->comm_allowance ?? '' }}">
                                     </div>
                                     <div class="mb-3">
                                         <label for="transpo_allowance" class="form-label">Transportation Allowance</label>
                                         <input type="number" name="transpo_allowance" id="transpo_allowance"
                                             class="form-control rounded-2 shadow-sm"
-                                            value="{{ old('transpo_allowance', $employee->compensationPackage->transpo_allowance) }}">
+                                            value="{{ optional( $employee->compensationPackage)->transpo_allowance ?? '' }}">
                                     </div>
                                     <div class="mb-3">
                                         <label for="parking_toll_allowance" class="form-label">Parking/Toll
                                             Allowance</label>
                                         <input type="number" name="parking_toll_allowance" id="parking_toll_allowance"
                                             class="form-control rounded-2 shadow-sm"
-                                            value="{{ old('parking_toll_allowance', $employee->compensationPackage->parking_toll_allowance) }}">
+                                            value="{{ optional($employee->compensationPackage)->parking_toll_allowance ?? '' }}">
                                     </div>
                                     <div class="mb-3">
                                         <label for="clothing_allowance" class="form-label">Clothing Allowance</label>
                                         <input type="number" name="clothing_allowance" id="clothing_allowance"
                                             class="form-control rounded-2 shadow-sm"
-                                            value="{{ old('clothing_allowance', $employee->compensationPackage->clothing_allowance) }}">
+                                            value="{{ optional($employee->compensationPackage)->clothing_allowance ?? '' }}">
                                     </div>
                                     <div class="mb-3">
                                         <label for="atm_account_number" class="form-label">ATM Account Number</label>
                                         <input type="text" name="atm_account_number" id="atm_account_number"
                                             class="form-control rounded-2 shadow-sm numeric-only"
-                                            value="{{ old('atm_account_number', $employee->compensationPackage->atm_account_number) }}">
+                                            value="{{ optional($employee->compensationPackage)->atm_account_number ?? '' }}">
                                     </div>
                                     <div class="mb-3">
                                         <label for="bank_name" class="form-label">Bank Name</label>
                                         <input type="text" name="bank_name" id="bank_name"
                                             class="form-control rounded-2 shadow-sm" style="text-transform: uppercase;"
-                                            value="{{ old('bank_name', $employee->compensationPackage->bank_name) }}">
+                                            value="{{ optional($employee->compensationPackage)->bank_name ?? '' }}">
                                     </div>
                                 </div>
                             </div>
@@ -411,24 +419,9 @@
     </div>
 @endsection
 @push('scripts')
-<script src="{{ asset('js/validation.js') }}"></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        // Initialize form validation
-        setupFormValidation('form');
-
-        // Uppercase formatting for specific fields
-        const uppercaseFields = ['first_name', 'middle_name', 'last_name', 'name_suffix',
-            'preferred_name', 'bank_name'];
-        uppercaseFields.forEach(id => {
-            const input = document.getElementById(id);
-            if (input) {
-                input.addEventListener('input', () => {
-                    input.value = input.value.toUpperCase();
-                });
-            }
-        });
-
 
         // CDM Level and Position dynamic loading
         const cdmSelect = document.getElementById('cdm_level_id');

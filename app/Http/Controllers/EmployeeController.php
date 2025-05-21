@@ -73,7 +73,7 @@ class EmployeeController extends Controller
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
             'phone_number' => [
                 'required',
                 'regex:/^(09|\+639)\d{9}$/'
@@ -95,6 +95,20 @@ class EmployeeController extends Controller
             'phone_number.regex' => 'The phone number must be a valid Philippine mobile number (e.g., 09171234567 or +639171234567)',
             'atm_account_number.numeric' => 'The ATM account number must contain only numbers',
             'address.required' => 'The address field is required.',
+            'first_name' => 'The first_name field is required.',
+            'last_name' => 'The last_name field is required.',
+            'email' => 'The email field is required.',
+            'birthday' => 'The birthday field is required.',
+            'gender' => 'The gender field is required.',
+            'civil_status' => 'The civil_status field is required.',
+            'hiring_date' => 'The hiring_date field is required.',
+            'basic_pay' => 'The basic_pay field is required.',
+            'employment_type_id' => 'The employment_type field is required.',
+            'position_id' => 'The position field is required.',
+            'cdm_level_id' =>'The cdm_level field is required.',
+            'department_id' => 'The department field is required.',
+            'agency_id' => 'The agency field is required.',
+
         ]);
 
         try {
@@ -130,7 +144,7 @@ class EmployeeController extends Controller
                 'email' => $request->email,
                 'phone_number' => $request->phone_number,
                 'civil_status' => $request->civil_status,
-                'address' => $request->address, // Ensure address is included
+                'address' => $request->address, 
                 'profile_picture' => $profilePicPath,
             ]);
 
@@ -189,12 +203,43 @@ class EmployeeController extends Controller
         public function update(Request $request, EmploymentInfo $employee)
     {
         $validated = $request->validate([
-            // ... (keep all your existing validation rules)
-            'address' => 'required|string|max:500', // Ensure address is required
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email',
+            'phone_number' => [
+                'required',
+                'regex:/^(09|\+639)\d{9}$/'
+            ],
+            'birthday' => 'required|date',
+            'gender' => 'required|in:Male,Female,Other',
+            'civil_status' => 'required|in:Single,Married,Divorced,Widowed,Separated',
+            'hiring_date' => 'required|date',
+            'basic_pay' => 'required|numeric',
+            'employment_type_id' => 'required|exists:employment_types,id',
+            'position_id' => 'required|exists:positions,id',
+            'cdm_level_id' => 'required|exists:cdm_levels,id',
+            'department_id' => 'required|exists:departments,id',
+            'agency_id' => 'required|exists:agencies,id',
+            'atm_account_number' => 'nullable|numeric',
+            'address' => 'required|string|max:500', // Made address required
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ], [
-            // ... (keep your existing custom messages)
+            'phone_number.regex' => 'The phone number must be a valid Philippine mobile number (e.g., 09171234567 or +639171234567)',
+            'atm_account_number.numeric' => 'The ATM account number must contain only numbers',
             'address.required' => 'The address field is required.',
+            'first_name' => 'The first_name field is required.',
+            'last_name' => 'The last_name field is required.',
+            'email' => 'The email field is required.',
+            'birthday' => 'The birthday field is required.',
+            'gender' => 'The gender field is required.',
+            'civil_status' => 'The civil_status field is required.',
+            'hiring_date' => 'The hiring_date field is required.',
+            'basic_pay' => 'The basic_pay field is required.',
+            'employment_type_id' => 'The employment_type field is required.',
+            'position_id' => 'The position field is required.',
+            'cdm_level_id' =>'The cdm_level field is required.',
+            'department_id' => 'The department field is required.',
+            'agency_id' => 'The agency field is required.',
         ]);
 
         try {
@@ -229,7 +274,7 @@ class EmployeeController extends Controller
                 ]);
             }
 
-            // ... (rest of your update method remains the same)
+
 
             DB::commit();
             return redirect()->route('employees.index')->with('success', 'Employee updated successfully.');

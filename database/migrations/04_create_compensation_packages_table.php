@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreign('employee_number')->references('employee_number')->on('employment_infos')->onDelete('cascade');
 
             // Compensation details
-            $table->decimal('basic_pay', 15, 2);
+            $table->decimal('basic_pay', 15, 2)->nullable();
             $table->decimal('rata', 15, 2)->nullable();
             $table->decimal('comm_allowance', 15, 2)->nullable();
             $table->decimal('transpo_allowance', 15, 2)->nullable();

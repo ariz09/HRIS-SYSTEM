@@ -105,37 +105,35 @@
                                 $totalHours = $start->diffInMinutes($end) / 60;
                             @endphp
                             <tr>
-                                <td>{{ $index + 1 }}</td>
-                                <td>
-                                    @if($overtime->employee && $overtime->employee->personalInfo)
-                                        {{ strtoupper($overtime->employee->personalInfo->last_name) }},
-                                        {{ strtoupper($overtime->employee->personalInfo->first_name) }}
-                                        {{ $overtime->employee->personalInfo->middle_name ? strtoupper($overtime->employee->personalInfo->middle_name) : '' }}
-                                    @else
-                                        {{ $overtime->employee_number }}
-                                    @endif
-                                </td>
-                                <td>
-                                    @php
-                                        $badge = [
-                                            'pending' => 'warning',
-                                            'approved' => 'success',
-                                            'declined' => 'danger'
-                                        ][$overtime->status ?? 'pending'];
-                                    @endphp
-                                    <span class="badge bg-{{ $badge }}">{{ ucfirst($overtime->status) }}</span>
-                                </td>
-                              
-                                <td>{{ $overtime->start->format('Y-m-d H:i') }}</td>
-                                <td>{{ $overtime->end->format('Y-m-d H:i') }}</td>
-                                <td>{{ number_format($totalHours, 2) }}
-                                <td>{{ $overtime->employee->department->name ?? 'N/A' }}</td>
-                                <td>{{ $overtime->employee->position->name ?? 'N/A' }}</td>
-                                <td>{{ $overtime->employee->employmentType->name ?? 'N/A' }}</td>
-
-                                <td>{{ Str::limit($overtime->reason, 50) }}</td>
-                                <td>{{ Str::limit($overtime->remarks, 50) }}</td>
-                                <td class="text-start">
+                                                            <td>{{ $index + 1 }}</td>
+                            <td>
+                                @if($overtime->employee && $overtime->employee->personalInfo)
+                                    {{ strtoupper($overtime->employee->personalInfo->last_name) }},
+                                    {{ strtoupper($overtime->employee->personalInfo->first_name) }}
+                                    {{ $overtime->employee->personalInfo->middle_name ? strtoupper($overtime->employee->personalInfo->middle_name) : '' }}
+                                @else
+                                    {{ $overtime->employee_number }}
+                                @endif
+                            </td>
+                            <td>
+                                @php
+                                    $badge = [
+                                        'pending' => 'warning',
+                                        'approved' => 'success',
+                                        'declined' => 'danger'
+                                    ][$overtime->status ?? 'pending'];
+                                @endphp
+                                <span class="badge bg-{{ $badge }}">{{ ucfirst($overtime->status ?? ""  ) }}</span>
+                            </td>
+                            <td>{{ $overtime->start->format('Y-m-d H:i') ?? "" }}</td>
+                            <td>{{ $overtime->end->format('Y-m-d H:i') ?? "" }}</td>
+                            <td>{{ number_format($totalHours ?? "" , 2) }}</td>
+                            <td>{{ $overtime->employee->department->name ?? 'N/A' }}</td>
+                            <td>{{ $overtime->employee->position->name ?? 'N/A' }}</td>
+                            <td>{{ $overtime->employee->employmentType->name ?? 'N/A' }}</td>
+                            <td>{{ Str::limit($overtime->reason ?? '', 50) }}</td>
+                            <td>{{ Str::limit($overtime->remarks ?? '', 50) }}</td>
+                            <td class="text-start">
                                   <button class="btn btn-sm btn-primary text-white me-1" data-bs-toggle="modal" data-bs-target="#actionModal{{ $overtime->id }}">
                                     Approve/Decline
                                  </button>
@@ -210,7 +208,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="9" class="text-center text-muted">No overtime requests found.</td>
+                                <td colspan="12" class="text-center text-muted">No overtime records found</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -222,9 +220,7 @@
 @endsection
 
 @push('styles')
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.bootstrap5.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
+
 <style>
     #overtimeTable td {
         vertical-align: middle;
@@ -240,22 +236,11 @@
 
 
 @push('scripts')
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.4.1/js/responsive.bootstrap5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+
 <script>
 $(document).ready(function() {
     var table = $('#overtimeTable').DataTable({
-        responsive: true,
+        responsive: true
         dom: '<"top d-flex justify-content-between align-items-center mb-2"Bf>rt<"bottom mt-3"ip>',
         buttons: [
             {
@@ -294,11 +279,11 @@ $(document).ready(function() {
             }
         },
         columnDefs: [
-            { responsivePriority: 1, targets: 1 },
-            { responsivePriority: 2, targets: 4 },
-            { responsivePriority: 3, targets: -1 },
-            { className: "text-center", targets: [0, 5, 6] },
-            { className: "text-start", targets: [3, 7] }
+            { responsivePriority: 1, targets: 1 }, // Employee name
+            { responsivePriority: 2, targets: 2 }, // Status
+            { responsivePriority: 3, targets: -1 }, // Actions (last column)
+            { className: "text-center", targets: [0, 2, 4, 5] }, // Center align these columns
+            { className: "text-start", targets: [1, 3, 6, 7, 8, 9, 10] } // Left align these columns
         ],
     });
 

@@ -11,11 +11,12 @@
         <li class="breadcrumb-item active">Employee List</li>
     </ol>
 
-    <div class="card shadow-sm">
-        <div class="card-header bg-danger text-white p-3">
+    <div class="card mb-4">
+        <div class="card-header  bg-danger text-white">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <i class="fas fa-users me-2"></i> <strong>Employee List</strong>
+                    <i class="fas fa-users me-2"></i> 
+                    Employee List
                 </div>
                 <div>
                     <a href="{{ route('employees.create') }}" class="btn btn-light btn-sm text-danger">
@@ -52,7 +53,7 @@
                                 <td>{{ optional($employee->agency)->name }}</td>
                                 <td>{{ optional($employee->position)->name }}</td>
                                 <td>{{ optional($employee->employmentStatus)->name }}</td>
-                                <td>{{ optional($employee->employmentType)->name ?? 'Not specified' }}</td>
+                                <td>{{ optional($employee->employmentType)->name ?? '' }}</td>
                                 <td>
                                     <a href="{{ route('employees.edit', $employee) }}" class="btn btn-warning btn-sm"
                                         data-bs-toggle="tooltip" title="Edit Employee">
@@ -102,9 +103,13 @@
         <form action="{{ route('employees.bulkUpload') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <div class="modal-content shadow-sm">
-                <div class="modal-header">
+                <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title" id="bulkUploadModalLabel">Upload CSV File</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn btn-sm btn-light delete-history-btn text-danger rounded-circle"
+                        data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"
+                        style="width: 24px; height: 24px; line-height: 1;">
+                        <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+                    </button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
@@ -113,13 +118,13 @@
                     </div>
                     <div class="mb-3">
                         <a href="{{ route('employees.template.download') }}"
-                            class="btn btn-primary btn-sm" target="_blank"  download>
+                            class="btn btn-secondary text-white btn-sm" target="_blank"  download>
                             Download Template
                         </a>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Upload</button>
+                    <button type="submit" class="btn btn-sm btn-success">Upload</button>
                 </div>
             </div>
         </form>
@@ -129,58 +134,18 @@
 @section('scripts')
 @push('scripts')
 <!-- Ensure jQuery is loaded first -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-<!-- DataTables CSS and JS (Bootstrap 5 + Responsive + Buttons) -->
-<link href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" rel="stylesheet">
-<link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css" rel="stylesheet">
-<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.bootstrap5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.print.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap5.min.js"></script>
 
 <script>
     $(document).ready(function () {
-        $('#employeesTable').DataTable({
-            responsive: true,
-            dom: '<"top d-flex justify-content-between align-items-center"lfB>rt<"bottom d-flex justify-content-between align-items-center"ip><"clear">',
-            buttons: [
-                {
-                    extend: 'csv',
-                    text: '<i class="fas fa-file-csv me-1"></i> Export CSV',
-                    className: 'btn btn-success btn-sm',
-                    title: 'Employment_Types',
-                    exportOptions: {
-                        columns: ':visible'
-                    }
-                },
-                {
-                    extend: 'copy',
-                    text: '<i class="fas fa-copy me-1"></i> Copy',
-                    className: 'btn btn-info btn-sm',
-                    exportOptions: {
-                        columns: ':visible'
-                    }
-                }
-            ],
-            lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "All"]],
-            pageLength: 10,
-            processing: true,
-            language: {
-                processing: '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div> Loading...'
-            },
-            initComplete: function() {
-                $('.dataTables_filter input').addClass('form-control form-control-sm');
-                $('.dataTables_length select').addClass('form-select form-select-sm');
-                $('.dt-buttons').addClass('btn-group');
-                $('.dt-buttons button').removeClass('btn-secondary');
-            }
-        });
+        setDatatable("employeesTable"); //simplified initialization for data table
+
+     /*    setDatatable("simpleTable", {
+            dom: 'rtip', // minimal layout
+            buttons: [] // no export buttons
+        }); */
+
     });
+
 
 
         /* // Delete modal handler remains the same

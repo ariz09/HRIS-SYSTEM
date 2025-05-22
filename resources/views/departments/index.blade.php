@@ -164,22 +164,16 @@
 @endsection
 
 @push('scripts')
-<!-- DataTables CSS and JS -->
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
+
 
 <script>
-    // Auto-dismiss success alert after 3 seconds
-    setTimeout(function () {
-        let alert = document.getElementById('success-alert');
-        if (alert) {
-            let bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
-            bsAlert.close();
-        }
-    }, 3000);
 
    $(document).ready(function() {
-        $('#departmentsTable').DataTable();
+      
+        setDatatable("departmentsTable", {
+            dom: 'rtip', // minimal layout
+            buttons: [] // no export buttons
+        }); 
 
         $(document).on('click', '.edit-btn', function(e) {
             e.preventDefault();

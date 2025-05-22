@@ -1,5 +1,11 @@
 @extends('layouts.app')
-
+@push('styles')
+<style>
+    #file201Table td:empty::after {
+        content: "\00a0"; /* &nbsp; */
+    }
+</style>
+@endpush
 @section('content')
 @if (session('success'))
     <div class="alert alert-success alert-dismissible fade show" role="alert" id="success-alert">
@@ -96,7 +102,7 @@
                                         {{ $file->employee_number }}
                                     @endif
                                 </td>
-                                <td>{{ ucwords(str_replace('_', ' ', $file->file_type)) }}</td>
+                                <td>{{ ucwords(str_replace('_', ' ', $file->file_type ?? "")) }}</td>
                                 <td>
                                     @if($file->attachment)
                                         <a href="{{ Storage::url($file->attachment) }}" target="_blank" class="btn btn-sm btn-outline-primary">
@@ -107,7 +113,7 @@
                                     @endif
                                 </td>
                                 <td>{{ $file->user->name ?? 'Unknown' }}</td>
-                                <td>{{ $file->created_at->format('Y-m-d H:i') }}</td>
+                                <td>{{ $file->created_at ? $file->created_at->format('Y-m-d H:i') : '' }}</td>
                                 <td>
                                     <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal{{ $file->id }}">
                                         Delete
@@ -139,7 +145,8 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center text-muted">No 201 files uploaded yet.</td>
+                                <td class="text-center text-muted">No 201 files uploaded yet.</td>
+                                <td></td><td></td><td></td><td></td><td></td><td></td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -151,51 +158,40 @@
 @endsection
 
 @push('styles')
-<!-- DataTables CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.13.4/css/dataTables.bootstrap5.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.4.1/css/responsive.bootstrap5.min.css">
-
 @endpush
 
 @push('scripts')
-<!-- jQuery (required for DataTables) -->
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.4.1/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.4.1/js/responsive.bootstrap5.min.js"></script>
-
 <script>
 $(document).ready(function() {
+    // First destroy any existing instance
+    if ($.fn.DataTable.isDataTable('#file201Table')) {
+        $('#file201Table').DataTable().destroy();
+    }
+
+    // Initialize with proper configuration
     $('#file201Table').DataTable({
         responsive: true,
-        dom: '<"top"lf>rt<"bottom"ip>',
         language: {
-            search: "_INPUT_",
-            searchPlaceholder: "Search...",
-            lengthMenu: "Show _MENU_ entries",
-            info: "Showing _START_ to _END_ of _TOTAL_ entries",
-            infoEmpty: "Showing 0 to 0 of 0 entries",
-            infoFiltered: "(filtered from _MAX_ total entries)",
-            paginate: {
-                first: "First",
-                last: "Last",
-                next: "Next",
-                previous: "Previous"
-            }
+            emptyTable: "No 201 files uploaded yet."
         },
-        columnDefs: [
-            { responsivePriority: 1, targets: 1 }, // Employee name
-            { responsivePriority: 2, targets: 2 }, // File type
-            { responsivePriority: 3, targets: -1 } // Action column
-        ]
+        columns: [
+            { data: null, defaultContent: "" }, // #
+            { data: "employee" },
+            { data: "file_type" },
+            { data: "attachment" },
+            { data: "uploaded_by" },
+            { data: "uploaded_at" },
+            { data: "action" }
+        ],
+        initComplete: function() {
+            // Remove any empty rows that might cause issues
+            $('tbody tr').each(function() {
+                if ($(this).children('td').length !== 7) {
+                    $(this).remove();
+                }
+            });
+        }
     });
-
-    // Auto-hide success alert after 5 seconds
-    setTimeout(function() {
-        $('#success-alert').fadeOut('slow');
-    }, 5000);
 });
 </script>
 @endpush

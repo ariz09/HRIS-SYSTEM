@@ -192,32 +192,32 @@
 
 
 <script>
-    // Auto-dismiss success alert after 3 seconds
-    setTimeout(function () {
-        let alert = document.getElementById('success-alert');
-        if (alert) {
-            let bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
-            bsAlert.close();
-        }
-    }, 3000);
 
+$(document).ready(function () {
+     
+        setDatatable("agenciesTable", {
+            dom: 'rtip', // minimal layout
+            buttons: [] // no export buttons
+        }); 
 
-        // Edit button click handler
-        $('.edit-btn').click(function() {
-            var agencyId = $(this).data('id');
-            $('#editId').val(agencyId);
-            $('#edit-name').val($(this).data('name'));
-            $('#edit-status').val($(this).data('status') ? '1' : '0');
-            $('#editForm').attr('action', '/agencies/' + agencyId);
-            $('#editModal').modal('show');
-        });
+    });
 
-        // Delete button click handler
-        $('.delete-btn').click(function() {
-            var agencyId = $(this).data('id');
-            $('#deleteForm').attr('action', '/agencies/' + agencyId);
-            $('#deleteModal').modal('show');
-        });
-   
+// Edit button click handler
+$('.edit-btn').click(function() {
+    var agencyId = $(this).data('id');
+    $('#editId').val(agencyId);
+    $('#edit-name').val($(this).data('name'));
+    $('#edit-status').val($(this).data('status') ? '1' : '0');
+    $('#editForm').attr('action', '/agencies/' + agencyId);
+    $('#editModal').modal('show');
+});
+
+// Delete button click handler
+$('.delete-btn').click(function() {
+    var agencyId = $(this).data('id');
+    $('#deleteForm').attr('action', '/agencies/' + agencyId);
+    $('#deleteModal').modal('show');
+});
+
 </script>
 @endpush

@@ -126,8 +126,15 @@
 
 @push('scripts')
 <script>
+
+
+        
     $(document).ready(function () {
-        $('#cdmLevelsTable').DataTable();
+       
+        setDatatable("cdmLevelsTable", {
+        dom: 'rtip', // minimal layout
+        buttons: [] // no export buttons
+    }); 
 
         $('.edit-btn').click(function () {
             var id = $(this).data('id');

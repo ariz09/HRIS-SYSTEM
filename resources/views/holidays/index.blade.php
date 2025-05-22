@@ -185,33 +185,12 @@
 @endsection
 
 @push('scripts')
-<!-- DataTables CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.bootstrap5.min.css">
-<!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.3.0/js/responsive.bootstrap5.min.js"></script>
+
 
 <script>
     $(document).ready(function() {
-        // Initialize DataTable with responsive plugin
-        $('#holidaysTable').DataTable({
-            responsive: {
-                details: {
-                    display: $.fn.dataTable.Responsive.display.modal({
-                        header: function(row) {
-                            var data = row.data();
-                            return 'Details for ' + data[0]; // Holiday Name
-                        }
-                    }),
-                    renderer: $.fn.dataTable.Responsive.renderer.tableAll({
-                        tableClass: 'table'
-                    })
-                }
-            }
-        });
+
+        setDatatable("holidaysTable"); 
     });
 </script>
 @endpush

@@ -157,35 +157,28 @@
 @endsection
 
 @push('scripts')
-<!-- DataTables CSS -->
-<link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/dataTables.bootstrap5.min.css">
-<!-- DataTables JS -->
-<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.5/js/dataTables.bootstrap5.min.js"></script>
 
 <script>
-    $(document).ready(function () {
-        $('#leaveTypesTable').DataTable();
 
-        setTimeout(() => $('.auto-close').alert('close'), 3000);
+$(document).ready(function() {
+    setDatatable("leaveTypesTable"); 
 
-        // ✅ Use delegated events for buttons inside DataTable
-        $('#leaveTypesTable').on('click', '.edit-btn', function () {
-            const id = $(this).data('id');
-            $.get('/leave-types/' + id + '/edit', function (data) {
-                $('#edit-name').val(data.name);
-                $('#edit-description').val(data.description);  // Add this line for description
-                $('#edit-status').val(data.status ? '1' : '0');
-                $('#editForm').attr('action', '/leave-types/' + id);
-                $('#editModal').modal('show');
-            });
-        });
-
-        $('#leaveTypesTable').on('click', '.delete-btn', function () {
-            const id = $(this).data('id');
-            $('#deleteForm').attr('action', '/leave-types/' + id);
-            $('#deleteModal').modal('show');
+    $('#leaveTypesTable').on('click', '.edit-btn', function () {
+        const id = $(this).data('id');
+        $.get('/leave-types/' + id + '/edit', function (data) {
+            $('#edit-name').val(data.name);
+            $('#edit-description').val(data.description);  // Add this line for description
+            $('#edit-status').val(data.status ? '1' : '0');
+            $('#editForm').attr('action', '/leave-types/' + id);
+            $('#editModal').modal('show');
         });
     });
+
+    $('#leaveTypesTable').on('click', '.delete-btn', function () {
+        const id = $(this).data('id');
+        $('#deleteForm').attr('action', '/leave-types/' + id);
+        $('#deleteModal').modal('show');
+    });
+});
 </script>
 @endpush

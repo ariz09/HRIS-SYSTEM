@@ -423,7 +423,6 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
 
-        // CDM Level and Position dynamic loading
         const cdmSelect = document.getElementById('cdm_level_id');
         const positionSelect = document.getElementById('position_id');
         const selectedPositionId = "{{ $employee->position_id }}";
@@ -445,7 +444,7 @@
 
                         data.positions.forEach(function (position) {
                             const option = new Option(position.name, position.id);
-                            if (position.id == selectedPositionId) {
+                            if (parseInt(position.id) === parseInt(selectedPositionId)) {
                                 option.selected = true;
                             }
                             positionSelect.add(option);
@@ -457,11 +456,12 @@
                     });
             });
 
+            // Trigger change if CDM Level already selected (e.g. during edit)
             if (cdmSelect.value) {
                 cdmSelect.dispatchEvent(new Event('change'));
             }
         }
-
+  
         // Back button validation
         const backButton = document.querySelector('a[href="{{ route('employees.index') }}"]');
         if (backButton) {

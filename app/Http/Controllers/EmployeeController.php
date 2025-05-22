@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use App\Models\PersonalInfo;
@@ -18,6 +19,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Response;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
+
 
 class EmployeeController extends Controller
 {
@@ -41,14 +44,14 @@ class EmployeeController extends Controller
             ->orderBy('employee_number')
             ->paginate(10);
 
-        foreach ($employees as $employee) {
+        /*       foreach ($employees as $employee) {
             \Log::info("Employee #{$employee->id} - Employment Type ID: {$employee->employment_type_id}");
             if ($employee->employmentType) {
                 \Log::info("Found employment type: {$employee->employmentType->name}");
             } else {
                 \Log::warning("No employment type found for employee #{$employee->id}");
             }
-        }
+        } */
 
         return view('employees.index', compact('employees'));
     }
@@ -105,7 +108,7 @@ class EmployeeController extends Controller
             'basic_pay' => 'The basic_pay field is required.',
             'employment_type_id' => 'The employment_type field is required.',
             'position_id' => 'The position field is required.',
-            'cdm_level_id' =>'The cdm_level field is required.',
+            'cdm_level_id' => 'The cdm_level field is required.',
             'department_id' => 'The department field is required.',
             'agency_id' => 'The agency field is required.',
 
@@ -144,7 +147,7 @@ class EmployeeController extends Controller
                 'email' => $request->email,
                 'phone_number' => $request->phone_number,
                 'civil_status' => $request->civil_status,
-                'address' => $request->address, 
+                'address' => $request->address,
                 'profile_picture' => $profilePicPath,
             ]);
 
@@ -184,32 +187,29 @@ class EmployeeController extends Controller
     }
 
 
-            public function edit(EmploymentInfo $employee)
-        {
-            $employee->load(['personalInfo']); // Or use 'employee' if that's the relationship name
+    public function edit(EmploymentInfo $employee)
+    {
+        $employee->load(['personalInfo']); // Or use 'employee' if that's the relationship name
 
-            return view('employees.edit', [
-                'employee' => $employee,
-                'statuses' => EmploymentStatus::all(),
-                'employmentTypes' => EmploymentType::all(),
-                'agencies' => Agency::all(),
-                'departments' => Department::all(),
-                'cdmLevels' => CDMLevel::all(),
-                'positions' => Position::all(),
-                'isEdit' => true
-            ]);
-        }
+        return view('employees.edit', [
+            'employee' => $employee,
+            'statuses' => EmploymentStatus::all(),
+            'employmentTypes' => EmploymentType::all(),
+            'agencies' => Agency::all(),
+            'departments' => Department::all(),
+            'cdmLevels' => CDMLevel::all(),
+            'positions' => Position::all(),
+            'isEdit' => true
+        ]);
+    }
 
-        public function update(Request $request, EmploymentInfo $employee)
+    public function update(Request $request, EmploymentInfo $employee)
     {
         $validated = $request->validate([
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'required|email|max:255|unique:users,email',
-            'phone_number' => [
-                'required',
-                'regex:/^(09|\+639)\d{9}$/'
-            ],
+            'email' => 'required|email|max:255|unique:users,email,' . $employee->user_id,
+            'phone_number' => ['required', 'regex:/^(09|\+639)\d{9}$/'],
             'birthday' => 'required|date',
             'gender' => 'required|in:Male,Female,Other',
             'civil_status' => 'required|in:Single,Married,Divorced,Widowed,Separated',
@@ -220,43 +220,25 @@ class EmployeeController extends Controller
             'cdm_level_id' => 'required|exists:cdm_levels,id',
             'department_id' => 'required|exists:departments,id',
             'agency_id' => 'required|exists:agencies,id',
+            'employment_status_id' => 'required|exists:employment_statuses,id',
             'atm_account_number' => 'nullable|numeric',
-            'address' => 'required|string|max:500', // Made address required
+            'address' => 'required|string|max:500',
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ], [
-            'phone_number.regex' => 'The phone number must be a valid Philippine mobile number (e.g., 09171234567 or +639171234567)',
-            'atm_account_number.numeric' => 'The ATM account number must contain only numbers',
-            'address.required' => 'The address field is required.',
-            'first_name' => 'The first_name field is required.',
-            'last_name' => 'The last_name field is required.',
-            'email' => 'The email field is required.',
-            'birthday' => 'The birthday field is required.',
-            'gender' => 'The gender field is required.',
-            'civil_status' => 'The civil_status field is required.',
-            'hiring_date' => 'The hiring_date field is required.',
-            'basic_pay' => 'The basic_pay field is required.',
-            'employment_type_id' => 'The employment_type field is required.',
-            'position_id' => 'The position field is required.',
-            'cdm_level_id' =>'The cdm_level field is required.',
-            'department_id' => 'The department field is required.',
-            'agency_id' => 'The agency field is required.',
         ]);
 
         try {
             DB::beginTransaction();
 
+            // Handle profile picture
             $profilePicPath = $employee->personalInfo->profile_picture ?? null;
             if ($request->hasFile('profile_picture')) {
-                // Delete old profile pic if exists
                 if ($profilePicPath && Storage::disk('public')->exists($profilePicPath)) {
                     Storage::disk('public')->delete($profilePicPath);
                 }
-                
-                // Store new profile pic
                 $profilePicPath = $request->file('profile_picture')->store('profile_picture', 'public');
             }
 
-            // Update Personal Info - MAKE SURE TO INCLUDE ADDRESS
+            // Update Personal Info
             if ($employee->personalInfo) {
                 $employee->personalInfo->update([
                     'first_name' => $request->first_name,
@@ -269,21 +251,56 @@ class EmployeeController extends Controller
                     'email' => $request->email,
                     'phone_number' => $request->phone_number,
                     'civil_status' => $request->civil_status,
-                    'address' => $request->address, // Ensure address is included
+                    'address' => $request->address,
                     'profile_picture' => $profilePicPath,
                 ]);
             }
 
+            // Update User
+            if ($employee->user) {
+                $employee->user->update([
+                    'email' => $request->email,
+                    'name' => $request->first_name . ' ' . $request->last_name,
+                ]);
+            }
 
+            // Update Employment Info
+            $employee->update([
+                'hiring_date' => $request->hiring_date,
+                'employment_status_id' => $request->employment_status_id,
+                'agency_id' => $request->agency_id,
+                'department_id' => $request->department_id,
+                'cdm_level_id' => $request->cdm_level_id,
+                'position_id' => $request->position_id,
+                'employment_type_id' => $request->employment_type_id,
+            ]);
+
+            // Update Compensation Package
+            $compensation = CompensationPackage::where('employee_number', $employee->employee_number)->first();
+            if ($compensation) {
+                $compensation->update([
+                    'basic_pay' => $request->basic_pay,
+                    'rata' => $request->rata,
+                    'comm_allowance' => $request->comm_allowance,
+                    'transpo_allowance' => $request->transpo_allowance,
+                    'parking_toll_allowance' => $request->parking_toll_allowance,
+                    'clothing_allowance' => $request->clothing_allowance,
+                    'atm_account_number' => $request->atm_account_number,
+                    'bank_name' => $request->bank_name,
+                ]);
+            }
 
             DB::commit();
             return redirect()->route('employees.index')->with('success', 'Employee updated successfully.');
         } catch (\Exception $e) {
-            DB::rollback();
+            DB::rollBack();
             Log::error('Error updating employee: ' . $e->getMessage());
-            return redirect()->back()->with('error', 'Something went wrong. Please try again.');
+
+            return redirect()->back()->with('error', 'An error occurred while updating the employee.');
         }
     }
+
+
 
     public function destroy(EmploymentInfo $employee)
     {
@@ -319,111 +336,179 @@ class EmployeeController extends Controller
     public function bulkUpload(Request $request)
     {
         $request->validate([
-            'file' => 'required|file|mimes:csv,txt',
+            'employee_csv' => 'required|mimes:csv,txt|max:10240'
         ]);
-
-        $path = $request->file('file')->getRealPath();
-        $data = array_map('str_getcsv', file($path));
-        $header = array_map('trim', array_shift($data));
-
-        // Get the latest number only once
-        $latestEmployee = EmploymentInfo::orderBy('employee_number', 'desc')->first();
-        $latestNumber = $latestEmployee ? (int)$latestEmployee->employee_number : 0;
-
+    
+        $file = $request->file('employee_csv');
+        $data = array_map('str_getcsv', file($file));
+        
+        // Clean headers by removing everything after (including parentheses)
+        $header = array_map(function($h) {
+            return trim(preg_replace('/\s*\(.*\)\s*/', '', strtolower($h)));
+        }, $data[0]);
+        
+        unset($data[0]); // remove header
+    
+        $errors = [];
+        $successCount = 0;
+        $rowIndex = 1;
+    
+        // Enable query logging for debugging
+        DB::enableQueryLog();
+    
         foreach ($data as $row) {
-            $row = array_combine($header, $row);
-
-            // Generate employee number
-            $latestNumber++;
-            $newEmployeeNumber = str_pad($latestNumber, 6, '0', STR_PAD_LEFT);
-
-            // Create user
-            $user = User::create([
-                'name' => $row['first_name'] . ' ' . $row['last_name'],
-                'email' => $row['email'],
-                'password' => bcrypt('PassW0rd@2025'),
-            ]);
-
-            // Create personal info
-            PersonalInfo::create([
-                'user_id' => $user->id,
-                'first_name' => $row['first_name'],
-                'middle_name' => $row['middle_name'],
-                'last_name' => $row['last_name'],
-                'name_suffix' => $row['name_suffix'],
-                'preferred_name' => $row['preferred_name'],
-                'gender' => $row['gender'],
-                'birthday' => $row['birthday'],
-                'email' => $row['email'],
-                'phone_number' => $row['phone_number'],
-                'civil_status' => $row['civil_status'],
-            ]);
-
-            // Create employment info
-            EmploymentInfo::create([
-                'user_id' => $user->id,
-                'employee_number' => $newEmployeeNumber,
-                'hiring_date' => $row['hiring_date'],
-                'employment_status_id' => $row['employment_status_id'],
-                'agency_id' => $row['agency_id'],
-                'department_id' => $row['department_id'],
-                'cdm_level_id' => $row['cdm_level_id'],
-                'position_id' => $row['position_id'],
-                'employment_type_id' => $row['employment_type_id'],
-            ]);
-
-            // Compensation info
-            CompensationPackage::create([
-                'employee_number' => $newEmployeeNumber,
-                'basic_pay' => $row['basic_pay'],
-                'rata' => $row['rata'],
-                'comm_allowance' => $row['comm_allowance'],
-                'transpo_allowance' => $row['transpo_allowance'],
-                'parking_toll_allowance' => $row['parking_toll_allowance'],
-                'clothing_allowance' => $row['clothing_allowance'],
-                'atm_account_number' => $row['atm_account_number'],
-                'bank_name' => $row['bank_name'],
-            ]);
+            $rowIndex++;
+    
+            // Skip empty rows
+            if (empty(array_filter($row))) {
+                continue;
+            }
+    
+            try {
+                $rowData = array_combine($header, $row);
+                
+                // Log the row data for debugging
+                Log::debug("Processing row $rowIndex", $rowData);
+    
+                // Extract just the ID from dropdown values (format: "ID - Description")
+                $idFields = [
+                    'employment_status_id',
+                    'agency_id',
+                    'department_id',
+                    'cdm_level_id',
+                    'position_id',
+                    'employment_type_id'
+                ];
+                
+                foreach ($idFields as $field) {
+                    if (isset($rowData[$field]) && preg_match('/^(\d+)\s*-\s*.+/', $rowData[$field], $matches)) {
+                        $rowData[$field] = $matches[1]; // Extract just the ID number
+                    }
+                }
+    
+                // Validate required fields
+                $validator = Validator::make($rowData, [
+                    'first_name' => 'required|string|max:255',
+                    'last_name' => 'required|string|max:255',
+                    'email' => 'required|email|max:255|unique:users,email',
+                    'phone_number' => ['required', 'regex:/^(09|\+639)\d{9}$/'],
+                    'birthday' => 'required|date',
+                    'gender' => 'required|in:Male,Female,Other',
+                    'civil_status' => 'required|in:Single,Married,Divorced,Widowed,Separated',
+                    'hiring_date' => 'required|date',
+                    'employment_type_id' => 'required|exists:employment_types,id',
+                    'position_id' => 'required|exists:positions,id',
+                    'cdm_level_id' => 'required|exists:cdm_levels,id',
+                    'department_id' => 'required|exists:departments,id',
+                    'agency_id' => 'required|exists:agencies,id',
+                    'basic_pay' => 'required|numeric',
+                    'atm_account_number' => 'nullable|numeric',
+                    'address' => 'required|string|max:500',
+                ], [
+                    'phone_number.regex' => 'The phone number must be a valid Philippine mobile number (e.g., 09171234567 or +639171234567)',
+                    'atm_account_number.numeric' => 'The ATM account number must contain only numbers',
+                    'address.required' => 'The address field is required.',
+                    'exists' => 'The selected :attribute is invalid.',
+                    'unique' => 'The :attribute has already been taken.',
+                ]);
+    
+                if ($validator->fails()) {
+                    $errors[] = [
+                        'row' => $rowIndex,
+                        'errors' => $validator->errors()->all(),
+                        'data' => $rowData
+                    ];
+                    continue;
+                }
+    
+                DB::beginTransaction();
+    
+                $employeeNumber = self::generateEmployeeNumber();
+                Log::info("Generated employee number: $employeeNumber");
+    
+                // Create User Account
+                $user = User::create([
+                    'email' => $rowData['email'],
+                    'password' => Hash::make('PassW0rd@2025'),
+                    'name' => $rowData['first_name'] . ' ' . $rowData['last_name'],
+                    'role' => 'employee',
+                ]);
+                Log::info("Created user with ID: {$user->id}");
+    
+                // Create Personal Info
+                $personalInfo = PersonalInfo::create([
+                    'user_id' => $user->id,
+                    'first_name' => $rowData['first_name'],
+                    'middle_name' => $rowData['middle_name'] ?? null,
+                    'last_name' => $rowData['last_name'],
+                    'name_suffix' => $rowData['name_suffix'] ?? null,
+                    'preferred_name' => $rowData['preferred_name'] ?? null,
+                    'gender' => $rowData['gender'],
+                    'birthday' => $rowData['birthday'],
+                    'email' => $rowData['email'],
+                    'phone_number' => $rowData['phone_number'],
+                    'civil_status' => $rowData['civil_status'],
+                    'address' => $rowData['address'],
+                ]);
+                Log::info("Created personal info with ID: {$personalInfo->id}");
+    
+                // Create Employment Info
+                $employmentInfo = EmploymentInfo::create([
+                    'user_id' => $user->id,
+                    'employee_number' => $employeeNumber,
+                    'hiring_date' => $rowData['hiring_date'],
+                    'employment_status_id' => $rowData['employment_status_id'] ?? EmploymentStatus::first()->id,
+                    'agency_id' => $rowData['agency_id'],
+                    'department_id' => $rowData['department_id'],
+                    'cdm_level_id' => $rowData['cdm_level_id'],
+                    'position_id' => $rowData['position_id'],
+                    'employment_type_id' => $rowData['employment_type_id'],
+                ]);
+                Log::info("Created employment info with ID: {$employmentInfo->id}");
+    
+                // Create Compensation Package
+                $compensation = CompensationPackage::create([
+                    'employee_number' => $employeeNumber,
+                    'basic_pay' => $rowData['basic_pay'],
+                    'rata' => $rowData['rata'] ?? 0,
+                    'comm_allowance' => $rowData['comm_allowance'] ?? 0,
+                    'transpo_allowance' => $rowData['transpo_allowance'] ?? 0,
+                    'parking_toll_allowance' => $rowData['parking_toll_allowance'] ?? 0,
+                    'clothing_allowance' => $rowData['clothing_allowance'] ?? 0,
+                    'atm_account_number' => $rowData['atm_account_number'] ?? null,
+                    'bank_name' => $rowData['bank_name'] ?? null,
+                ]);
+                Log::info("Created compensation package with ID: {$compensation->id}");
+    
+                DB::commit();
+                $successCount++;
+                
+            } catch (\Exception $e) {
+                DB::rollBack();
+                $errorMessage = "Row $rowIndex: " . $e->getMessage();
+                Log::error($errorMessage);
+                Log::error($e->getTraceAsString());
+                
+                $errors[] = [
+                    'row' => $rowIndex,
+                    'errors' => [$errorMessage],
+                    'data' => $rowData ?? null
+                ];
+            }
         }
-
-        return redirect()->back()->with('success', 'Bulk upload successful.');
+    
+        // Log all executed queries
+        Log::debug('Executed queries:', DB::getQueryLog());
+        DB::disableQueryLog();
+    
+        $message = "$successCount employees uploaded successfully.";
+        if (count($errors) > 0) {
+            $message .= " " . count($errors) . " rows had errors.";
+        }
+    
+        return back()->with([
+            'success' => $message,
+            'uploadErrors' => $errors
+        ]);
     }
-
-
-public function downloadTemplate()
-{
-    $headers = [
-        'first_name', 'middle_name', 'last_name', 'name_suffix', 'preferred_name', 'gender', 'birthday',
-        'email', 'phone_number', 'civil_status', 'hiring_date', 'employment_status_id', 'agency_id',
-        'department_id', 'cdm_level_id', 'position_id', 'employment_type_id', 'basic_pay', 'rata',
-        'comm_allowance', 'transpo_allowance', 'parking_toll_allowance', 'clothing_allowance',
-        'atm_account_number', 'bank_name'
-    ];
-
-    // Sample data (IDs from reference tables)
-    $sample = [[
-        'Juan', 'Dela', 'Cruz', '', 'JD', 'Male', '1990-01-01',
-        'juan@example.com', '09171234567', 'Single', '2024-01-15', EmploymentStatus::first()?->id ?? '', Agency::first()?->id ?? '',
-        Department::first()?->id ?? '', CDMLevel::first()?->id ?? '', Position::first()?->id ?? '', EmploymentType::first()?->id ?? '','25000', '5000',
-        '2000', '1500', '1000','1000', '1234567890', 'BPI'
-    ]];
-
-    $callback = function () use ($headers, $sample) {
-        $file = fopen('php://output', 'w');
-        fputcsv($file, $headers);
-
-        foreach ($sample as $row) {
-            fputcsv($file, $row);
-        }
-
-        fclose($file);
-    };
-
-    return Response::stream($callback, 200, [
-        "Content-Type" => "text/csv",
-        "Content-Disposition" => "attachment; filename=employee_upload_template.csv",
-    ]);
-}
-
-
 }

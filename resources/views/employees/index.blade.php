@@ -1,8 +1,49 @@
 @extends('layouts.app')
 
 @section('content')
+@if(session('error_details'))
+    <div class="alert alert-danger">
+        <h5>Detailed Errors:</h5>
+        <div class="table-responsive">
+            <table class="table table-sm table-bordered">
+                <thead>
+                    <tr>
+                        <th>Row #</th>
+                        <th>Errors</th>
+                        <th>Data</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach(session('error_details') as $error)
+                        <tr>
+                            <td>{{ $error['row'] }}</td>
+                            <td>
+                                <ul class="mb-0">
+                                    @foreach($error['errors'] as $err)
+                                        <li>{{ $err }}</li>
+                                    @endforeach
+                                </ul>
+                            </td>
+                            <td>
+                                <pre class="mb-0">{{ json_encode($error['data'] ?? 'No data', JSON_PRETTY_PRINT) }}</pre>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+    </div>
+@endif
+
+{{-- Custom row-level errors for bulk upload (optional for this page) --}}
+<x-error-alert :message="session('rowErrors')" />
+
+{{-- Generic success message --}}
 <x-success-alert :message="session('success')" />
+
+{{-- Generic error message --}}
 <x-error-alert :message="session('error')" />
+{{-- Custom error message for duplicate employee numbers --}}
 
 <div class="container-fluid px-4">
     <h1 class="mt-4">Employee Management</h1>
@@ -105,26 +146,26 @@
             <div class="modal-content shadow-sm">
                 <div class="modal-header bg-danger text-white">
                     <h5 class="modal-title" id="bulkUploadModalLabel">Upload CSV File</h5>
-                    <button type="button" class="btn btn-sm btn-light delete-history-btn text-danger rounded-circle"
-                        data-bs-toggle="modal" data-bs-target="#deleteConfirmModal"
-                        style="width: 24px; height: 24px; line-height: 1;">
-                        <i class="fas fa-times" style="font-size: 0.75rem;"></i>
-                    </button>
+                    <button type="button" class="btn-close btn-light" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="mb-3">
-                        <label for="csv_file" class="form-label">Select CSV File</label>
-                        <input type="file" name="csv_file" id="csv_file" class="form-control" required accept=".csv">
+                        <label for="employee_csv" class="form-label">Select CSV File</label>
+                        <input type="file" name="employee_csv" id="employee_csv" class="form-control" required accept=".csv">
+                        @error('employee_csv')
+                            <div class="text-danger">{{ $message }}</div>
+                        @enderror
                     </div>
                     <div class="mb-3">
-                        <a href="{{ route('employees.template.download') }}"
-                            class="btn btn-secondary text-white btn-sm" target="_blank"  download>
+                        <a href="{{ route('employees.template.download') }}" 
+                           class="btn btn-secondary text-white btn-sm" target="_blank" download>
                             Download Template
                         </a>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-sm btn-success">Upload</button>
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-success btn-sm">Upload</button>
                 </div>
             </div>
         </form>

@@ -188,50 +188,29 @@
 <script src="https://cdn.datatables.net/responsive/2.3.0/js/responsive.bootstrap5.min.js"></script>
 
 <script>
-    // Auto-dismiss success alert after 3 seconds
-    setTimeout(function () {
-        let alert = document.getElementById('success-alert');
-        if (alert) {
-            let bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
-            bsAlert.close();
-        }
-    }, 3000);
-
+     
     $(document).ready(function() {
-        // Initialize DataTable with responsive plugin
-        $('#assignLeavesTable').DataTable({
-            responsive: {
-                details: {
-                    display: $.fn.dataTable.Responsive.display.modal({
-                        header: function(row) {
-                            var data = row.data();
-                            return 'Details for ' + data[1]; // CDM Level Name
-                        }
-                    }),
-                    renderer: $.fn.dataTable.Responsive.renderer.tableAll({
-                        tableClass: 'table'
-                    })
-                }
-            }
-        });
+        setDatatable("assignLeavesTable", {
+        dom: 'rtip', // minimal layout
+        buttons: [] // no export buttons
+    }); 
+    // Edit button click handler
+    $('.edit-btn').click(function() {
+        var assignId = $(this).data('id');
+        $('#editId').val(assignId);
+        $('#edit-cdm-level').val($(this).data('cdm-level'));
+        $('#edit-leave-count').val($(this).data('leave'));
+        $('#edit-notes').val($(this).data('notes'));
+        $('#editForm').attr('action', '/assign_leaves/' + assignId);
+        $('#editModal').modal('show');
+    });
 
-        // Edit button click handler
-        $('.edit-btn').click(function() {
-            var assignId = $(this).data('id');
-            $('#editId').val(assignId);
-            $('#edit-cdm-level').val($(this).data('cdm-level'));
-            $('#edit-leave-count').val($(this).data('leave'));
-            $('#edit-notes').val($(this).data('notes'));
-            $('#editForm').attr('action', '/assign_leaves/' + assignId);
-            $('#editModal').modal('show');
-        });
-
-        // Delete button click handler
-        $('.delete-btn').click(function() {
-            var assignId = $(this).data('id');
-            $('#deleteForm').attr('action', '/assign_leaves/' + assignId);
-            $('#deleteModal').modal('show');
-        });
+    // Delete button click handler
+    $('.delete-btn').click(function() {
+        var assignId = $(this).data('id');
+        $('#deleteForm').attr('action', '/assign_leaves/' + assignId);
+        $('#deleteModal').modal('show');
+    });
     });
 </script>
 @endpush

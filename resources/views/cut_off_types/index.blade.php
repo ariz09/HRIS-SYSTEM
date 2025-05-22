@@ -152,6 +152,7 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    
     const editModal = document.getElementById('editModal');
     editModal.addEventListener('show.bs.modal', event => {
         const button = event.relatedTarget;

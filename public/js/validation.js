@@ -4,6 +4,15 @@ document.addEventListener('DOMContentLoaded', function() {
     setupUppercaseFields();
     setupNumericFields();
     setupPhoneValidation();
+
+    // Auto-dismiss success alert after 3 seconds
+    setTimeout(function () {
+        let alert = document.getElementById('success-alert');
+        if (alert) {
+            let bsAlert = bootstrap.Alert.getOrCreateInstance(alert);
+            bsAlert.close();
+        }
+    }, 3000);
 });
 
 // Basic validation setup

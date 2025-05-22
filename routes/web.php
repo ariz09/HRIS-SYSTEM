@@ -117,6 +117,8 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('agencies', AgencyController::class)->names('agencies');
         Route::resource('cdmlevels', CDMLevelController::class)->names('cdmlevels');
         Route::resource('roles', RoleController::class)->names('roles');
+        Route::get('user-roles', [RoleController::class, 'userRoles'])->name('roles.user-roles');
+        Route::put('user-roles/{user}', [RoleController::class, 'updateUserRole'])->name('roles.update-user-role');
         Route::resource('role_permissions', RolePermissionController::class)->names('role_permissions');
         Route::resource('employment_types', EmploymentTypeController::class)->names('employment_types');
     });

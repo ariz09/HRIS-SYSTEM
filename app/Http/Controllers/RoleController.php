@@ -7,6 +7,7 @@ namespace App\Http\Controllers;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class RoleController extends Controller
 {
@@ -48,5 +49,30 @@ class RoleController extends Controller
     public function assignDefaultRole(User $user)
     {
         $user->assignRole('employee');
+    }
+
+    public function userRoles()
+    {
+        $users = User::with('roles')->get();
+        $roles = Role::all();
+        return view('roles.user_roles', compact('users', 'roles'));
+    }
+
+    public function updateUserRole(Request $request, User $user)
+    {
+        // Prevent editing current user's roles
+        if ($user->id === Auth::id()) {
+            return redirect()->route('roles.user-roles')
+                ->with('error', 'You cannot modify your own roles.');
+        }
+
+        $request->validate([
+            'roles' => 'required|array',
+            'roles.*' => 'exists:roles,name'
+        ]);
+
+        $user->syncRoles($request->roles);
+
+        return redirect()->route('roles.user-roles')->with('success', 'User roles updated successfully.');
     }
 }

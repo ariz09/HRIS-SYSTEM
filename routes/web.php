@@ -29,7 +29,8 @@ use App\Http\Controllers\{
     File201Controller,
     OvertimeController,
     PeriodTypeController,
-    CutOffTypeController
+    CutOffTypeController,
+   BulkUploadTemplateController,
 
 };
 
@@ -52,7 +53,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('period_types', PeriodTypeController::class);
     Route::resource('cut_off_types', CutOffTypeController::class);
 
-    // Time Records - accessible by all employees and timekeeper
+       // Time Records - accessible by all employees and timekeeper
     Route::prefix('time-records')->middleware(['role:employee|timekeeper|admin'])->group(function () {
         Route::get('/', [TimeRecordController::class, 'index'])->name('time-records.index');
         Route::post('/time-in', [TimeRecordController::class, 'timeIn'])->name('time-in');
@@ -74,7 +75,7 @@ Route::middleware(['auth'])->group(function () {
     // Employee Management - accessible by admin, manager, and recruiter
     Route::prefix('employees')->middleware(['role:admin|manager|recruiter'])->name('employees.')->group(function () {
         Route::get('{employee}/edit', [EmployeeController::class, 'edit'])->name('edit');
-        Route::get('/template-download', [EmployeeController::class, 'downloadTemplate'])->name('template.download');
+        Route::get('/template-download', [BulkUploadTemplateController::class, 'downloadTemplate'])->name('template.download');
         Route::post('/bulk-upload', [EmployeeController::class, 'bulkUpload'])->name('bulkUpload');
 
         // Nested Modules for Each Employee

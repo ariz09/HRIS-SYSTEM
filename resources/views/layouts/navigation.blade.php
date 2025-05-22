@@ -17,7 +17,15 @@
             <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
                data-bs-toggle="dropdown" aria-expanded="false">
                <i class="fas fa-user fa-fw"></i>
-               <span class="d-none d-lg-inline">{{ Auth::user()->name }}</span>
+               <span class="d-none d-lg-inline">
+                    {{
+                        Auth::user()->personalInfo && Auth::user()->personalInfo->first_name && Auth::user()->personalInfo->last_name
+                            ? Auth::user()->personalInfo->last_name . ', ' . Auth::user()->personalInfo->first_name
+                            : (Auth::user()->personalInfo && Auth::user()->personalInfo->preferred_name
+                                ? Auth::user()->personalInfo->preferred_name
+                                : Auth::user()->name)
+                    }}
+                </span>
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                 {{-- <li><a class="dropdown-item" href="{{ route('profile.edit') }}">Profile</a></li> --}}

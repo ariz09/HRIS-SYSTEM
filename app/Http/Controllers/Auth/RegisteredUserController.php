@@ -43,6 +43,7 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'is_active' => false
         ]);
 
         PersonalInfo::create([
@@ -59,11 +60,9 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        Auth::login($user);
-
         $roleController = new RoleController();
         $roleController->assignDefaultRole($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('login', absolute: false));
     }
 }

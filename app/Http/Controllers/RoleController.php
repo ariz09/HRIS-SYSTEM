@@ -49,4 +49,23 @@ class RoleController extends Controller
     {
         $user->assignRole('employee');
     }
+
+    public function userRoles()
+    {
+        $users = User::with('roles')->get();
+        $roles = Role::all();
+        return view('roles.user_roles', compact('users', 'roles'));
+    }
+
+    public function updateUserRole(Request $request, User $user)
+    {
+        $request->validate([
+            'roles' => 'required|array',
+            'roles.*' => 'exists:roles,name'
+        ]);
+
+        $user->syncRoles($request->roles);
+
+        return redirect()->route('roles.user-roles')->with('success', 'User roles updated successfully.');
+    }
 }

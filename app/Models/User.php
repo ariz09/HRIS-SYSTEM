@@ -18,7 +18,8 @@ class User extends Authenticatable
         'password',
         'employee_id',
         'temp_password',
-        'password_changed'
+        'password_changed',
+        'is_active'
     ];
 
     protected $hidden = [
@@ -32,9 +33,9 @@ class User extends Authenticatable
     ];
 
     public function personalInfo()
-{
-    return $this->hasOne(\App\Models\PersonalInfo::class, 'user_id');
-}
+    {
+        return $this->hasOne(\App\Models\PersonalInfo::class, 'user_id');
+    }
 
 
     public function employmentInfo()

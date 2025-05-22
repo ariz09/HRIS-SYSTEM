@@ -49,6 +49,15 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        $user = Auth::user();
+        if (! $user->is_active) {
+            Auth::logout();
+
+            session()->flash('inactive', 'Your account is inactive.');
+            redirect()->back()->send();
+            return;
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

@@ -13,28 +13,30 @@
     <div class="card shadow mb-4">
         <div class="card-header bg-danger text-white py-3">
             <h6 class="m-0 font-weight-bold">Time Records</h6>
-            <form method="GET" class="row g-2 align-items-center mt-2" action="">
-                <div class="col-auto">
-                    <label for="start_date" class="col-form-label text-white">Start Date</label>
-                </div>
-                <div class="col-auto">
+
+        </div>
+        <form method="GET" action="" class="p-3 bg-light border rounded shadow-sm mb-3">
+            <div class="row g-3 align-items-end">
+                <div class="col-md-3">
+                    <label for="start_date" class="form-label text-dark">Start Date</label>
                     <input type="date" id="start_date" name="start_date" class="form-control" value="{{ request('start_date') }}">
                 </div>
-                <div class="col-auto">
-                    <label for="end_date" class="col-form-label text-white">End Date</label>
-                </div>
-                <div class="col-auto">
+                <div class="col-md-3">
+                    <label for="end_date" class="form-label text-dark">End Date</label>
                     <input type="date" id="end_date" name="end_date" class="form-control" value="{{ request('end_date') }}">
                 </div>
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-light">Filter</button>
+                <div class="col-md-6 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-filter me-1"></i> Filter
+                    </button>
+                    <a href="{{ route('time-records.all') }}" class="btn btn-outline-secondary w-100">
+                        <i class="fas fa-undo me-1"></i> Reset
+                    </a>
                 </div>
-                <div class="col-auto">
-                    <a href="{{ route('time-records.all') }}" class="btn btn-light">Reset</a>
-                </div>
-            </form>
-        </div>
+            </div>
+        </form>
         <div class="card-body">
+            
             <div class="mb-3">
                {{--  <a href="{{ route('time-records.all', array_merge(request()->all(), ['report' => '1'])) }}" class="btn btn-success">
                     <i class="fas fa-file-excel"></i> Generate Report
@@ -62,10 +64,11 @@
                             $endDate = request('end_date') ? Carbon\Carbon::parse(request('end_date'))->endOfDay() : now()->endOfDay();
 
                             $groupedRecords = $timeRecords
-                                ->whereBetween('recorded_at', [$startDate, $endDate])
-                                ->groupBy(['user_id', function($record) {
-                                    return Carbon\Carbon::parse($record->recorded_at)->format('Y-m-d');
-                                }]);
+                                ? $timeRecords->whereBetween('recorded_at', [$startDate, $endDate])
+                                            ->groupBy(['user_id', function($record) {
+                                                return Carbon\Carbon::parse($record->recorded_at)->format('Y-m-d');
+                                            }])
+                                : [];
                         @endphp
                         @forelse($groupedRecords as $userId => $dateRecords)
                             @foreach($dateRecords as $date => $records)
@@ -121,14 +124,14 @@
                                 @endphp
                                 <tr>
                                     <td>{{ optional($employee->user)->name ?? 'N/A' }}</td>
-                                    <td>{{ $date }}</td>
+                                    <td>{{ $date ?? 'N/A'}}</td>
                                     <td>{{ $timeIn ? Carbon\Carbon::parse($timeIn->recorded_at)->setTimezone(config('app.timezone'))->locale('en')->format('g:i:s A') : 'N/A' }}</td>
                                     <td>{{ $timeOut ? Carbon\Carbon::parse($timeOut->recorded_at)->setTimezone(config('app.timezone'))->locale('en')->format('g:i:s A') : 'N/A' }}</td>
                                     <td>{{ optional($employee)->department->name ?? 'N/A' }}</td>
                                     <td>{{ optional($employee)->position->name ?? 'N/A' }}</td>
                                     <td>{{ optional($employee)->agency->name ?? 'N/A' }}</td>
-                                    <td>{{ $status }}</td>
-                                    <td>{{ $totalHours }}</td>
+                                    <td>{{ $status ?? 'N/A' }}</td>
+                                    <td>{{ $totalHours ?? 'N/A' }}</td>
                                 </tr>
                             @endforeach
                         @empty
@@ -144,62 +147,62 @@
 </div>
 
 @push('scripts')
-
-
 <script>
 $(document).ready(function() {
-    const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: '2-digit', day: '2-digit' }).replace(/\//g, '-');
-    const fileName = `All_Employees_Time_Records_${today}`;
-
-    $('#allTimeRecordsTable').DataTable({
-        dom: '<"d-flex justify-content-between align-items-center mb-3"Bf>rt<"d-flex justify-content-between align-items-center"ip>',
-        buttons: [
-            {
-                extend: 'excel',
-                text: '<i class="fas fa-file-excel"></i> Excel',
-                className: 'btn btn-success me-2',
-                exportOptions: {
-                    columns: ':not(:last-child)'
+    const table = $('#allTimeRecordsTable');
+    
+    // Only initialize if table exists and has valid structure
+    if (table.length && table.find('thead th').length === table.find('tbody tr:first td').length) {
+        const today = new Date().toLocaleDateString('en-US', { 
+            year: 'numeric', 
+            month: '2-digit', 
+            day: '2-digit' 
+        }).replace(/\//g, '-');
+        
+        const fileName = `All_Employees_Time_Records_${today}`;
+        
+        table.DataTable({
+            dom: '<"d-flex justify-content-between align-items-center mb-3"Bf>rt<"d-flex justify-content-between align-items-center"ip>',
+            buttons: [
+                {
+                    extend: 'excel',
+                    text: '<i class="fas fa-file-excel"></i> Excel',
+                    className: 'btn btn-success me-2',
+                    title: fileName,
+                    filename: fileName
                 },
-                title: fileName,
-                filename: fileName
+                {
+                    extend: 'pdf',
+                    text: '<i class="fas fa-file-pdf"></i> PDF',
+                    className: 'btn btn-danger me-2',
+                    title: fileName,
+                    filename: fileName
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="fas fa-print"></i> Print',
+                    className: 'btn btn-info',
+                    title: fileName
+                }
+            ],
+            order: [[1, 'desc']],
+            pageLength: 25,
+            language: {
+                emptyTable: "No records available",
+                zeroRecords: "No matching records found"
             },
-            {
-                extend: 'pdf',
-                text: '<i class="fas fa-file-pdf"></i> PDF',
-                className: 'btn btn-danger me-2',
-                exportOptions: {
-                    columns: ':not(:last-child)'
-                },
-                title: fileName,
-                filename: fileName
+            initComplete: function() {
+                // Safe initialization callback
+                console.log('DataTables initialized successfully');
             },
-            {
-                extend: 'print',
-                text: '<i class="fas fa-print"></i> Print',
-                className: 'btn btn-info',
-                exportOptions: {
-                    columns: ':not(:last-child)'
-                },
-                title: fileName
+            error: function() {
+                console.error('DataTables initialization error');
             }
-        ],
-        order: [[1, 'desc'], [3, 'desc']], // Sort by date and time by default
-        pageLength: 25,
-        language: {
-            search: "Search records:",
-            lengthMenu: "Show _MENU_ records per page",
-            info: "Showing _START_ to _END_ of _TOTAL_ records",
-            infoEmpty: "No records available",
-            infoFiltered: "(filtered from _MAX_ total records)"
-        },
-        columnDefs: [
-            {
-                targets: '_all',
-                searchable: true
-            }
-        ]
-    });
+        });
+    } else {
+        console.warn('DataTables not initialized - table structure invalid');
+        table.addClass('table-bordered table-striped');
+    }
 });
 </script>
 @endpush

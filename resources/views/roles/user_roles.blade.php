@@ -41,9 +41,13 @@
                                     @endforeach
                                 </td>
                                 <td>
-                                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editUserRoleModal{{ $user->id }}">
-                                        <i class="fas fa-edit"></i> Edit Roles
-                                    </button>
+                                    @if($user->id !== auth()->id())
+                                        <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editUserRoleModal{{ $user->id }}">
+                                            <i class="fas fa-edit"></i> Edit Roles
+                                        </button>
+                                    @else
+                                        <span class="text-muted">Current User</span>
+                                    @endif
                                 </td>
                             </tr>
                         @endforeach

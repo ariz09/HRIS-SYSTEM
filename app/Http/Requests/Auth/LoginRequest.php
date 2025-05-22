@@ -41,6 +41,7 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
+        // Attempt to authenticate the user
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 
@@ -49,8 +50,19 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // Check if the authenticated user is active
+        $user = Auth::user();
+        if (! $user->is_active) {
+            Auth::logout(); // Log the user out immediately
+
+            throw ValidationException::withMessages([
+                'email' => 'Your account is inactive.',
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
+
 
     /**
      * Ensure the login request is not rate limited.

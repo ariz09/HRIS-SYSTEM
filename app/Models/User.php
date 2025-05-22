@@ -32,9 +32,9 @@ class User extends Authenticatable
     ];
 
     public function personalInfo()
-{
-    return $this->hasOne(\App\Models\PersonalInfo::class, 'user_id');
-}
+    {
+        return $this->hasOne(\App\Models\PersonalInfo::class, 'user_id');
+    }
 
 
     public function employmentInfo()

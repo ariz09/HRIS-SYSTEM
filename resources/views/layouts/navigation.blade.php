@@ -9,9 +9,35 @@
         <i class="fas fa-bars"></i>
     </button>
 
+    <!-- Navbar Notifications -->
+    <ul class="navbar-nav">
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" 
+               data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="fas fa-bell"></i>
+                <span class="badge bg-danger" id="inactiveUsersCount">
+                    {{ App\Models\User::where('is_active', false)->count() }}
+                </span>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="notificationsDropdown">
+                <li><h6 class="dropdown-header">New User Approvals</h6></li>
+                <li id="inactiveUsersList">
+                    @if(App\Models\User::where('is_active', false)->count() > 0)
+                        <a class="dropdown-item" href="{{ route('inactive-users.index') }}">
+                            <i class="fas fa-users me-2"></i>
+                            {{ App\Models\User::where('is_active', false)->count() }} users waiting approval
+                        </a>
+                    @else
+                        <span class="dropdown-item text-muted">No pending approvals</span>
+                    @endif
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-center" href="{{ route('inactive-users.index') }}">View All</a></li>
+            </ul>
+        </li>
+    </ul>
 
-
-    <!-- Navbar User Menu - Now properly aligned to the right -->
+    <!-- Navbar User Menu -->
     <ul class="navbar-nav ms-auto">
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
@@ -40,3 +66,31 @@
         </li>
     </ul>
 </nav>
+
+@push('scripts')
+<script>
+    let previousCount = {{ App\Models\User::where('is_active', false)->count() }};
+    // Poll for new inactive users every 30 seconds
+    setInterval(function() {
+        fetch("{{ route('inactive-users.count') }}")
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('inactiveUsersCount').textContent = data.count;
+                
+                // Update dropdown content
+                let dropdownContent = '';
+                if (data.count > 0) {
+                    dropdownContent = `
+                        <a class="dropdown-item" href="{{ route('inactive-users.index') }}">
+                            <i class="fas fa-users me-2"></i>
+                            ${data.count} users waiting approval
+                        </a>
+                    `;
+                } else {
+                    dropdownContent = '<span class="dropdown-item text-muted">No pending approvals</span>';
+                }
+                document.getElementById('inactiveUsersList').innerHTML = dropdownContent;
+            });
+    }, 30000); // 30 seconds
+</script>
+@endpush

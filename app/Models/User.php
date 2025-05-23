@@ -7,6 +7,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Spatie\Permission\Traits\HasRoles;
+use App\Models\InactiveUserNotification;
 
 class User extends Authenticatable
 {
@@ -41,6 +42,33 @@ class User extends Authenticatable
     public function employmentInfo()
     {
         return $this->hasOne(\App\Models\EmploymentInfo::class, 'user_id');
+    }
+
+    // app/Models/User.php
+
+
+    // Add these methods to your User class
+    public function inactiveNotifications()
+    {
+        return $this->hasMany(InactiveUserNotification::class);
+    }
+
+    public function isActive()
+    {
+        return $this->is_active;
+    }
+
+    public function getFullNameAttribute()
+    {
+        if ($this->personalInfo && $this->personalInfo->first_name && $this->personalInfo->last_name) {
+            return $this->personalInfo->last_name . ', ' . $this->personalInfo->first_name;
+        }
+        
+        if ($this->personalInfo && $this->personalInfo->preferred_name) {
+            return $this->personalInfo->preferred_name;
+        }
+        
+        return $this->name;
     }
 
 

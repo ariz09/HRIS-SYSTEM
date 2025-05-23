@@ -23,6 +23,7 @@
                     <a class="nav-link" href="{{ route('employment_types.index') }}">Employment Types</a>
                     <a class="nav-link" href="{{ route('cdmlevels.index') }}">CDM Levels</a>
                     <a class="nav-link" href="{{ route('agencies.index') }}">Agencies</a>
+                    <a class="nav-link" href="{{ route('inactive-users.index') }}">Activate Users</a>
                 </nav>
             </div>
 

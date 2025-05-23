@@ -31,6 +31,7 @@ use App\Http\Controllers\{
     PeriodTypeController,
     CutOffTypeController,
    BulkUploadTemplateController,
+   InactiveUserController,
 
 };
 
@@ -52,6 +53,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/dashboard/action', [DashboardController::class, 'handleAction'])->name('dashboard.action');
     Route::resource('period_types', PeriodTypeController::class);
     Route::resource('cut_off_types', CutOffTypeController::class);
+
+    Route::get('/inactive-users', [InactiveUserController::class, 'index'])->name('inactive-users.index');
+    Route::post('/users/{user}/activate', [InactiveUserController::class, 'activate'])->name('users.activate');
+    Route::get('/inactive-users/count', [InactiveUserController::class, 'getInactiveCount'])->name('inactive-users.count');
 
        // Time Records - accessible by all employees and timekeeper
     Route::prefix('time-records')->middleware(['role:employee|timekeeper|admin'])->group(function () {

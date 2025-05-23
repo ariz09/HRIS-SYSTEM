@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\RoleController;
+use App\Models\CompensationPackage;
 use App\Models\EmploymentInfo;
 use App\Models\PersonalInfo;
 use App\Models\User;
@@ -39,6 +40,9 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
+        // generate employee number
+        $employee_number = EmployeeController::generateEmployeeNumber();
+
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
@@ -54,8 +58,12 @@ class RegisteredUserController extends Controller
 
         EmploymentInfo::create([
             'user_id' => $user->id,
-            'employee_number' => EmployeeController::generateEmployeeNumber(),
+            'employee_number' => $employee_number,
             'hiring_date' => now()->toDateString(),
+        ]);
+
+        CompensationPackage::create([
+            'employee_number' => $employee_number
         ]);
 
         event(new Registered($user));

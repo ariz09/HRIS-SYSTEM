@@ -7,9 +7,7 @@ export default defineConfig({
         laravel({
             input: [
                 'resources/css/app.css',
-                'resources/css/validation.css', // Add this line
                 'resources/js/app.js',
-                'resources/js/validation.js', // Add this line
             ],
             refresh: true,
         }),

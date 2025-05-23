@@ -1,5 +1,37 @@
 @extends('layouts.app')
-
+@if(session('error_details'))
+<div class="alert alert-danger">
+    <h5>Detailed Errors:</h5>
+    <div class="table-responsive">
+        <table class="table table-sm table-bordered">
+            <thead>
+                <tr>
+                    <th>Row #</th>
+                    <th>Errors</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach(session('error_details') as $error)
+                    <tr>
+                        <td>{{ $error['row'] }}</td>
+                        <td>
+                            <ul class="mb-0">
+                                @foreach($error['errors'] as $err)
+                                    <li>{{ $err }}</li>
+                                @endforeach
+                            </ul>
+                        </td>
+                        <td>
+                            <pre class="mb-0">{{ json_encode($error['data'] ?? 'No data', JSON_PRETTY_PRINT) }}</pre>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+@endif
 @section('content')
 <x-success-alert :message="session('success')" />
 <x-error-alert :message="session('error')" />
@@ -114,7 +146,7 @@
                 <div class="modal-body">
                     <div class="mb-3">
                         <label for="csv_file" class="form-label">Select CSV File</label>
-                        <input type="file" name="csv_file" id="csv_file" class="form-control" required accept=".csv">
+                        <input type="file" name="employee_csv" id="employee_csv" class="form-control" required accept=".csv">
                     </div>
                     <div class="mb-3">
                         <a href="{{ route('employees.template.download') }}"

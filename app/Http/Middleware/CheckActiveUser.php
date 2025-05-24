@@ -13,7 +13,7 @@ class CheckActiveUser
     {
         if (Auth::check() && !Auth::user()->is_active) {
             Auth::logout();
-            return redirect()->route('no.access');
+            return redirect()->route('no.access')
                 ->with('error', 'Your account is not active. Please contact your supervisor.');
         }
 

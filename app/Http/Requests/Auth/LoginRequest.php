@@ -41,21 +41,19 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        if (!Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
-
             throw ValidationException::withMessages([
                 'email' => trans('auth.failed'),
             ]);
         }
 
         $user = Auth::user();
-        if (! $user->is_active) {
+        if (!$user->is_active) {
             Auth::logout();
-
-            session()->flash('inactive', 'Your account is inactive.');
-            redirect()->back()->send();
-            return;
+            throw ValidationException::withMessages([
+                'email' => 'Your account is not active',
+            ])->redirectTo(route('no.access'));
         }
 
         RateLimiter::clear($this->throttleKey());
@@ -89,6 +87,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey(): string
     {
-        return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+        return Str::transliterate(Str::lower((string) $this->input('email')) . '|' . $this->ip());
     }
 }

@@ -30,15 +30,15 @@ use App\Http\Controllers\{
     OvertimeController,
     PeriodTypeController,
     CutOffTypeController,
-   BulkUploadTemplateController,
-   InactiveUserController,
-
+    BulkUploadTemplateController,
+    InactiveUserController,
 };
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
 // Redirect root to login
 Route::redirect('/', '/login');
+Route::view('/no-access', 'auth.no-access')->name('no.access');
 
 // Guest Routes (Unauthenticated)
 Route::middleware('guest')->group(function () {
@@ -47,7 +47,7 @@ Route::middleware('guest')->group(function () {
 });
 
 // Authenticated User Routes
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth',\App\Http\Middleware\CheckActiveUser::class])->group(function () {
     // Dashboard - accessible by all authenticated users
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard/action', [DashboardController::class, 'handleAction'])->name('dashboard.action');
@@ -58,7 +58,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/users/{user}/activate', [InactiveUserController::class, 'activate'])->name('users.activate');
     Route::get('/inactive-users/count', [InactiveUserController::class, 'getInactiveCount'])->name('inactive-users.count');
 
-       // Time Records - accessible by all employees and timekeeper
+    // Time Records - accessible by all employees and timekeeper
     Route::prefix('time-records')->middleware(['role:employee|timekeeper|admin'])->group(function () {
         Route::get('/', [TimeRecordController::class, 'index'])->name('time-records.index');
         Route::post('/time-in', [TimeRecordController::class, 'timeIn'])->name('time-in');
@@ -67,6 +67,10 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/my', [TimeRecordController::class, 'myTimeRecords'])->name('time-records.my');
         Route::get('/all', [TimeRecordController::class, 'allTimeRecords'])->middleware(['role:timekeeper|admin'])->name('time-records.all');
     });
+
+    // Main Employee resource route
+    Route::resource('employees', EmployeeController::class);
+
 
     Route::prefix('employees/{employee}/employment-histories')->group(function () {
         Route::get('edit', [EmployeeEmploymentHistoryController::class, 'edit'])
@@ -105,8 +109,6 @@ Route::middleware(['auth'])->group(function () {
         Route::resource('education', EmployeeEducationController::class)->except(['show']);
     });
 
-    // Main Employee resource route
-    Route::resource('employees', EmployeeController::class);
 
     // Leave Management - accessible by admin, manager, and supervisor
     Route::middleware(['role:admin|manager|supervisor'])->group(function () {
@@ -156,7 +158,6 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['role:admin'])->get('/test-role', function () {
         return 'Role middleware works!';
     });
-
 });
 
 // API endpoint

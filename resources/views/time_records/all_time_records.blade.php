@@ -36,7 +36,7 @@
             </div>
         </form>
         <div class="card-body">
-            
+
             <div class="mb-3">
                {{--  <a href="{{ route('time-records.all', array_merge(request()->all(), ['report' => '1'])) }}" class="btn btn-success">
                     <i class="fas fa-file-excel"></i> Generate Report
@@ -64,11 +64,13 @@
                             $endDate = request('end_date') ? Carbon\Carbon::parse(request('end_date'))->endOfDay() : now()->endOfDay();
 
                             $groupedRecords = $timeRecords
-                                ? $timeRecords->whereBetween('recorded_at', [$startDate, $endDate])
-                                            ->groupBy(['user_id', function($record) {
-                                                return Carbon\Carbon::parse($record->recorded_at)->format('Y-m-d');
-                                            }])
-                                : [];
+                            ? $timeRecords->groupBy([
+                                'user_id',
+                                function($record) {
+                                    return Carbon\Carbon::parse($record->recorded_at)->format('Y-m-d');
+                                }
+                            ])
+                            : [];
                         @endphp
                         @forelse($groupedRecords as $userId => $dateRecords)
                             @foreach($dateRecords as $date => $records)
@@ -150,17 +152,17 @@
 <script>
 $(document).ready(function() {
     const table = $('#allTimeRecordsTable');
-    
+
     // Only initialize if table exists and has valid structure
     if (table.length && table.find('thead th').length === table.find('tbody tr:first td').length) {
-        const today = new Date().toLocaleDateString('en-US', { 
-            year: 'numeric', 
-            month: '2-digit', 
-            day: '2-digit' 
+        const today = new Date().toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
         }).replace(/\//g, '-');
-        
+
         const fileName = `All_Employees_Time_Records_${today}`;
-        
+
         table.DataTable({
             dom: '<"d-flex justify-content-between align-items-center mb-3"Bf>rt<"d-flex justify-content-between align-items-center"ip>',
             buttons: [

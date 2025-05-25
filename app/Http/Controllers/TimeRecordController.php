@@ -170,12 +170,29 @@ class TimeRecordController extends Controller
 
     public function allTimeRecords(Request $request)
     {
+        $user = Auth::user();
+        $employmentInfo = $user->employmentInfo;
+
+        if (!$employmentInfo) {
+            return response()->json([
+                'success' => false,
+                'message' => 'No employment information found for the user.'
+            ], 404);
+        }
+
+        $userDepartment = $employmentInfo->department_id;
+        $userAgency = $employmentInfo->agency_id;
+
         $query = \App\Models\TimeRecord::with([
             'employee.user',
             'employee.department',
             'employee.position',
             'employee.agency'
-        ]);
+        ])
+        ->whereHas('employee', function($q) use ($userDepartment, $userAgency) {
+            $q->where('department_id', $userDepartment)
+              ->where('agency_id', $userAgency);
+        });
 
         if ($request->filled('start_date')) {
             $query->whereDate('recorded_at', '>=', $request->start_date);
@@ -183,6 +200,7 @@ class TimeRecordController extends Controller
         if ($request->filled('end_date')) {
             $query->whereDate('recorded_at', '<=', $request->end_date);
         }
+
         $timeRecords = $query->orderBy('recorded_at', 'desc')->get();
 
         // Export to CSV if requested

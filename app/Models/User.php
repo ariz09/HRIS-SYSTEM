@@ -41,7 +41,7 @@ class User extends Authenticatable
 
     public function employmentInfo()
     {
-        return $this->hasOne(\App\Models\EmploymentInfo::class, 'user_id');
+        return $this->hasOne(EmploymentInfo::class);
     }
 
     // app/Models/User.php
@@ -63,11 +63,11 @@ class User extends Authenticatable
         if ($this->personalInfo && $this->personalInfo->first_name && $this->personalInfo->last_name) {
             return $this->personalInfo->last_name . ', ' . $this->personalInfo->first_name;
         }
-        
+
         if ($this->personalInfo && $this->personalInfo->preferred_name) {
             return $this->personalInfo->preferred_name;
         }
-        
+
         return $this->name;
     }
 

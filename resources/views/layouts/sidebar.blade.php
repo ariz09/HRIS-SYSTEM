@@ -35,9 +35,12 @@
             </a>
             <div class="collapse" id="collapseLeave" data-bs-parent="#sidenavAccordion">
                 <nav class="sb-sidenav-menu-nested nav">
-                    <a class="nav-link" href="{{ route('leaves.index') }}">Leave Applications</a>
-                    <a class="nav-link" href="{{ route('leave_types.index') }}">Leave Types</a>
-                    <a class="nav-link" href="{{ route('assign_leaves.index') }}">Assign Leaves</a>
+                    <a class="nav-link" href="{{ route('leaves.index') }}">My Leave Requests</a>
+                    <a class="nav-link" href="{{ route('leaves.create') }}">Submit Leave Request</a>
+                    @role('admin|manager|supervisor')
+                        <a class="nav-link" href="{{ route('leave_types.index') }}">Leave Types</a>
+                        <a class="nav-link" href="{{ route('assign_leaves.index') }}">Assign Leaves</a>
+                    @endrole
                     <a class="nav-link" href="{{ route('overtimes.index') }}">Overtime Management</a>
                 </nav>
             </div>

@@ -6,6 +6,8 @@ use App\Models\Leave;
 use App\Models\LeaveType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class LeaveController extends Controller
 {
@@ -41,7 +43,26 @@ class LeaveController extends Controller
     public function create()
     {
         $leaveTypes = LeaveType::all();
-        return view('leaves.create', compact('leaveTypes'));
+        $employmentInfo = Auth::user()->employmentInfo;
+        $levelName = $employmentInfo && $employmentInfo->cdmLevel ? $employmentInfo->cdmLevel->name : null;
+        $balances = [];
+        foreach ($leaveTypes as $type) {
+            $entitlement = \App\Models\LeaveEntitlement::where('leave_type_id', $type->id)
+                ->where('employee_level', $levelName)
+                ->first();
+            $allowed = $entitlement ? $entitlement->days_allowed : 0;
+            $used = \App\Models\Leave::where('user_id', Auth::id())
+                ->where('leave_type_id', $type->id)
+                ->where('status', 'approved')
+                ->whereYear('start_date', now()->year)
+                ->sum(DB::raw('DATEDIFF(end_date, start_date) + 1'));
+            $balances[$type->id] = [
+                'allowed' => $allowed,
+                'used' => $used,
+                'remaining' => max($allowed - $used, 0),
+            ];
+        }
+        return view('leaves.create', compact('leaveTypes', 'balances'));
     }
 
     /**
@@ -58,6 +79,43 @@ class LeaveController extends Controller
             'contact_number' => 'required|string',
             'address_during_leave' => 'required|string',
         ]);
+
+        // Get employee info and level
+        $employmentInfo = Auth::user()->employmentInfo;
+        $levelName = $employmentInfo && $employmentInfo->cdmLevel ? $employmentInfo->cdmLevel->name : null;
+
+        // For Compassionate Leave, use relationship type as level
+        $leaveType = \App\Models\LeaveType::find($validated['leave_type_id']);
+        $entitlementLevel = $levelName;
+        if ($leaveType && $leaveType->name === 'Compassionate Leave') {
+            // For demo, use 'Parent/Spouse/Child' as default; in real app, get from request
+            $entitlementLevel = 'Parent/Spouse/Child';
+        }
+
+        // Fetch entitlement
+        $entitlement = \App\Models\LeaveEntitlement::where('leave_type_id', $validated['leave_type_id'])
+            ->where('employee_level', $entitlementLevel)
+            ->first();
+        if (!$entitlement) {
+            return back()->withErrors(['You do not have an entitlement for this leave type/level.']);
+        }
+        $allowedDays = $entitlement->days_allowed;
+
+        // Calculate requested days
+        $start = new Carbon($validated['start_date']);
+        $end = new Carbon($validated['end_date']);
+        $requestedDays = $end->diffInDays($start) + 1;
+
+        // Sum used days for this leave type and level this year
+        $usedDays = \App\Models\Leave::where('user_id', Auth::id())
+            ->where('leave_type_id', $validated['leave_type_id'])
+            ->where('status', 'approved')
+            ->whereYear('start_date', now()->year)
+            ->sum(DB::raw('DATEDIFF(end_date, start_date) + 1'));
+
+        if (($usedDays + $requestedDays) > $allowedDays) {
+            return back()->withErrors(['You have exceeded your leave entitlement for this type.']);
+        }
 
         $leave = new Leave();
         $leave->user_id = Auth::id();

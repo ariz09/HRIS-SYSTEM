@@ -41,6 +41,7 @@
                                 <option value="{{ $type->id }}">{{ $type->name }}</option>
                             @endforeach
                         </select>
+                        <div id="leave-balance-info" class="mt-2 text-info small"></div>
                     </div>
                     <div class="col-md-6">
                         <label for="duration" class="form-label">Duration</label>
@@ -97,6 +98,19 @@
     // Ensure start date is not after end date
     document.getElementById('end_date').addEventListener('change', function() {
         document.getElementById('start_date').max = this.value;
+    });
+
+    // Show leave balance info
+    const balances = @json($balances);
+    const leaveTypeSelect = document.getElementById('leave_type');
+    const balanceInfo = document.getElementById('leave-balance-info');
+    leaveTypeSelect.addEventListener('change', function() {
+        const id = this.value;
+        if (balances[id]) {
+            balanceInfo.textContent = `Remaining: ${balances[id].remaining} day(s) (Used: ${balances[id].used} / Allowed: ${balances[id].allowed})`;
+        } else {
+            balanceInfo.textContent = '';
+        }
     });
 </script>
 @endpush

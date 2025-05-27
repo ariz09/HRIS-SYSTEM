@@ -25,5 +25,8 @@ class DatabaseSeeder extends Seeder
             HolidaySeeder::class,
             RoleSeeder::class,
         ]);
+
+        // Call the leave entitlements seeder
+        $this->call(LeaveEntitlementsTableSeeder::class);
     }
 }

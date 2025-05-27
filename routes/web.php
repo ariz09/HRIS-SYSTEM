@@ -34,7 +34,8 @@ use App\Http\Controllers\{
     InactiveUserController,
     ProfilePictureController, 
     UserPersonalInfoController,
-};
+    ProfileDependentController
+};  
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 
@@ -65,6 +66,10 @@ Route::middleware(['auth',\App\Http\Middleware\CheckActiveUser::class])->group(f
 
        Route::get('/profile/personal-info/edit', [UserPersonalInfoController::class, 'edit'])->name('profile.personal-info.edit');
        Route::put('/profile/personal-info/update', [UserPersonalInfoController::class, 'update'])->name('profile.personal-info.update');
+       Route::get('/profile/dependents/edit', [ProfileDependentController::class, 'edit'])->name('profile.dependents.edit');
+       Route::put('/profile/dependents/update', [ProfileDependentController::class, 'update'])->name('profile.dependents.update');
+       Route::delete('/profile/dependents/{dependent}', [ProfileDependentController::class, 'destroy'])->name('profile.dependents.destroy');
+
 
     // Dashboard - accessible by all authenticated users
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

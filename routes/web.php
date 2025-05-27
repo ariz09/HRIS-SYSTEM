@@ -32,6 +32,12 @@ use App\Http\Controllers\{
     CutOffTypeController,
     BulkUploadTemplateController,
     InactiveUserController,
+    ProfilePictureController,
+    UserPersonalInfoController,
+    ProfileDependentController,
+    ProfileEmergencyContactController,
+    ProfileEducationController,
+    ProfileEmploymentHistoryController
 };
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -47,7 +53,36 @@ Route::middleware('guest')->group(function () {
 });
 
 // Authenticated User Routes
-Route::middleware(['auth',\App\Http\Middleware\CheckActiveUser::class])->group(function () {
+Route::middleware(['auth', \App\Http\Middleware\CheckActiveUser::class])->group(function () {
+
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'index'])->name('profile.index');
+        Route::get('/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    });
+
+    // Profile picture routes
+    Route::post('/profile/picture/upload', [ProfilePictureController::class, 'upload'])
+        ->name('profile.picture.upload');
+
+    Route::delete('/profile/picture/remove', [ProfilePictureController::class, 'destroy'])
+        ->name('profile.picture.remove');
+
+    Route::get('/profile/personal-info/edit', [UserPersonalInfoController::class, 'edit'])->name('profile.personal-info.edit');
+    Route::put('/profile/personal-info/update', [UserPersonalInfoController::class, 'update'])->name('profile.personal-info.update');
+    Route::get('/profile/dependents/edit', [ProfileDependentController::class, 'edit'])->name('profile.dependents.edit');
+    Route::put('/profile/dependents/update', [ProfileDependentController::class, 'update'])->name('profile.dependents.update');
+    Route::delete('/profile/dependents/{dependent}', [ProfileDependentController::class, 'destroy'])->name('profile.dependents.destroy');
+    // For regular users editing their own emergency contacts
+    Route::get('/profile/emergency-contacts/edit', [ProfileEmergencyContactController::class, 'edit'])->name('profile.emergency-contacts.edit');
+    Route::put('/profile/emergency-contacts/update', [ProfileEmergencyContactController::class, 'update'])->name('profile.emergency-contacts.update');
+    Route::delete('/profile/emergency-contacts/{contact}', [ProfileEmergencyContactController::class, 'destroy'])->name('profile.emergency-contacts.destroy');
+    Route::get('/profile/educations/edit', [ProfileEducationController::class, 'edit'])->name('profile.educations.edit');
+    Route::put('/profile/educations/update', [ProfileEducationController::class, 'update'])->name('profile.educations.update');
+    Route::delete('/profile/educations/{education}', [ProfileEducationController::class, 'destroy'])->name('profile.educations.destroy');
+    // For regular users editing their own employment history
+    Route::get('/profile/employment-history/edit', [ProfileEmploymentHistoryController::class, 'edit'])->name('profile.employment-history.edit');
+    Route::put('/profile/employment-history/update', [ProfileEmploymentHistoryController::class, 'update'])->name('profile.employment-history.update');
+    Route::delete('/profile/employment-history/{history}', [ProfileEmploymentHistoryController::class, 'destroy'])->name('profile.employment-history.destroy');
     // Dashboard - accessible by all authenticated users
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard/action', [DashboardController::class, 'handleAction'])->name('dashboard.action');

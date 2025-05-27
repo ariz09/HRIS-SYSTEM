@@ -2,22 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use Illuminate\Http\RedirectResponse;
+use App\Models\PersonalInfo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\View\View;
 
-use App\Models\PersonalInfo;
 use App\Models\EmploymentInfo;
 use App\Models\CompensationPackage;
 use App\Models\EmployeeDependent;
 use App\Models\EmployeeEmergencyContact;
 use App\Models\EmployeeEducation;
 use App\Models\EmployeeEmploymentHistory;
-
-class ProfileController extends Controller
+class UserPersonalInfoController extends Controller
 {
     public function index()
     {
@@ -66,49 +61,51 @@ class ProfileController extends Controller
                 //'governmentIds' => GovernmentId::where('employee_number', $employeeNumber)->first(),
             ]);
         }
-    
-
-    public function edit(Request $request): View
+    public function edit()
     {
-        return view('profile.edit', [
-            'user' => $request->user(),
-        ]);
-    }
+        $user = Auth::user();
+        $personalInfo = $user->personalInfo;
 
-    /**
-     * Update the user's profile information.
-     */
-    public function update(ProfileUpdateRequest $request): RedirectResponse
-    {
-        $request->user()->fill($request->validated());
-
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if (!$personalInfo) {
+            abort(404, 'Personal information not found');
         }
 
-        $request->user()->save();
-
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return view('profile.edit-personal-info', compact('personalInfo'));
     }
 
-    /**
-     * Delete the user's account.
-     */
-    public function destroy(Request $request): RedirectResponse
+    public function update(Request $request)
     {
-        $request->validateWithBag('userDeletion', [
-            'password' => ['required', 'current_password'],
+        $user = Auth::user();
+        $personalInfo = $user->personalInfo;
+
+        if (!$personalInfo) {
+            abort(404, 'Personal information not found');
+        }
+
+        $validated = $request->validate([
+            'first_name' => 'required|string|max:255',
+            'middle_name' => 'nullable|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'name_suffix' => 'nullable|string|max:20',
+            'preferred_name' => 'nullable|string|max:255',
+            'gender' => 'required|string|in:Male,Female,Other',
+            'birthday' => 'required|date',
+            'email' => 'required|email|unique:personal_infos,email,'.$personalInfo->id,
+            'phone_number' => 'required|string|max:20',
+            'civil_status' => 'required|string|in:Single,Married,Divorced,Widowed,Separated',
+            'address' => 'required|string|max:500',
         ]);
 
-        $user = $request->user();
+        // Convert names to uppercase
+        $validated['first_name'] = strtoupper($validated['first_name']);
+        $validated['middle_name'] = $validated['middle_name'] ? strtoupper($validated['middle_name']) : null;
+        $validated['last_name'] = strtoupper($validated['last_name']);
+        $validated['name_suffix'] = $validated['name_suffix'] ? strtoupper($validated['name_suffix']) : null;
+        $validated['preferred_name'] = $validated['preferred_name'] ? strtoupper($validated['preferred_name']) : null;
 
-        Auth::logout();
+        $personalInfo->update($validated);
 
-        $user->delete();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return Redirect::to('/');
+        return redirect()->route('profile.index')
+            ->with('success', 'Personal information updated successfully');
     }
 }

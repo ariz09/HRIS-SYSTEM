@@ -32,6 +32,7 @@ use App\Http\Controllers\{
     CutOffTypeController,
     BulkUploadTemplateController,
     InactiveUserController,
+    ProfilePictureController, 
 };
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -53,6 +54,13 @@ Route::middleware(['auth',\App\Http\Middleware\CheckActiveUser::class])->group(f
         Route::get('/', [ProfileController::class, 'index'])->name('profile.index');
         Route::get('/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     });
+
+       // Profile picture routes
+       Route::post('/profile/picture/upload', [ProfilePictureController::class, 'upload'])
+       ->name('profile.picture.upload');
+       
+   Route::delete('/profile/picture/remove', [ProfilePictureController::class, 'destroy'])
+       ->name('profile.picture.remove');
 
     // Dashboard - accessible by all authenticated users
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

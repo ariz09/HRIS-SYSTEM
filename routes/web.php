@@ -33,6 +33,7 @@ use App\Http\Controllers\{
     BulkUploadTemplateController,
     InactiveUserController,
     ProfilePictureController, 
+    UserPersonalInfoController,
 };
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -61,6 +62,9 @@ Route::middleware(['auth',\App\Http\Middleware\CheckActiveUser::class])->group(f
        
    Route::delete('/profile/picture/remove', [ProfilePictureController::class, 'destroy'])
        ->name('profile.picture.remove');
+
+       Route::get('/profile/personal-info/edit', [UserPersonalInfoController::class, 'edit'])->name('profile.personal-info.edit');
+       Route::put('/profile/personal-info/update', [UserPersonalInfoController::class, 'update'])->name('profile.personal-info.update');
 
     // Dashboard - accessible by all authenticated users
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

@@ -114,8 +114,11 @@
 <!-- Personal Information Card -->
 <div class="col-md-6">
     <div class="card h-100 shadow-sm">
-        <div class="card-header bg-danger text-white">
+        <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
             <h6 class="mb-0"><i class="fas fa-user me-2"></i>Personal Information</h6>
+            <a href="{{ route('profile.personal-info.edit') }}" class="btn btn-sm btn-light">
+                <i class="fas fa-edit"></i> Edit
+            </a>
         </div>
         <div class="card-body">
             @if($personalInfo)
@@ -167,6 +170,7 @@
                         <textarea class="form-control" disabled>{{ $personalInfo->address ?? 'Not specified' }}</textarea>
                     </div>
                 </div>
+                
             @else
                 <div class="alert alert-warning mt-3">No personal information available</div>
             @endif

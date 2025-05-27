@@ -407,8 +407,11 @@
         <!-- Education Card -->
         <div class="col-md-6">
             <div class="card h-100 shadow-sm">
-                <div class="card-header bg-danger text-white">
+                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
                     <h6 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>Education</h6>
+                    <a href="{{ route('profile.educations.edit') }}" class="btn btn-sm btn-light">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
                 </div>
                 <div class="card-body">
                     @if($education->count() > 0)

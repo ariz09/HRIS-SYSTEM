@@ -79,25 +79,66 @@
         <div class="col-md-6">
             <div class="card h-100 shadow-sm">
                 <div class="card-header bg-danger text-white">
-                    <h5 class="mb-0"><i class="fas fa-briefcase me-2"></i>Employment Information</h5>
+                    <h6 class="mb-0"><i class="fas fa-briefcase me-2"></i>Employment Information</h6>
                 </div>
                 <div class="card-body">
                     @if($employmentInfo)
                         <div class="row">
                             <div class="col-md-4 fw-bold">Employee ID:</div>
-                            <div class="col-md-8">{{ $employmentInfo->employee_number }}</div>
-                            
+                            <div class="col-md-8">
+                                <input type="text" class="form-control"
+                                    value="{{ $employmentInfo->employee_number }}"
+                                    disabled>
+                            </div>
+
                             <div class="col-md-4 fw-bold mt-2">Position:</div>
-                            <div class="col-md-8 mt-2">{{ $employmentInfo->position_id }}</div>
-                            
+                            <div class="col-md-8 mt-2">
+                                <input type="text" class="form-control"
+                                    value="{{ $employmentInfo->position->name ?? 'Not specified' }}"
+                                    disabled>
+                            </div>
+
                             <div class="col-md-4 fw-bold mt-2">Department:</div>
-                            <div class="col-md-8 mt-2">{{ $employmentInfo->department_id }}</div>
-                            
-                            <div class="col-md-4 fw-bold mt-2">Hire Date:</div>
-                           <div class="col-md-8 mt-2">{{ $employmentInfo->hiring_date ? \Carbon\Carbon::parse($employmentInfo->hiring_date)->format('m/d/Y') : 'Not specified' }}</div>
-                            
+                            <div class="col-md-8 mt-2">
+                                <input type="text" class="form-control"
+                                    value="{{ $employmentInfo->department->name ?? 'Not specified' }}"
+                                    disabled>
+                            </div>
+
+                            <div class="col-md-4 fw-bold mt-2">Agency:</div>
+                            <div class="col-md-8 mt-2">
+                                <input type="text" class="form-control"
+                                    value="{{ $employmentInfo->agency->name ?? 'Not specified' }}"
+                                    disabled>
+                            </div>
+
+                            <div class="col-md-4 fw-bold mt-2">CDM Level:</div>
+                            <div class="col-md-8 mt-2">
+                                <input type="text" class="form-control"
+                                    value="{{ $employmentInfo->cdmLevel->name ?? 'Not specified' }}"
+                                    disabled>
+                            </div>
+
                             <div class="col-md-4 fw-bold mt-2">Employment Type:</div>
-                            <div class="col-md-8 mt-2">{{ $employmentInfo->employment_type }}</div>
+                            <div class="col-md-8 mt-2">
+                                <input type="text" class="form-control"
+                                    value="{{ $employmentInfo->employmentType->name ?? 'Not specified' }}"
+                                    disabled>
+                            </div>
+
+                            <div class="col-md-4 fw-bold mt-2">Employment Status:</div>
+                            <div class="col-md-8 mt-2">
+                                <input type="text" class="form-control"
+                                    value="{{ $employmentInfo->employmentStatus->name ?? 'Not specified' }}"
+                                    disabled>
+                            </div>
+
+                            <div class="col-md-4 fw-bold mt-2">Hire Date:</div>
+                            <div class="col-md-8 mt-2">
+                                <input type="text" class="form-control"
+                                    value="{{ $employmentInfo->hiring_date ? \Carbon\Carbon::parse($employmentInfo->hiring_date)->format('m/d/Y') : 'Not specified' }}"
+                                    disabled>
+                            </div>
                         </div>
                     @else
                         <div class="alert alert-warning">No employment information available</div>
@@ -105,6 +146,8 @@
                 </div>
             </div>
         </div>
+
+
 
         <!-- Compensation Package Card -->
         <div class="col-md-6">

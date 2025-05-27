@@ -447,8 +447,11 @@
         <!-- Employment History Card -->
         <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header bg-danger text-white">
+                <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
                     <h6 class="mb-0"><i class="fas fa-history me-2"></i>Employment History</h6>
+                    <a href="{{ route('profile.employment-history.edit') }}" class="btn btn-sm btn-light">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
                 </div>
                 <div class="card-body">
                     @if($employmentHistory->count() > 0)

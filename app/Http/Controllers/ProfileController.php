@@ -9,11 +9,65 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
 
+use App\Models\PersonalInfo;
+use App\Models\EmploymentInfo;
+use App\Models\CompensationPackage;
+use App\Models\EmployeeDependent;
+use App\Models\EmployeeEmergencyContact;
+use App\Models\EmployeeEducation;
+use App\Models\EmployeeEmploymentHistory;
+
 class ProfileController extends Controller
 {
-    /**
-     * Display the user's profile form.
-     */
+    public function index()
+    {
+        $user = Auth::user();
+        $employmentInfo = EmploymentInfo::with([
+            'agency',
+            'department',
+            'cdmLevel',
+            'position',
+            'employmentType',
+            'employmentStatus'
+        ])->where('user_id', $user->id)->first();
+
+        $employeeNumber = optional($employmentInfo)->employee_number;
+
+        return view('profile.index', [ 
+            'personalInfo' => PersonalInfo::where('user_id', $user->id)->first(),
+            'employmentInfo' => $employmentInfo,
+            'compensation' => $employeeNumber ? CompensationPackage::where('employee_number', $employeeNumber)->first() : null,
+            'agency' => $employeeNumber ? EmploymentInfo::where('employee_number', $employeeNumber)->value('agency_id') : null,
+            'dependents' => $employeeNumber ? EmployeeDependent::where('employee_number', $employeeNumber)->get() : collect(),
+            'emergencyContacts' => $employeeNumber ? EmployeeEmergencyContact::where('employee_number', $employeeNumber)->get() : collect(),
+            'education' => $employeeNumber ? EmployeeEducation::where('employee_number', $employeeNumber)->get() : collect(),
+            'employmentHistory' => $employeeNumber ? EmployeeEmploymentHistory::where('employee_number', $employeeNumber)->get() : collect(),
+            //'governmentIds' => $employeeNumber ? GovernmentId::where('employee_number', $employeeNumber)->first() : null,
+        ]);
+    }
+
+
+
+
+    
+        public function show()
+        {
+            $user = Auth::user();
+            $employeeNumber = EmploymentInfo::where('userid', $user->id)->value('employee_number');
+
+            return view('profile.index', [
+                'personalInfo' => PersonalInfo::where('userid', $user->id)->first(),
+                'employmentInfo' => EmploymentInfo::where('userid', $user->id)->first(),
+                'compensation' => CompensationPackage::where('employee_number', $employeeNumber)->first(),
+                'dependents' => EmployeeDependent::where('employee_number', $employeeNumber)->get(),
+                'emergencyContacts' => EmployeeEmergencyContact::where('employee_number', $employeeNumber)->get(),
+                'education' => EmployeeEducation::where('employee_number', $employeeNumber)->get(),
+                'employmentHistory' => EmployeeEmploymentHistory::where('employee_number', $employeeNumber)->get(),
+                //'governmentIds' => GovernmentId::where('employee_number', $employeeNumber)->first(),
+            ]);
+        }
+    
+
     public function edit(Request $request): View
     {
         return view('profile.edit', [

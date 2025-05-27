@@ -48,6 +48,12 @@ Route::middleware('guest')->group(function () {
 
 // Authenticated User Routes
 Route::middleware(['auth',\App\Http\Middleware\CheckActiveUser::class])->group(function () {
+
+    Route::prefix('profile')->group(function () {
+        Route::get('/', [ProfileController::class, 'index'])->name('profile.index');
+        Route::get('/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+    });
+
     // Dashboard - accessible by all authenticated users
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::post('/dashboard/action', [DashboardController::class, 'handleAction'])->name('dashboard.action');

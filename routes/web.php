@@ -117,6 +117,14 @@ Route::middleware(['auth',\App\Http\Middleware\CheckActiveUser::class])->group(f
         Route::resource('assign_leaves', AssignLeaveController::class)->parameters(['assign_leaves' => 'assignLeave'])->names('assign_leaves');
     });
 
+    // Employee Leave Requests - accessible by all employees
+    Route::middleware(['role:employee|admin|manager|supervisor'])->group(function () {
+        Route::get('/my-leaves', [LeaveController::class, 'myLeaves'])->name('leaves.my');
+        Route::get('/leaves/create', [LeaveController::class, 'create'])->name('leaves.create');
+        Route::post('/leaves', [LeaveController::class, 'store'])->name('leaves.store');
+        Route::get('/leaves/{leave}', [LeaveController::class, 'show'])->name('leaves.show');
+    });
+
     // Holiday Management - accessible by admin only
     Route::middleware(['role:admin'])->group(function () {
         Route::resource('holidays', HolidayController::class)->names('holidays');

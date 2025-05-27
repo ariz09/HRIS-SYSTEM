@@ -23,6 +23,19 @@ class LeaveController extends Controller
     }
 
     /**
+     * Display the authenticated user's leave requests.
+     */
+    public function myLeaves()
+    {
+        $leaves = Leave::with(['leaveType'])
+            ->where('user_id', Auth::id())
+            ->latest()
+            ->get();
+
+        return view('leaves.my', compact('leaves'));
+    }
+
+    /**
      * Show the form for creating a new resource.
      */
     public function create()

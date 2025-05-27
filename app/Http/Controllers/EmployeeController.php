@@ -285,19 +285,24 @@ class EmployeeController extends Controller
                 ]);
             }
             
-            // Update Employment Info 
-            $employee->update([
-                'hiring_date' => $request->hiring_date,
-                'employment_status_id' => $request->employment_status_id,
-                'agency_id' => $request->agency_id,
-                'department_id' => $request->department_id,
-                'cdm_level_id' => $request->cdm_level_id,
-                'position_id' => $request->position_id,
-                'employment_type_id' => $request->employment_type_id,
-            ]);
-            
-            // Update Compensation Package
-            if ($employee->compensationPackage) {
+            // Update or Create Employment Info
+            if ($employee->employmentInfo) {
+                // Update existing employment info
+                $employee->employmentInfo->update([
+                    'hiring_date' => $request->hiring_date,
+                    'employment_status_id' => $request->employment_status_id,
+                    'agency_id' => $request->agency_id,
+                    'department_id' => $request->department_id,
+                    'cdm_level_id' => $request->cdm_level_id,
+                    'position_id' => $request->position_id,
+                    'employment_type_id' => $request->employment_type_id,
+                ]);
+            } 
+       
+
+            // Update or Create Compensation Package
+            if ($employee->compensationPackage()) {
+                // Update existing compensation package
                 $employee->compensationPackage->update([
                     'basic_pay' => $request->basic_pay,
                     'rata' => $request->rata,
@@ -308,7 +313,8 @@ class EmployeeController extends Controller
                     'atm_account_number' => $request->atm_account_number,
                     'bank_name' => $request->bank_name,
                 ]);
-            }
+            } 
+
 
 
 

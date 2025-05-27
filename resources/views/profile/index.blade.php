@@ -5,7 +5,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h4>My Profile</h4>
         @if(auth()->user()->is_active)
-        {{--     <a href="{{ route('profile.edit') }}" class="btn btn-primary">
+        {{--     <a href="{{ route('profile.edit') }}" class="btn btn-danger">
                 <i class="fas fa-edit"></i> Edit Profile
             </a> --}}
         @endif
@@ -147,28 +147,71 @@
             </div>
         </div>
 
-
-
-        <!-- Compensation Package Card -->
+       <!-- Compensation Package Card -->
         <div class="col-md-6">
             <div class="card h-100 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Compensation</h5>
+                <div class="card-header bg-danger text-white">
+                    <h6 class="mb-0"><i class="fas fa-money-bill-wave me-2"></i>Compensation</h6>
                 </div>
                 <div class="card-body">
                     @if($compensation)
+                        @php
+                            $totalPackage = $compensation->basic_pay +
+                                            $compensation->rata +
+                                            $compensation->comm_allowance +
+                                            $compensation->transpo_allowance +
+                                            $compensation->clothing_allowance +
+                                            $compensation->parking_toll_allowance;
+                        @endphp
                         <div class="row">
-                            <div class="col-md-4 fw-bold">Base Salary:</div>
-                            <div class="col-md-8">${{ number_format($compensation->base_salary, 2) }}</div>
-                            
-                            <div class="col-md-4 fw-bold mt-2">Bonus:</div>
-                            <div class="col-md-8 mt-2">${{ number_format($compensation->bonus, 2) }}</div>
-                            
-                            <div class="col-md-4 fw-bold mt-2">Allowances:</div>
-                            <div class="col-md-8 mt-2">${{ number_format($compensation->allowances, 2) }}</div>
-                            
-                            <div class="col-md-4 fw-bold mt-2">Tax Information:</div>
-                            <div class="col-md-8 mt-2">{{ $compensation->tax_information ?? 'N/A' }}</div>
+                            <div class="col-md-4 fw-bold">Basic Pay:</div>
+                            <div class="col-md-8">
+                                <input type="text" class="form-control"
+                                    value="{{ number_format($compensation->basic_pay, 2) }}"
+                                    disabled>
+                            </div>
+
+                            <div class="col-md-4 fw-bold mt-2">RATA:</div>
+                            <div class="col-md-8 mt-2">
+                                <input type="text" class="form-control"
+                                    value="{{ number_format($compensation->rata, 2) }}"
+                                    disabled>
+                            </div>
+
+                            <div class="col-md-4 fw-bold mt-2">Comm Allowance:</div>
+                            <div class="col-md-8 mt-2">
+                                <input type="text" class="form-control"
+                                    value="{{ number_format($compensation->comm_allowance, 2) }}"
+                                    disabled>
+                            </div>
+
+                            <div class="col-md-4 fw-bold mt-2">Transpo Allowance:</div>
+                            <div class="col-md-8 mt-2">
+                                <input type="text" class="form-control"
+                                    value="{{ number_format($compensation->transpo_allowance, 2) }}"
+                                    disabled>
+                            </div>
+
+                            <div class="col-md-4 fw-bold mt-2">Clothing Allowance:</div>
+                            <div class="col-md-8 mt-2">
+                                <input type="text" class="form-control"
+                                    value="{{ number_format($compensation->clothing_allowance, 2) }}"
+                                    disabled>
+                            </div>
+
+                            <div class="col-md-4 fw-bold mt-2">Parking/Toll Allowance:</div>
+                            <div class="col-md-8 mt-2">
+                                <input type="text" class="form-control"
+                                    value="{{ number_format($compensation->parking_toll_allowance, 2) }}"
+                                    disabled>
+                            </div>
+
+                            <div class="col-md-4 fw-bold mt-2 text-danger">Total Package:</div>
+                            <div class="col-md-8 mt-2">
+                                <input type="text" class="form-control fw-bold text-danger"
+                                    value="{{ number_format($totalPackage, 2) }}"
+                                    disabled>
+                            </div>
                         </div>
                     @else
                         <div class="alert alert-warning">No compensation information available</div>
@@ -177,11 +220,12 @@
             </div>
         </div>
 
+
         <!-- Dependents Card -->
         <div class="col-md-6">
             <div class="card h-100 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-child me-2"></i>Dependents</h5>
+                <div class="card-header bg-danger text-white">
+                    <h6 class="mb-0"><i class="fas fa-child me-2"></i>Dependents</h6>
                 </div>
                 <div class="card-body">
                     @if($dependents->count() > 0)
@@ -198,8 +242,8 @@
                                     @foreach($dependents as $dependent)
                                         <tr>
                                             <td>{{ $dependent->full_name }}</td>
-                                            <td>{{ ucfirst($dependent->relationship) }}</td>
-                                            <td>{{ $dependent->birthdate->format('m/d/Y') }}</td>
+                                            <td>{{ ucfirst($dependent->dependent_type) }}</td>
+                                            <td>{{ $dependent->birthdate ? \Carbon\Carbon::parse($dependent->birthdate)->format('m/d/Y') : 'Not specified' }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -215,8 +259,8 @@
         <!-- Emergency Contacts Card -->
         <div class="col-md-6">
             <div class="card h-100 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-phone-alt me-2"></i>Emergency Contacts</h5>
+                <div class="card-header bg-danger text-white">
+                    <h6 class="mb-0"><i class="fas fa-phone-alt me-2"></i>Emergency Contacts</h6>
                 </div>
                 <div class="card-body">
                     @if($emergencyContacts->count() > 0)
@@ -233,10 +277,10 @@
                                 <tbody>
                                     @foreach($emergencyContacts as $contact)
                                         <tr>
-                                            <td>{{ $contact->full_name }}</td>
+                                            <td>{{ $contact->fullname }}</td>
                                             <td>{{ ucfirst($contact->relationship) }}</td>
-                                            <td>{{ $contact->phone_number }}</td>
-                                            <td>{{ $contact->email ?? 'N/A' }}</td>
+                                            <td>{{ $contact->contact_number ?? 'N/A'}}</td>
+                                            <td>{{ $contact->address ?? 'N/A' }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -252,8 +296,8 @@
         <!-- Education Card -->
         <div class="col-md-6">
             <div class="card h-100 shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>Education</h5>
+                <div class="card-header bg-danger text-white">
+                    <h6 class="mb-0"><i class="fas fa-graduation-cap me-2"></i>Education</h6>
                 </div>
                 <div class="card-body">
                     @if($education->count() > 0)
@@ -263,15 +307,17 @@
                                     <tr>
                                         <th>Institution</th>
                                         <th>Degree</th>
-                                        <th>Year</th>
+                                        <th>Year Graduated</th>
+                                        <th>Status</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($education as $edu)
                                         <tr>
-                                            <td>{{ $edu->institution }}</td>
-                                            <td>{{ $edu->degree }}</td>
-                                            <td>{{ $edu->year_completed }}</td>
+                                            <td>{{ $edu->school_name }}</td>
+                                            <td>{{ $edu->course_taken }}</td>
+                                            <td>{{ $edu->year_finished }}</td>
+                                            <td>{{ $edu->status }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>
@@ -287,8 +333,8 @@
         <!-- Employment History Card -->
         <div class="col-12">
             <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0"><i class="fas fa-history me-2"></i>Employment History</h5>
+                <div class="card-header bg-danger text-white">
+                    <h6 class="mb-0"><i class="fas fa-history me-2"></i>Employment History</h6>
                 </div>
                 <div class="card-body">
                     @if($employmentHistory->count() > 0)
@@ -297,21 +343,21 @@
                                 <thead class="table-light">
                                     <tr>
                                         <th>Company</th>
-                                        <th>Position</th>
+                                        <th>Job Title</th>
                                         <th>Duration</th>
-                                        <th>Responsibilities</th>
+                                        <th>Company Address</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($employmentHistory as $history)
                                         <tr>
                                             <td>{{ $history->company_name }}</td>
-                                            <td>{{ $history->position }}</td>
+                                            <td>{{ $history->job_title }}</td>
                                             <td>
                                                 {{ $history->start_date->format('m/d/Y') }} - 
                                                 {{ $history->end_date ? $history->end_date->format('m/d/Y') : 'Present' }}
                                             </td>
-                                            <td>{{ Str::limit($history->responsibilities, 50) }}</td>
+                                            <td>{{ Str::limit($history->company_address, 50) }}</td>
                                         </tr>
                                     @endforeach
                                 </tbody>

@@ -21,10 +21,10 @@
                 <div class="card-body">
                     @if($personalInfo)
                         <div class="row">
-                            <div class="col-md-4 fw-bold">Full Name:</div>
+                            <div class="col-md-4 fw-bold">Name:</div>
                             <div class="col-md-8">
                                 <input type="text" class="form-control" 
-                                       value="{{strtoupper($personalInfo->preffered_name ?? 
+                                       value="{{strtoupper($personalInfo->preferred_name ?? 
                                                 $personalInfo->first_name . ' ' .
                                                 $personalInfo->middle_name . ' ' .
                                                 $personalInfo->last_name . ' ' .

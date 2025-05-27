@@ -34,7 +34,8 @@ use App\Http\Controllers\{
     InactiveUserController,
     ProfilePictureController, 
     UserPersonalInfoController,
-    ProfileDependentController
+    ProfileDependentController,
+    ProfileEmergencyContactController
 };  
 
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -69,7 +70,10 @@ Route::middleware(['auth',\App\Http\Middleware\CheckActiveUser::class])->group(f
        Route::get('/profile/dependents/edit', [ProfileDependentController::class, 'edit'])->name('profile.dependents.edit');
        Route::put('/profile/dependents/update', [ProfileDependentController::class, 'update'])->name('profile.dependents.update');
        Route::delete('/profile/dependents/{dependent}', [ProfileDependentController::class, 'destroy'])->name('profile.dependents.destroy');
-
+    // For regular users editing their own emergency contacts
+    Route::get('/profile/emergency-contacts/edit', [ProfileEmergencyContactController::class, 'edit'])->name('profile.emergency-contacts.edit');
+    Route::put('/profile/emergency-contacts/update', [ProfileEmergencyContactController::class, 'update'])->name('profile.emergency-contacts.update');
+    Route::delete('/profile/emergency-contacts/{contact}', [ProfileEmergencyContactController::class, 'destroy'])->name('profile.emergency-contacts.destroy');
 
     // Dashboard - accessible by all authenticated users
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');

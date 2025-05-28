@@ -186,6 +186,9 @@
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
+        <form method="POST" id="deleteContactForm">
+            @csrf
+            @method('DELETE')
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="deleteConfirmModalLabel">Delete Contact</h5>
@@ -195,87 +198,110 @@
                 Are you sure you want to delete this emergency contact?
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form method="POST" id="deleteContactForm">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
+                <button type="button" id="cancelbtn" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                   <button type="submit" class="btn btn-danger">Delete</button>
             </div>
         </div>
+        </form>
     </div>
 </div>
 @endsection
-
 @push('scripts')
     <script src="{{ asset('js/validation.js') }}"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        let contactIndex = {{ $contacts->count() }};
-        const addContactBtn = document.getElementById('add-contact-btn');
-        const contactsContainer = document.getElementById('contacts-container');
-        const contactTemplate = document.getElementById('contact-template');
-        const deleteModal = document.getElementById('deleteConfirmModal');
-        const deleteForm = document.getElementById('deleteContactForm');
-
-        // Add new contact
-        addContactBtn.addEventListener('click', () => {
-            const newContact = contactTemplate.content.cloneNode(true);
-            newContact.querySelectorAll('[name]').forEach(input => {
-                input.name = input.name.replace('__INDEX__', contactIndex);
+        document.addEventListener('DOMContentLoaded', () => {
+            let contactIndex = {{ $contacts->count() }};
+            const addContactBtn = document.getElementById('add-contact-btn');
+            const contactsContainer = document.getElementById('contacts-container');
+            const contactTemplate = document.getElementById('contact-template');
+            
+            // Add new contact
+            addContactBtn.addEventListener('click', () => {
+                if (contactIndex >= 5) {
+                    alert('Maximum of 5 emergency contacts allowed.');
+                    return;
+                }
+                
+                const newContact = contactTemplate.content.cloneNode(true);
+                newContact.querySelectorAll('[name]').forEach(input => {
+                    input.name = input.name.replace('__INDEX__', contactIndex);
+                });
+                newContact.querySelector('.contact-number').textContent = contactIndex + 1;
+                contactsContainer.appendChild(newContact);
+                contactIndex++;
             });
-            newContact.querySelector('.contact-number').textContent = contactIndex + 1;
-            contactsContainer.appendChild(newContact);
-            contactIndex++;
-        });
 
-        // Handle delete buttons
-        document.addEventListener('click', e => {
-            const deleteBtn = e.target.closest('.delete-contact-btn');
-            if (deleteBtn) {
-                const contactCard = deleteBtn.closest('.contact-card');
-                const contactId = deleteBtn.dataset.contactId;
+            // Handle delete buttons - event delegation
+            document.addEventListener('click', e => {
+                const deleteBtn = e.target.closest('.delete-contact-btn');
+                if (deleteBtn) {
+                    const contactCard = deleteBtn.closest('.contact-card');
+                    const contactId = deleteBtn.dataset.contactId;
+                    const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
 
-                if (contactId) {
-                    // Existing contact - set up the delete form
-                    deleteForm.action = `/profile/emergency-contacts/${contactId}`;
-                    const modal = new bootstrap.Modal(deleteModal);
-                    modal.index();
-                } else {
-                    // New contact - just remove the card
-                    contactCard.remove();
+                    if (contactId) {
+                        // Existing contact - show confirmation modal
+                        document.getElementById('deleteContactForm').action = `/profile/emergency-contacts/${contactId}`;
+                        const modal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+                        modal.show();
+                    } else {
+                        // New contact - just remove the card
+                        contactCard.remove();
+                        // Update contact numbers
+                        updateContactNumbers();
+                    }
                 }
+            });
+
+            // Properly handle modal dismissal
+            const deleteModal = document.getElementById('deleteConfirmModal');
+            if (deleteModal) {
+                deleteModal.addEventListener('hidden.bs.modal', function () {
+                    // This ensures the backdrop is properly removed
+                    document.body.classList.remove('modal-open');
+                    const backdrops = document.getElementsByClassName('modal-backdrop');
+                    for (let backdrop of backdrops) {
+                        backdrop.remove();
+                    }
+                });
             }
-        });
 
-        // Back button validation
-        const backButton = document.getElementById('back-button');
-        backButton.addEventListener('click', function(e) {
-            const contactCards = document.querySelectorAll('.contact-card');
-            if (contactCards.length < 2) {
-                e.preventDefault();
-                alert('You must provide at least 2 emergency contacts before going back.');
-                return;
+            // Update contact numbers when one is deleted
+            function updateContactNumbers() {
+                document.querySelectorAll('.contact-card').forEach((card, index) => {
+                    card.querySelector('.contact-number').textContent = index + 1;
+                });
             }
 
-            let isValid = true;
-            for (let i = 0; i < 2; i++) {
-                const card = contactCards[i];
-                const fullname = card.querySelector('input[name*="[fullname]"]');
-                const relationship = card.querySelector('select[name*="[relationship]"]');
-                const contactNumber = card.querySelector('input[name*="[contact_number]"]');
+            const backButton = document.getElementById('back-button');
+            backButton.addEventListener('click', function(e) {
+                const contactCards = document.querySelectorAll('.contact-card');
 
-                if (!fullname?.value.trim() || !relationship?.value || !contactNumber?.value.trim()) {
-                    isValid = false;
-                    break;
+                if (contactCards.length < 2) {
+                    e.preventDefault();
+                    showAlert('warning', 'You must provide at least 2 emergency contacts before going back.');
+                    return;
                 }
-            }
 
-            if (!isValid) {
-                e.preventDefault();
-                alert('Please fill out all required fields for the first two emergency contacts before going back.');
-            }
+                let isValid = true;
+                for (let i = 0; i < 2; i++) {
+                    const card = contactCards[i];
+                    const fullname = card.querySelector('input[name*="[fullname]"]');
+                    const relationship = card.querySelector('select[name*="[relationship]"]');
+                    const contactNumber = card.querySelector('input[name*="[contact_number]"]');
+
+                    if (!fullname?.value.trim() || !relationship?.value || !contactNumber?.value.trim()) {
+                        isValid = false;
+                        break;
+                    }
+                }
+
+                if (!isValid) {
+                    e.preventDefault();
+                    showAlert('warning', 'Please fill out Full Name, Relationship, and Contact Number for the first two emergency contacts before going back.');
+                }
+            });
+            
         });
-    });
     </script>
 @endpush

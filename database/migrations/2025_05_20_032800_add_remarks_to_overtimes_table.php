@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('overtimes', function (Blueprint $table) {
-            $table->text('remarks')->nullable();
-        });
+        // Schema::table('overtimes', function (Blueprint $table) {
+        //     $table->text('remarks')->nullable();
+        // });
     }
 
     /**

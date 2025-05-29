@@ -188,97 +188,204 @@
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="deleteConfirmModalLabel">Delete Education Record</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                Are you sure you want to delete this education record?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form method="POST" id="deleteEducationForm">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </div>
-        </div>
+        <form method="POST" id="deleteEducationForm">
+            @csrf
+            @method('DELETE')
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteConfirmModalLabel">Delete Education Record</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this education record?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    
+                </div>
+             </div>
+        </form>
     </div>
 </div>
 @endsection
-
 @push('scripts')
     <script src="{{ asset('js/validation.js') }}"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        let educationIndex = {{ $educations->count() }};
-        const addEducationBtn = document.getElementById('add-education-btn');
-        const educationsContainer = document.getElementById('educations-container');
-        const educationTemplate = document.getElementById('education-template');
-        const deleteModal = document.getElementById('deleteConfirmModal');
-        const deleteForm = document.getElementById('deleteEducationForm');
-
-        // Add new education record
-        addEducationBtn.addEventListener('click', () => {
-            const newEducation = educationTemplate.content.cloneNode(true);
-            newEducation.querySelectorAll('[name]').forEach(input => {
-                input.name = input.name.replace('__INDEX__', educationIndex);
+        document.addEventListener('DOMContentLoaded', () => {
+            // Constants and variables
+            let educationIndex = {{ $educations->count() }};
+            const addEducationBtn = document.getElementById('add-education-btn');
+            const educationsContainer = document.getElementById('educations-container');
+            const educationTemplate = document.getElementById('education-template');
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            const deleteForm = document.getElementById('deleteEducationForm');
+            
+            // Add new education record
+            addEducationBtn.addEventListener('click', () => {
+                const newEducation = educationTemplate.content.cloneNode(true);
+                newEducation.querySelectorAll('[name]').forEach(input => {
+                    input.name = input.name.replace('__INDEX__', educationIndex);
+                });
+                newEducation.querySelector('.education-number').textContent = educationIndex + 1;
+                educationsContainer.appendChild(newEducation);
+                educationIndex++;
+                
+                // Scroll to new education record
+                educationsContainer.lastElementChild.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'nearest' 
+                });
             });
-            newEducation.querySelector('.education-number').textContent = educationIndex + 1;
-            educationsContainer.appendChild(newEducation);
-            educationIndex++;
-        });
 
-        // Handle delete buttons
-        document.addEventListener('click', e => {
-            const deleteBtn = e.target.closest('.delete-education-btn');
-            if (deleteBtn) {
+            // Handle delete buttons - event delegation
+            document.addEventListener('click', e => {
+                const deleteBtn = e.target.closest('.delete-education-btn');
+                if (!deleteBtn) return;
+                
                 const educationCard = deleteBtn.closest('.education-card');
                 const educationId = deleteBtn.dataset.educationId;
 
                 if (educationId) {
-                    // Existing record - set up the delete form
+                    // Existing record - show confirmation modal
                     deleteForm.action = `/profile/educations/${educationId}`;
-                    const modal = new bootstrap.Modal(deleteModal);
-                    modal.index();
+                    deleteModal.show();
                 } else {
                     // New record - just remove the card
+                    if (document.querySelectorAll('.education-card').length <= 1) {
+                        showAlert('warning', 'You must maintain at least 1 education record.');
+                        return;
+                    }
                     educationCard.remove();
+                    updateEducationNumbers();
+                    educationIndex--;
                 }
+            });
+
+            // Proper modal cleanup when hidden
+            const modalElement = document.getElementById('deleteConfirmModal');
+            modalElement.addEventListener('hidden.bs.modal', cleanUpModal);
+
+            // Handle delete form submission
+            if (deleteForm) {
+                deleteForm.addEventListener('submit', function(e) {
+                    const deleteBtn = this.querySelector('button[type="submit"]');
+                    deleteBtn.disabled = true;
+                    deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...';
+                });
+            }
+
+            // Update education numbers when one is deleted
+            function updateEducationNumbers() {
+                document.querySelectorAll('.education-card').forEach((card, index) => {
+                    const header = card.querySelector('.card-header h6');
+                    if (header) header.textContent = `Education Record #${index + 1}`;
+                });
+            }
+
+            // Year validation
+            document.addEventListener('change', e => {
+                if (e.target.name?.includes('[year_finished]')) {
+                    const currentYear = new Date().getFullYear();
+                    const yearInput = e.target;
+                    const yearValue = parseInt(yearInput.value);
+                    
+                    if (yearValue && (yearValue < 1900 || yearValue > currentYear + 5)) {
+                        showAlert('warning', `Year must be between 1900 and ${currentYear + 5}`);
+                        yearInput.value = '';
+                    }
+                }
+            });
+
+            // Back button validation
+            const backButton = document.getElementById('back-button');
+            if (backButton) {
+                backButton.addEventListener('click', function(e) {
+                    if (!validateEducations()) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            // Validate educations before leaving
+            function validateEducations() {
+                const educationCards = document.querySelectorAll('.education-card');
+                
+                if (educationCards.length < 1) {
+                    showAlert('warning', 'You must provide at least 1 education record.');
+                    return false;
+                }
+
+                let isValid = true;
+                const invalidFields = [];
+                
+                for (let i = 0; i < educationCards.length; i++) {
+                    const card = educationCards[i];
+                    const inputs = {
+                        schoolName: card.querySelector('input[name*="[school_name]"]'),
+                        courseTaken: card.querySelector('input[name*="[course_taken]"]'),
+                        yearFinished: card.querySelector('input[name*="[year_finished]"]'),
+                        status: card.querySelector('select[name*="[status]"]')
+                    };
+
+                    if (!inputs.schoolName?.value.trim()) invalidFields.push('School Name');
+                    if (!inputs.courseTaken?.value.trim()) invalidFields.push('Course Taken');
+                    if (!inputs.yearFinished?.value.trim()) invalidFields.push('Year Finished');
+                    if (!inputs.status?.value) invalidFields.push('Status');
+                }
+
+                if (invalidFields.length > 0) {
+                    showAlert('warning', `Please complete these required fields: ${[...new Set(invalidFields)].join(', ')}`);
+                    return false;
+                }
+
+                return true;
+            }
+            
+            // Clean up modal completely
+            function cleanUpModal() {
+                // Remove all modal backdrops
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                
+                // Reset body styles
+                document.body.classList.remove('modal-open');
+                document.body.style.paddingRight = '';
+                document.body.style.overflow = '';
+                
+                // Ensure modal is hidden
+                modalElement.style.display = 'none';
+                modalElement.removeAttribute('aria-modal');
+                modalElement.removeAttribute('role');
+                modalElement.setAttribute('aria-hidden', 'true');
+            }
+            
+            // Show alert message
+            function showAlert(type, message) {
+                // Remove existing alerts first
+                document.querySelectorAll('.global-alert').forEach(el => el.remove());
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `global-alert alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+                alertDiv.style.zIndex = '1060';
+                alertDiv.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <i class="fas ${type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'} me-2"></i>
+                        <span>${message}</span>
+                        <button type="button" class="btn-close ms-3" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                
+                document.body.appendChild(alertDiv);
+                
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        const bsAlert = new bootstrap.Alert(alertDiv);
+                        bsAlert.close();
+                    }
+                }, 5000);
             }
         });
-
-        // Back button validation
-        const backButton = document.getElementById('back-button');
-        backButton.addEventListener('click', function(e) {
-            const educationCards = document.querySelectorAll('.education-card');
-            if (educationCards.length < 1) {
-                e.preventDefault();
-                alert('You must provide at least 1 education record before going back.');
-                return;
-            }
-
-            let isValid = true;
-            for (let i = 0; i < 1; i++) {
-                const card = educationCards[i];
-                const schoolName = card.querySelector('input[name*="[school_name]"]');
-                const courseTaken = card.querySelector('input[name*="[course_taken]"]');
-                const yearFinished = card.querySelector('input[name*="[year_finished]"]');
-                const status = card.querySelector('select[name*="[status]"]');
-
-                if (!schoolName?.value.trim() || !courseTaken?.value.trim() || !yearFinished?.value.trim() || !status?.value) {
-                    isValid = false;
-                    break;
-                }
-            }
-
-            if (!isValid) {
-                e.preventDefault();
-                alert('Please fill out all required fields for at least one education record before going back.');
-            }
-        });
-    });
     </script>
 @endpush

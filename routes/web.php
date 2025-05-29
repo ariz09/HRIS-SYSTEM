@@ -27,7 +27,7 @@ use App\Http\Controllers\{
     EmployeeEmploymentHistoryController,
     TimeRecordController,
     File201Controller,
-    OvertimeController,
+    ExcessTimeController,
     PeriodTypeController,
     CutOffTypeController,
     BulkUploadTemplateController,
@@ -168,11 +168,11 @@ Route::middleware(['auth', \App\Http\Middleware\CheckActiveUser::class])->group(
 
     // Payroll Management - accessible by admin and payroll officer
     Route::middleware(['role:admin|payroll officer'])->group(function () {
-        Route::prefix('overtimes')->name('overtimes.')->group(function () {
-            Route::get('/', [OvertimeController::class, 'index'])->name('index');
-            Route::post('/', [OvertimeController::class, 'store'])->name('store');
-            Route::put('/{id}', [OvertimeController::class, 'update'])->name('update');
-            Route::delete('/{id}', [OvertimeController::class, 'destroy'])->name('destroy');
+        Route::prefix('excess')->name('excess.')->group(function () {
+            Route::get('/', [ExcessTimeController::class, 'index'])->name('index');
+            Route::post('/', [ExcessTimeController::class, 'store'])->name('store');
+            Route::put('/{id}', [ExcessTimeController::class, 'update'])->name('update');
+            Route::delete('/{id}', [ExcessTimeController::class, 'destroy'])->name('destroy');
         });
     });
 

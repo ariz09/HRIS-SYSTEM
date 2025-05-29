@@ -182,104 +182,192 @@
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="deleteConfirmModalLabel">Delete Employment History</h5>
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        <form method="POST" id="deleteHistoryForm">
+            @csrf
+            @method('DELETE')
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteConfirmModalLabel">Delete Employment History</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to delete this employment history record?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>            
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                </div>
             </div>
-            <div class="modal-body">
-                Are you sure you want to delete this employment history record?
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form method="POST" id="deleteHistoryForm">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-            </div>
-        </div>
+        </form>
     </div>
+    
 </div>
 @endsection
 
 @push('scripts')
-<script src="{{ asset('js/validation.js') }}"></script>
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    let historyIndex = {{ $histories->count() }};
-    const addHistoryBtn = document.getElementById('add-history-btn');
-    const historiesContainer = document.getElementById('histories-container');
-    const historyTemplate = document.getElementById('history-template');
-    const deleteModal = document.getElementById('deleteConfirmModal');
-    const deleteForm = document.getElementById('deleteHistoryForm');
+    <script src="{{ asset('js/validation.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Constants and variables
+            let historyIndex = {{ $histories->count() }};
+            const addHistoryBtn = document.getElementById('add-history-btn');
+            const historiesContainer = document.getElementById('histories-container');
+            const historyTemplate = document.getElementById('history-template');
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            const deleteForm = document.getElementById('deleteHistoryForm');
+            
+            // Add new history
+            addHistoryBtn.addEventListener('click', () => {
+                const newHistory = historyTemplate.content.cloneNode(true);
+                newHistory.querySelectorAll('[name]').forEach(input => {
+                    input.name = input.name.replace('__INDEX__', historyIndex);
+                });
+                newHistory.querySelector('.history-number').textContent = historyIndex + 1;
+                historiesContainer.appendChild(newHistory);
+                historyIndex++;
+                
+                // Scroll to new history
+                historiesContainer.lastElementChild.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'nearest' 
+                });
+            });
 
-    // Add new history
-    addHistoryBtn.addEventListener('click', () => {
-        const newHistory = historyTemplate.content.cloneNode(true);
-        newHistory.querySelectorAll('[name]').forEach(input => {
-            input.name = input.name.replace('__INDEX__', historyIndex);
+            // Handle delete buttons - event delegation
+            document.addEventListener('click', e => {
+                const deleteBtn = e.target.closest('.delete-history-btn');
+                if (!deleteBtn) return;
+                
+                const historyCard = deleteBtn.closest('.history-card');
+                const historyId = deleteBtn.dataset.historyId;
+
+                if (historyId) {
+                    // Existing record - show confirmation modal
+                    deleteForm.action = `/profile/employment-history/${historyId}`;
+                    deleteModal.show();
+                } else {
+                    // New record - just remove the card
+                    historyCard.remove();
+                    updateHistoryNumbers();
+                    historyIndex--;
+                }
+            });
+
+            // Proper modal cleanup when hidden
+            const modalElement = document.getElementById('deleteConfirmModal');
+            modalElement.addEventListener('hidden.bs.modal', cleanUpModal);
+
+            // Handle delete form submission
+            if (deleteForm) {
+                deleteForm.addEventListener('submit', function(e) {
+                    const deleteBtn = this.querySelector('button[type="submit"]');
+                    deleteBtn.disabled = true;
+                    deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...';
+                });
+            }
+
+            // Update history numbers when one is deleted
+            function updateHistoryNumbers() {
+                document.querySelectorAll('.history-card').forEach((card, index) => {
+                    const header = card.querySelector('.card-header h6');
+                    if (header) header.textContent = `Employment Record #${index + 1}`;
+                });
+            }
+
+            // Date validation
+            document.addEventListener('change', e => {
+                if (e.target.name?.includes('[end_date]') && e.target.value) {
+                    const startDateInput = e.target.closest('.card-body').querySelector('input[name$="[start_date]"]');
+                    if (startDateInput?.value && new Date(e.target.value) < new Date(startDateInput.value)) {
+                        showAlert('warning', 'End date must be after start date');
+                        e.target.value = '';
+                    }
+                }
+            });
+
+            // Back button validation
+            const backButton = document.getElementById('back-button');
+            if (backButton) {
+                backButton.addEventListener('click', function(e) {
+                    if (!validateHistories()) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            // Validate histories before leaving
+            function validateHistories() {
+                const historyCards = document.querySelectorAll('.history-card');
+                
+                let isValid = true;
+                const invalidFields = [];
+                
+                for (let i = 0; i < historyCards.length; i++) {
+                    const card = historyCards[i];
+                    const inputs = {
+                        jobTitle: card.querySelector('input[name*="[job_title]"]'),
+                        companyName: card.querySelector('input[name*="[company_name]"]'),
+                        companyAddress: card.querySelector('textarea[name*="[company_address]"]'),
+                        startDate: card.querySelector('input[name*="[start_date]"]')
+                    };
+
+                    if (!inputs.jobTitle?.value.trim()) invalidFields.push('Job Title');
+                    if (!inputs.companyName?.value.trim()) invalidFields.push('Company Name');
+                    if (!inputs.companyAddress?.value.trim()) invalidFields.push('Company Address');
+                    if (!inputs.startDate?.value.trim()) invalidFields.push('Start Date');
+                }
+
+                if (invalidFields.length > 0) {
+                    showAlert('warning', `Please complete these required fields: ${[...new Set(invalidFields)].join(', ')}`);
+                    return false;
+                }
+
+                return true;
+            }
+            
+            // Clean up modal completely
+            function cleanUpModal() {
+                // Remove all modal backdrops
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                
+                // Reset body styles
+                document.body.classList.remove('modal-open');
+                document.body.style.paddingRight = '';
+                document.body.style.overflow = '';
+                
+                // Ensure modal is hidden
+                modalElement.style.display = 'none';
+                modalElement.removeAttribute('aria-modal');
+                modalElement.removeAttribute('role');
+                modalElement.setAttribute('aria-hidden', 'true');
+            }
+            
+            // Show alert message
+            function showAlert(type, message) {
+                // Remove existing alerts first
+                document.querySelectorAll('.global-alert').forEach(el => el.remove());
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `global-alert alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+                alertDiv.style.zIndex = '1060';
+                alertDiv.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <i class="fas ${type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'} me-2"></i>
+                        <span>${message}</span>
+                        <button type="button" class="btn-close ms-3" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                
+                document.body.appendChild(alertDiv);
+                
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        const bsAlert = new bootstrap.Alert(alertDiv);
+                        bsAlert.close();
+                    }
+                }, 5000);
+            }
         });
-        newHistory.querySelector('.history-number').textContent = historyIndex + 1;
-        historiesContainer.appendChild(newHistory);
-        historyIndex++;
-    });
-
-    // Handle delete buttons
-    document.addEventListener('click', e => {
-        const deleteBtn = e.target.closest('.delete-history-btn');
-        if (deleteBtn) {
-            const historyCard = deleteBtn.closest('.history-card');
-            const historyId = deleteBtn.dataset.historyId;
-
-            if (historyId) {
-                // Existing record - set up the delete form
-                deleteForm.action = `/profile/employment-history/${historyId}`;
-                const modal = new bootstrap.Modal(deleteModal);
-                modal.index();
-            } else {
-                // New record - just remove the card
-                historyCard.remove();
-            }
-        }
-    });
-
-    // Date validation
-    document.addEventListener('change', e => {
-        if (e.target.name?.includes('[end_date]') && e.target.value) {
-            const startDateInput = e.target.closest('.card-body').querySelector('input[name$="[start_date]"]');
-            if (startDateInput?.value && new Date(e.target.value) < new Date(startDateInput.value)) {
-                alert('End date must be after start date');
-                e.target.value = '';
-            }
-        }
-    });
-
-    // Back button validation
-    const backButton = document.getElementById('back-button');
-    backButton.addEventListener('click', function(e) {
-        const historyCards = document.querySelectorAll('.history-card');
-        
-        let isValid = true;
-        for (let i = 0; i < historyCards.length; i++) {
-            const card = historyCards[i];
-            const jobTitle = card.querySelector('input[name*="[job_title]"]');
-            const companyName = card.querySelector('input[name*="[company_name]"]');
-            const companyAddress = card.querySelector('textarea[name*="[company_address]"]');
-            const startDate = card.querySelector('input[name*="[start_date]"]');
-
-            if (!jobTitle?.value.trim() || !companyName?.value.trim() || 
-                !companyAddress?.value.trim() || !startDate?.value.trim()) {
-                isValid = false;
-                break;
-            }
-        }
-
-        if (!isValid) {
-            e.preventDefault();
-            alert('Please fill out all required fields for all employment history records before going back.');
-        }
-    });
-});
-</script>
+    </script>
 @endpush

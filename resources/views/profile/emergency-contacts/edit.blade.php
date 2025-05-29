@@ -186,6 +186,9 @@
 <!-- Delete Confirmation Modal -->
 <div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
+        <form method="POST" id="deleteContactForm">
+            @csrf
+            @method('DELETE')
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="deleteConfirmModalLabel">Delete Contact</h5>
@@ -195,87 +198,189 @@
                 Are you sure you want to delete this emergency contact?
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <form method="POST" id="deleteContactForm">
-                    @csrf
-                    @method('DELETE')
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
+                <button type="button" id="cancelbtn" class="btn btn-sm btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                   <button type="submit" class="btn btn-sm btn-danger">Delete</button>
             </div>
         </div>
+        </form>
     </div>
 </div>
 @endsection
-
 @push('scripts')
     <script src="{{ asset('js/validation.js') }}"></script>
     <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        let contactIndex = {{ $contacts->count() }};
-        const addContactBtn = document.getElementById('add-contact-btn');
-        const contactsContainer = document.getElementById('contacts-container');
-        const contactTemplate = document.getElementById('contact-template');
-        const deleteModal = document.getElementById('deleteConfirmModal');
-        const deleteForm = document.getElementById('deleteContactForm');
-
-        // Add new contact
-        addContactBtn.addEventListener('click', () => {
-            const newContact = contactTemplate.content.cloneNode(true);
-            newContact.querySelectorAll('[name]').forEach(input => {
-                input.name = input.name.replace('__INDEX__', contactIndex);
+        document.addEventListener('DOMContentLoaded', () => {
+            // Constants and variables
+            let contactIndex = {{ $contacts->count() }};
+            const MAX_CONTACTS = 5;
+            const addContactBtn = document.getElementById('add-contact-btn');
+            const contactsContainer = document.getElementById('contacts-container');
+            const contactTemplate = document.getElementById('contact-template');
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            
+            // Add new contact
+            addContactBtn.addEventListener('click', () => {
+                if (contactIndex >= MAX_CONTACTS) {
+                    showAlert('warning', `Maximum of ${MAX_CONTACTS} emergency contacts allowed.`);
+                    return;
+                }
+                
+                const newContact = contactTemplate.content.cloneNode(true);
+                newContact.querySelectorAll('[name]').forEach(input => {
+                    input.name = input.name.replace('__INDEX__', contactIndex);
+                });
+                newContact.querySelector('.contact-number').textContent = contactIndex + 1;
+                contactsContainer.appendChild(newContact);
+                contactIndex++;
+                
+                // Scroll to new contact
+                contactsContainer.lastElementChild.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             });
-            newContact.querySelector('.contact-number').textContent = contactIndex + 1;
-            contactsContainer.appendChild(newContact);
-            contactIndex++;
-        });
 
-        // Handle delete buttons
-        document.addEventListener('click', e => {
-            const deleteBtn = e.target.closest('.delete-contact-btn');
-            if (deleteBtn) {
+            // Handle delete buttons - event delegation
+            document.addEventListener('click', e => {
+                const deleteBtn = e.target.closest('.delete-contact-btn');
+                if (!deleteBtn) return;
+                
                 const contactCard = deleteBtn.closest('.contact-card');
                 const contactId = deleteBtn.dataset.contactId;
 
                 if (contactId) {
-                    // Existing contact - set up the delete form
-                    deleteForm.action = `/profile/emergency-contacts/${contactId}`;
-                    const modal = new bootstrap.Modal(deleteModal);
-                    modal.index();
+                    // Existing contact - show confirmation modal
+                    document.getElementById('deleteContactForm').action = `/profile/emergency-contacts/${contactId}`;
+                    deleteModal.show();
                 } else {
                     // New contact - just remove the card
+                    if (document.querySelectorAll('.contact-card').length <= 2) {
+                        showAlert('warning', 'You must maintain at least 2 emergency contacts.');
+                        return;
+                    }
                     contactCard.remove();
+                    updateContactNumbers();
+                    contactIndex--;
                 }
+            });
+
+            // Modal cleanup when hidden
+            const modalElement = document.getElementById('deleteConfirmModal');
+            modalElement.addEventListener('hidden.bs.modal', cleanUpModal);
+
+            // Handle delete form submission
+            const deleteForm = document.getElementById('deleteContactForm');
+            if (deleteForm) {
+                deleteForm.addEventListener('submit', function(e) {
+                    const deleteBtn = this.querySelector('button[type="submit"]');
+                    deleteBtn.disabled = true;
+                    deleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...';
+                });
             }
-        });
 
-        // Back button validation
-        const backButton = document.getElementById('back-button');
-        backButton.addEventListener('click', function(e) {
-            const contactCards = document.querySelectorAll('.contact-card');
-            if (contactCards.length < 2) {
-                e.preventDefault();
-                alert('You must provide at least 2 emergency contacts before going back.');
-                return;
+            // Update contact numbers
+            function updateContactNumbers() {
+                document.querySelectorAll('.contact-card').forEach((card, index) => {
+                    const header = card.querySelector('.card-header h6');
+                    if (header) header.textContent = `Contact #${index + 1}`;
+                });
             }
 
-            let isValid = true;
-            for (let i = 0; i < 2; i++) {
-                const card = contactCards[i];
-                const fullname = card.querySelector('input[name*="[fullname]"]');
-                const relationship = card.querySelector('select[name*="[relationship]"]');
-                const contactNumber = card.querySelector('input[name*="[contact_number]"]');
+            // Back button validation
+            const backButton = document.getElementById('back-button');
+            if (backButton) {
+                backButton.addEventListener('click', function(e) {
+                    if (!validateContacts()) {
+                        e.preventDefault();
+                    }
+                });
+            }
 
-                if (!fullname?.value.trim() || !relationship?.value || !contactNumber?.value.trim()) {
-                    isValid = false;
-                    break;
+            // Validate contacts before leaving
+            function validateContacts() {
+                const contactCards = document.querySelectorAll('.contact-card');
+                if (contactCards.length < 2) {
+                    showAlert('warning', 'You must provide at least 2 emergency contacts.');
+                    return false;
                 }
-            }
 
-            if (!isValid) {
-                e.preventDefault();
-                alert('Please fill out all required fields for the first two emergency contacts before going back.');
+                const invalidFields = [];
+                for (let i = 0; i < 2; i++) {
+                    const card = contactCards[i];
+                    const inputs = {
+                        fullname: card.querySelector('input[name*="[fullname]"]'),
+                        relationship: card.querySelector('select[name*="[relationship]"]'),
+                        contactNumber: card.querySelector('input[name*="[contact_number]"]')
+                    };
+
+                    if (!inputs.fullname?.value.trim()) invalidFields.push('Full Name');
+                    if (!inputs.relationship?.value) invalidFields.push('Relationship');
+                    
+                    if (!inputs.contactNumber?.value.trim()) {
+                        invalidFields.push('Contact Number');
+                    } else if (!/^(09|\+639)\d{9}$/.test(inputs.contactNumber.value.trim())) {
+                        invalidFields.push('Valid Contact Number');
+                    }
+                }
+
+                if (invalidFields.length > 0) {
+                    showAlert('warning', `Please complete these fields for the first two contacts: ${[...new Set(invalidFields)].join(', ')}`);
+                    return false;
+                }
+
+                return true;
             }
+            
+            // Clean up modal completely
+            function cleanUpModal() {
+                // Remove all modal backdrops
+                document.querySelectorAll('.modal-backdrop').forEach(el => el.remove());
+                
+                // Reset body styles
+                document.body.classList.remove('modal-open');
+                document.body.style.paddingRight = '';
+                document.body.style.overflow = '';
+                
+                // Ensure modal is hidden
+                modalElement.style.display = 'none';
+                modalElement.removeAttribute('aria-modal');
+                modalElement.removeAttribute('role');
+                modalElement.setAttribute('aria-hidden', 'true');
+            }
+            
+            // Show alert message
+            function showAlert(type, message) {
+                // Remove existing alerts first
+                document.querySelectorAll('.global-alert').forEach(el => el.remove());
+                
+                const alertDiv = document.createElement('div');
+                alertDiv.className = `global-alert alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+                alertDiv.style.zIndex = '1060';
+                alertDiv.innerHTML = `
+                    <div class="d-flex align-items-center">
+                        <i class="fas ${type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle'} me-2"></i>
+                        <span>${message}</span>
+                        <button type="button" class="btn-close ms-3" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                `;
+                
+                document.body.appendChild(alertDiv);
+                
+                // Auto-dismiss after 5 seconds
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        const bsAlert = new bootstrap.Alert(alertDiv);
+                        bsAlert.close();
+                    }
+                }, 5000);
+            }
+            
+            // Phone number validation
+            document.addEventListener('input', e => {
+                if (e.target.name && e.target.name.includes('contact_number')) {
+                    const input = e.target;
+                    input.classList.toggle('is-invalid', 
+                        input.value.trim() && !/^(09|\+639)\d{9}$/.test(input.value.trim())
+                    );
+                }
+            });
         });
-    });
     </script>
 @endpush

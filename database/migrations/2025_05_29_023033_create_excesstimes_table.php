@@ -7,13 +7,17 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
     public function up()
-    {
-        Schema::create('overtimes', function (Blueprint $table) {
+    {   
+        Schema::dropIfExists('overtimes');
+        Schema::dropIfExists('excesstimes');
+        Schema::create('excesstimes', function (Blueprint $table) {
             $table->id();
             $table->string('employee_number');
             $table->dateTime('start');
             $table->dateTime('end');
             $table->text('reason');
+            $table->text('status')->default('pending');
+            $table->text('remarks')->default('');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->timestamps();
             
@@ -26,6 +30,6 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::dropIfExists('overtimes');
+        Schema::dropIfExists('excesstimes');
     }
 };

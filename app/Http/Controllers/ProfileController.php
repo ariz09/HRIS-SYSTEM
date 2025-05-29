@@ -111,4 +111,31 @@ class ProfileController extends Controller
 
         return Redirect::to('/');
     }
+
+    public function showChangePasswordForm()
+    {
+        return view('auth.change-password');
+    }
+
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'current_password' => 'required',
+            'new_password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = Auth::user();
+
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'The current password is incorrect']);
+        }
+
+        $user->update([
+            'password' => Hash::make($request->new_password),
+            'password_changed' => 1
+        ]);
+
+        return redirect()->route('password.change')
+            ->with('success', 'Password changed successfully. You will be logged out in 5 seconds.');
+    }
 }

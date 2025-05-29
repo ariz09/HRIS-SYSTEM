@@ -33,17 +33,17 @@
                     <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
                     <input type="password" name="password" id="password" required
                         class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
-                    <div class="text-right mt-2">
+                   {{--  <div class="text-right mt-2">
                         <a href="{{ route('password.request') }}" class="text-sm text-blue-600 hover:underline">Forgot password?</a>
-                    </div>
+                    </div> --}}
                 </div>
 
                 <!-- Remember Me -->
-                <div class="flex items-center">
+               {{--  <div class="flex items-center">
                     <input id="inputRememberPassword" type="checkbox" name="remember"
                         class="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
                     <label for="inputRememberPassword" class="ml-2 block text-sm text-gray-700">Remember Password</label>
-                </div>
+                </div> --}}
 
                 <!-- Submit Button -->
                 <div>

@@ -60,6 +60,9 @@ Route::middleware(['auth', \App\Http\Middleware\CheckActiveUser::class])->group(
         Route::get('/edit', [ProfileController::class, 'edit'])->name('profile.edit');
     });
 
+    Route::get('/change-password', [ProfileController::class, 'showChangePasswordForm'])->name('password.change');
+    Route::put('/change-password', [ProfileController::class, 'changePassword'])->name('password.update');
+    
     // Profile picture routes
     Route::post('/profile/picture/upload', [ProfilePictureController::class, 'upload'])
         ->name('profile.picture.upload');

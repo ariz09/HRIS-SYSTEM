@@ -77,7 +77,7 @@
                 <nav class="sb-sidenav-menu-nested nav">
                     <a class="nav-link" href="{{ route('roles.index') }}">Roles Management</a>
                     <a class="nav-link" href="{{ route('roles.user-roles') }}">User Roles</a>
-                    <a class="nav-link" href="{{ route('role_permissions.index') }}">Roles & Access</a>
+                    {{-- <a class="nav-link" href="{{ route('role_permissions.index') }}">Roles & Access</a> --}}
                 </nav>
             </div>
 

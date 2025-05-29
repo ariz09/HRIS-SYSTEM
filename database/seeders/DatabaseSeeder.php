@@ -21,9 +21,11 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
 
+
         $this->call([
             HolidaySeeder::class,
             RoleSeeder::class,
+            AdminSeeder::class,
         ]);
 
         // Call the leave entitlements seeder

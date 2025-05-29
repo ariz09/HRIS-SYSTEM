@@ -2,11 +2,11 @@
 
 @section('content')
 <div class="container">
-    <h3 class="mb-4">Overtime Management</h3>
+    <h3 class="mb-4">Excess Time Management</h3>
 
     <ol class="breadcrumb mb-4">
         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
-        <li class="breadcrumb-item active">Overtime</li>
+        <li class="breadcrumb-item active">excesstime</li>
     </ol>
 
     @if(session('success'))
@@ -16,11 +16,11 @@
         </div>
     @endif
 
-    <!-- New Overtime Request Form -->
+    <!-- New excesstime Request Form -->
     <div class="card mb-4">
-        <div class="card-header bg-danger text-white">New Overtime Request</div>
+        <div class="card-header bg-danger text-white">New Excess Time Request</div>
         <div class="card-body">
-            <form action="{{ route('overtimes.store') }}" method="POST">
+            <form action="{{ route('excess.store') }}" method="POST">
                 @csrf
                 <div class="row mb-3">
                     <div class="col-md-12">
@@ -70,14 +70,14 @@
         </div>
     </div>
 
-    <!-- Overtime Table -->
+    <!-- Excess Time Table -->
     <div class="card">
         <div class="card-header bg-danger text-white d-flex justify-content-between align-items-center">
-            <span>Overtime Requests</span>
+            <span>Excess Time Requests</span>
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-striped table-hover table-bordered" id="overtimeTable">
+                <table class="table table-striped table-hover table-bordered" id="excesstimeTable">
                     <thead class="table-light">
                         <tr>
                             <th>#</th>
@@ -98,21 +98,21 @@
                             use Carbon\Carbon;
                         @endphp
                     <tbody>
-                        @forelse($overtimes as $index => $overtime)
+                        @forelse($excesstimes as $index => $excesstime)
                             @php
-                                $start = Carbon::parse($overtime->start);
-                                $end = Carbon::parse($overtime->end);
+                                $start = Carbon::parse($excesstime->start);
+                                $end = Carbon::parse($excesstime->end);
                                 $totalHours = $start->diffInMinutes($end) / 60;
                             @endphp
                             <tr>
                                                             <td>{{ $index + 1 }}</td>
                             <td>
-                                @if($overtime->employee && $overtime->employee->personalInfo)
-                                    {{ strtoupper($overtime->employee->personalInfo->last_name) }},
-                                    {{ strtoupper($overtime->employee->personalInfo->first_name) }}
-                                    {{ $overtime->employee->personalInfo->middle_name ? strtoupper($overtime->employee->personalInfo->middle_name) : '' }}
+                                @if($excesstime->employee && $excesstime->employee->personalInfo)
+                                    {{ strtoupper($excesstime->employee->personalInfo->last_name) }},
+                                    {{ strtoupper($excesstime->employee->personalInfo->first_name) }}
+                                    {{ $excesstime->employee->personalInfo->middle_name ? strtoupper($excesstime->employee->personalInfo->middle_name) : '' }}
                                 @else
-                                    {{ $overtime->employee_number }}
+                                    {{ $excesstime->employee_number }}
                                 @endif
                             </td>
                             <td>
@@ -121,36 +121,36 @@
                                         'pending' => 'warning',
                                         'approved' => 'success',
                                         'declined' => 'danger'
-                                    ][$overtime->status ?? 'pending'];
+                                    ][$excesstime->status ?? 'pending'];
                                 @endphp
-                                <span class="badge bg-{{ $badge }}">{{ ucfirst($overtime->status ?? ""  ) }}</span>
+                                <span class="badge bg-{{ $badge }}">{{ ucfirst($excesstime->status ?? ""  ) }}</span>
                             </td>
-                            <td>{{ $overtime->start->format('Y-m-d H:i') ?? "" }}</td>
-                            <td>{{ $overtime->end->format('Y-m-d H:i') ?? "" }}</td>
+                            <td>{{ $excesstime->start->format('Y-m-d H:i') ?? "" }}</td>
+                            <td>{{ $excesstime->end->format('Y-m-d H:i') ?? "" }}</td>
                             <td>{{ number_format($totalHours ?? "" , 2) }}</td>
-                            <td>{{ $overtime->employee->department->name ?? 'N/A' }}</td>
-                            <td>{{ $overtime->employee->position->name ?? 'N/A' }}</td>
-                            <td>{{ $overtime->employee->employmentType->name ?? 'N/A' }}</td>
-                            <td>{{ Str::limit($overtime->reason ?? '', 50) }}</td>
-                            <td>{{ Str::limit($overtime->remarks ?? '', 50) }}</td>
+                            <td>{{ $excesstime->employee->department->name ?? 'N/A' }}</td>
+                            <td>{{ $excesstime->employee->position->name ?? 'N/A' }}</td>
+                            <td>{{ $excesstime->employee->employmentType->name ?? 'N/A' }}</td>
+                            <td>{{ Str::limit($excesstime->reason ?? '', 50) }}</td>
+                            <td>{{ Str::limit($excesstime->remarks ?? '', 50) }}</td>
                             <td class="text-start">
-                                  <button class="btn btn-sm btn-primary text-white me-1" data-bs-toggle="modal" data-bs-target="#actionModal{{ $overtime->id }}">
+                                  <button class="btn btn-sm btn-primary text-white me-1" data-bs-toggle="modal" data-bs-target="#actionModal{{ $excesstime->id }}">
                                     Approve/Decline
                                  </button>
                                     <button class="btn btn-sm btn-danger" data-bs-toggle="modal"
-                                            data-bs-target="#deleteModal{{ $overtime->id }}">
+                                            data-bs-target="#deleteModal{{ $excesstime->id }}">
                                         <i class="fas fa-trash"></i>
                                     </button>
 
                                      <!-- Take Action Modal -->
-                                    <div class="modal fade" id="actionModal{{ $overtime->id }}" tabindex="-1" aria-labelledby="actionModalLabel{{ $overtime->id }}" aria-hidden="true" >
+                                    <div class="modal fade" id="actionModal{{ $excesstime->id }}" tabindex="-1" aria-labelledby="actionModalLabel{{ $excesstime->id }}" aria-hidden="true" >
                                         <div class="modal-dialog modal-dialog-centered modal-lg">
-                                           <form method="POST" action="{{ route('overtimes.update', $overtime->id) }}">
+                                           <form method="POST" action="{{ route('excess.update', $excesstime->id) }}">
                                                 @csrf
                                                 @method('PUT')
                                                 <div class="modal-content ">
                                                     <div class="modal-header bg-danger text-white">
-                                                        <h5 class="modal-title" id="actionModalLabel{{ $overtime->id }}">Take Action on Overtime</h5>
+                                                        <h5 class="modal-title" id="actionModalLabel{{ $excesstime->id }}">Take Action on excesstime</h5>
                                                         
                                                         <button type="button" class="btn btn-sm btn-light delete-dependent-btn text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
                                                             <i class="fas fa-times" style="font-size: 0.75rem;"></i>
@@ -158,16 +158,16 @@
                                                     </div>
                                                     <div class="modal-body">
                                                         <div class="mb-3">
-                                                            <label for="status{{ $overtime->id }}" class="form-label">Status</label>
-                                                            <select name="status" id="status{{ $overtime->id }}" class="form-select" required>
+                                                            <label for="status{{ $excesstime->id }}" class="form-label">Status</label>
+                                                            <select name="status" id="status{{ $excesstime->id }}" class="form-select" required>
                                                                 <option value="" disabled selected>Choose status</option>
                                                                 <option value="approved">Approve</option>
                                                                 <option value="declined">Decline</option>
                                                             </select>
                                                         </div>
                                                         <div class="mb-3">
-                                                            <label for="remarks{{ $overtime->id }}" class="form-label">Remarks (optional)</label>
-                                                            <textarea name="remarks" id="remarks{{ $overtime->id }}" rows="3" class="form-control" placeholder="Add remarks here...">{{ old('remarks') }}</textarea>
+                                                            <label for="remarks{{ $excesstime->id }}" class="form-label">Remarks (optional)</label>
+                                                            <textarea name="remarks" id="remarks{{ $excesstime->id }}" rows="3" class="form-control" placeholder="Add remarks here...">{{ old('remarks') }}</textarea>
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer">
@@ -180,20 +180,20 @@
                                     </div>
 
                                     <!-- Delete Modal -->
-                                    <div class="modal fade" id="deleteModal{{ $overtime->id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $overtime->id }}" aria-hidden="true">
+                                    <div class="modal fade" id="deleteModal{{ $excesstime->id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $excesstime->id }}" aria-hidden="true">
                                         <div class="modal-dialog modal-dialog-centered">
                                             <div class="modal-content">
                                                 <div class="modal-header bg-danger text-white">
-                                                    <h5 class="modal-title" id="deleteModalLabel{{ $overtime->id }}">Confirm Delete</h5>
+                                                    <h5 class="modal-title" id="deleteModalLabel{{ $excesstime->id }}">Confirm Delete</h5>
                                                    <button type="button" class="btn btn-sm btn-light delete-dependent-btn text-danger rounded-circle" data-bs-dismiss="modal" aria-label="Close" style="width: 24px; height: 24px; line-height: 1;">
                                                         <i class="fas fa-times" style="font-size: 0.75rem;"></i>
                                                     </button>
                                                 </div>
                                                 <div class="modal-body">
-                                                    Are you sure you want to delete this overtime request?
+                                                    Are you sure you want to delete this excesstime request?
                                                 </div>
                                                 <div class="modal-footer">
-                                                    <form action="{{ route('overtimes.destroy', $overtime->id) }}" method="POST">
+                                                    <form action="{{ route('excess.destroy', $excesstime->id) }}" method="POST">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
@@ -208,7 +208,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="12" class="text-center text-muted">No overtime records found</td>
+                                <td colspan="12" class="text-center text-muted">No excesstime records found</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -222,10 +222,10 @@
 @push('styles')
 
 <style>
-    #overtimeTable td {
+    #excesstimeTable td {
         vertical-align: middle;
     }
-    #overtimeTable th, #overtimeTable td {
+    #excesstimeTable th, #excesstimeTable td {
         white-space: nowrap;
     }
     .table-responsive {
@@ -239,7 +239,7 @@
 
 <script>
 $(document).ready(function() {
-    var table = $('#overtimeTable').DataTable({
+    var table = $('#excesstimeTable').DataTable({
         responsive: true
         dom: '<"top d-flex justify-content-between align-items-center mb-2"Bf>rt<"bottom mt-3"ip>',
         buttons: [

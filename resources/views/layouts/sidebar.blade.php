@@ -38,7 +38,7 @@
                     <a class="nav-link" href="{{ route('leaves.index') }}">Leave Applications</a>
                     <a class="nav-link" href="{{ route('leave_types.index') }}">Leave Types</a>
                     <a class="nav-link" href="{{ route('assign_leaves.index') }}">Assign Leaves</a>
-                    <a class="nav-link" href="{{ route('overtimes.index') }}">Overtime Management</a>
+                    <a class="nav-link" href="{{ route('excess.index') }}">Excess Time Management</a>
                 </nav>
             </div>
 

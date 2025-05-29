@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Overtime;
+use App\Models\Excesstime;
 use App\Models\EmploymentInfo;
 use Illuminate\Http\Request;
 
-class OvertimeController extends Controller
+class ExcessTimeController extends Controller
 {
     public function index()
     {
-        $overtimes = Overtime::with([
+        $excesstimes = ExcessTime::with([
                 'employee.personalInfo',
                 'employee.department',
                 'employee.position'
@@ -27,7 +27,7 @@ class OvertimeController extends Controller
             ->orderBy('employee_number')
             ->get();
 
-        return view('overtimes.index', compact('overtimes', 'employees'));
+        return view('excess.index', compact('excesstimes', 'employees'));
     }
    
 
@@ -42,10 +42,10 @@ class OvertimeController extends Controller
 
         $validated['user_id'] = auth()->user()->id;
 
-        Overtime::create($validated);
+        Excesstime::create($validated);
 
-        return redirect()->route('overtimes.index')
-            ->with('success', 'Overtime request submitted successfully.');
+        return redirect()->route('excess.index')
+            ->with('success', 'Excess request submitted successfully.');
     }
 
     public function update(Request $request, $id)
@@ -55,21 +55,21 @@ class OvertimeController extends Controller
             'remarks' => 'nullable|string|max:1000',
         ]);
 
-        $overtime = Overtime::findOrFail($id);
+        $excesstime = Excesstime::findOrFail($id);
 
-        $overtime->status = $validated['status'];
-        $overtime->remarks = $validated['remarks'] ?? null;
-        $overtime->save();
+        $excesstime->status = $validated['status'];
+        $excesstime->remarks = $validated['remarks'] ?? null;
+        $excesstime->save();
 
-        return redirect()->route('overtimes.index')
-                         ->with('success', 'Overtime request has been ' . $validated['status'] . '.');
+        return redirect()->route('excess.index')
+                         ->with('success', 'Excess request has been ' . $validated['status'] . '.');
     }
 
-    public function destroy(Overtime $overtime)
+    public function destroy(Excesstime $excesstime)
     {
-        $overtime->delete();
+        $excesstime->delete();
 
-        return redirect()->route('overtimes.index')
-            ->with('success', 'Overtime request deleted successfully.');
+        return redirect()->route('excess.index')
+            ->with('success', 'excesstime request deleted successfully.');
     }
 }

@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             HolidaySeeder::class,
             RoleSeeder::class,
             AdminSeeder::class,
+            PositionSeeder::class,
         ]);
 
         // Call the leave entitlements seeder

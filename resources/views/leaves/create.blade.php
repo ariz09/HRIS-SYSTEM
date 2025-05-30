@@ -24,6 +24,34 @@
         </div>
     @endif
 
+    @if($balances)
+        <div class="mb-4">
+            <h5>Leave Balances</h5>
+            <div class="table-responsive">
+                <table class="table table-bordered table-sm align-middle">
+                    <thead>
+                        <tr>
+                            <th>Leave Type</th>
+                            <th>Allowed</th>
+                            <th>Used</th>
+                            <th>Remaining</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($leaveTypes as $type)
+                            <tr>
+                                <td>{{ $type->name }}</td>
+                                <td>{{ $balances[$type->id]['allowed'] }}</td>
+                                <td>{{ $balances[$type->id]['used'] }}</td>
+                                <td>{{ $balances[$type->id]['remaining'] }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endif
+
     <div class="card mb-4">
         <div class="card-header">
             <i class="fas fa-calendar-plus me-1"></i>
@@ -87,31 +115,38 @@
         </div>
     </div>
 </div>
-
+@endsection
 @push('scripts')
 <script>
-    // Ensure end date is not before start date
-    document.getElementById('start_date').addEventListener('change', function() {
-        document.getElementById('end_date').min = this.value;
-    });
-
-    // Ensure start date is not after end date
-    document.getElementById('end_date').addEventListener('change', function() {
-        document.getElementById('start_date').max = this.value;
-    });
-
-    // Show leave balance info
-    const balances = @json($balances);
-    const leaveTypeSelect = document.getElementById('leave_type');
-    const balanceInfo = document.getElementById('leave-balance-info');
-    leaveTypeSelect.addEventListener('change', function() {
-        const id = this.value;
-        if (balances[id]) {
-            balanceInfo.textContent = `Remaining: ${balances[id].remaining} day(s) (Used: ${balances[id].used} / Allowed: ${balances[id].allowed})`;
-        } else {
-            balanceInfo.textContent = '';
-        }
-    });
+document.getElementById('start_date').addEventListener('change', function() {
+    document.getElementById('end_date').min = this.value;
+});
+document.getElementById('end_date').addEventListener('change', function() {
+    document.getElementById('start_date').max = this.value;
+});
+const balances = @json($balances);
+const entitlements = @json($entitlements);
+const leaveTypeSelect = document.getElementById('leave_type');
+const balanceInfo = document.getElementById('leave-balance-info');
+let allowedInfo = document.getElementById('leave-allowed-info');
+if (!allowedInfo) {
+    allowedInfo = document.createElement('div');
+    allowedInfo.id = 'leave-allowed-info';
+    allowedInfo.className = 'mt-1 text-success small';
+    leaveTypeSelect.parentNode.appendChild(allowedInfo);
+}
+leaveTypeSelect.addEventListener('change', function() {
+    const id = this.value;
+    if (balances[id]) {
+        balanceInfo.textContent = `Remaining: ${balances[id].remaining} day(s) (Used: ${balances[id].used} / Allowed: ${balances[id].allowed})`;
+    } else {
+        balanceInfo.textContent = '';
+    }
+    if (entitlements[id]) {
+        allowedInfo.textContent = `Days Allowed for your level: ${entitlements[id]} day(s)`;
+    } else {
+        allowedInfo.textContent = '';
+    }
+});
 </script>
 @endpush
-@endsection

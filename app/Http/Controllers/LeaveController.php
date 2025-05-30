@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use App\Models\LeaveBalance;
 
 class LeaveController extends Controller
 {
@@ -45,24 +46,37 @@ class LeaveController extends Controller
         $leaveTypes = LeaveType::all();
         $employmentInfo = Auth::user()->employmentInfo;
         $levelName = $employmentInfo && $employmentInfo->cdmLevel ? $employmentInfo->cdmLevel->name : null;
+        $year = now()->year;
+        $userId = Auth::id();
         $balances = [];
+        $entitlements = [];
         foreach ($leaveTypes as $type) {
-            $entitlement = \App\Models\LeaveEntitlement::where('leave_type_id', $type->id)
-                ->where('employee_level', $levelName)
-                ->first();
-            $allowed = $entitlement ? $entitlement->days_allowed : 0;
-            $used = \App\Models\Leave::where('user_id', Auth::id())
+            // Initialize balance if not present
+            $balance = \App\Models\LeaveBalance::firstOrCreate([
+                'user_id' => $userId,
+                'leave_type_id' => $type->id,
+                'year' => $year,
+            ], [
+                'balance' => optional(\App\Models\LeaveEntitlement::where('leave_type_id', $type->id)->where('employee_level', $levelName)->first())->days_allowed ?? 0
+            ]);
+            $allowed = $balance->balance;
+            $used = \App\Models\Leave::where('user_id', $userId)
                 ->where('leave_type_id', $type->id)
                 ->where('status', 'approved')
-                ->whereYear('start_date', now()->year)
+                ->whereYear('start_date', $year)
                 ->sum(DB::raw('DATEDIFF(end_date, start_date) + 1'));
             $balances[$type->id] = [
                 'allowed' => $allowed,
                 'used' => $used,
                 'remaining' => max($allowed - $used, 0),
             ];
+            // Add entitlement (days allowed for this leave type and level)
+            $entitlement = \App\Models\LeaveEntitlement::where('leave_type_id', $type->id)
+                ->where('employee_level', $levelName)
+                ->first();
+            $entitlements[$type->id] = $entitlement ? $entitlement->days_allowed : 0;
         }
-        return view('leaves.create', compact('leaveTypes', 'balances'));
+        return view('leaves.create', compact('leaveTypes', 'balances', 'entitlements'));
     }
 
     /**
@@ -80,19 +94,13 @@ class LeaveController extends Controller
             'address_during_leave' => 'required|string',
         ]);
 
-        // Get employee info and level
         $employmentInfo = Auth::user()->employmentInfo;
         $levelName = $employmentInfo && $employmentInfo->cdmLevel ? $employmentInfo->cdmLevel->name : null;
-
-        // For Compassionate Leave, use relationship type as level
         $leaveType = \App\Models\LeaveType::find($validated['leave_type_id']);
         $entitlementLevel = $levelName;
         if ($leaveType && $leaveType->name === 'Compassionate Leave') {
-            // For demo, use 'Parent/Spouse/Child' as default; in real app, get from request
             $entitlementLevel = 'Parent/Spouse/Child';
         }
-
-        // Fetch entitlement
         $entitlement = \App\Models\LeaveEntitlement::where('leave_type_id', $validated['leave_type_id'])
             ->where('employee_level', $entitlementLevel)
             ->first();
@@ -100,25 +108,28 @@ class LeaveController extends Controller
             return back()->withErrors(['You do not have an entitlement for this leave type/level.']);
         }
         $allowedDays = $entitlement->days_allowed;
-
-        // Calculate requested days
-        $start = new Carbon($validated['start_date']);
-        $end = new Carbon($validated['end_date']);
+        $start = new \Carbon\Carbon($validated['start_date']);
+        $end = new \Carbon\Carbon($validated['end_date']);
         $requestedDays = $end->diffInDays($start) + 1;
-
-        // Sum used days for this leave type and level this year
-        $usedDays = \App\Models\Leave::where('user_id', Auth::id())
+        $year = now()->year;
+        $userId = Auth::id();
+        $leaveBalance = LeaveBalance::firstOrCreate([
+            'user_id' => $userId,
+            'leave_type_id' => $validated['leave_type_id'],
+            'year' => $year,
+        ], [
+            'balance' => $allowedDays
+        ]);
+        $usedDays = \App\Models\Leave::where('user_id', $userId)
             ->where('leave_type_id', $validated['leave_type_id'])
             ->where('status', 'approved')
-            ->whereYear('start_date', now()->year)
+            ->whereYear('start_date', $year)
             ->sum(DB::raw('DATEDIFF(end_date, start_date) + 1'));
-
-        if (($usedDays + $requestedDays) > $allowedDays) {
-            return back()->withErrors(['You have exceeded your leave entitlement for this type.']);
+        if (($usedDays + $requestedDays) > $leaveBalance->balance) {
+            return back()->withErrors(['You have exceeded your leave balance for this type.']);
         }
-
         $leave = new Leave();
-        $leave->user_id = Auth::id();
+        $leave->user_id = $userId;
         $leave->leave_type_id = $validated['leave_type_id'];
         $leave->duration = $validated['duration'];
         $leave->start_date = $validated['start_date'];
@@ -128,7 +139,7 @@ class LeaveController extends Controller
         $leave->address_during_leave = $validated['address_during_leave'];
         $leave->status = 'pending';
         $leave->save();
-
+        // Deduct from balance only when approved (not here, but in approval logic)
         return redirect()->route('leaves.index')
             ->with('success', 'Leave request submitted successfully.');
     }

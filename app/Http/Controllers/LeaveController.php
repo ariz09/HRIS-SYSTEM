@@ -43,11 +43,11 @@ class LeaveController extends Controller
      */
     public function create()
     {
-        $leaveTypes = LeaveType::all();
-        $employmentInfo = Auth::user()->employmentInfo;
-        $levelName = $employmentInfo && $employmentInfo->cdmLevel ? $employmentInfo->cdmLevel->name : null;
-        $year = now()->year;
-        $userId = Auth::id();
+        $leaveTypes = LeaveType::all(); // get all leave types
+        $employmentInfo = Auth::user()->employmentInfo; // get the employment info of the user
+        $levelName = $employmentInfo && $employmentInfo->cdmLevel ? $employmentInfo->cdmLevel->name : null; // get the level name of the user
+        $year = now()->year; // get the current year
+        $userId = Auth::id(); // get the user id
         $balances = [];
         $entitlements = [];
         foreach ($leaveTypes as $type) {
@@ -57,7 +57,7 @@ class LeaveController extends Controller
                 'leave_type_id' => $type->id,
                 'year' => $year,
             ], [
-                'balance' => optional(\App\Models\LeaveEntitlement::where('leave_type_id', $type->id)->where('employee_level', $levelName)->first())->days_allowed ?? 0
+                'balance' => optional(\App\Models\LeaveEntitlement::where('leave_type_id', $type->id)->where('cdm_level_id', $levelName)->first())->days_allowed ?? 0
             ]);
             $allowed = $balance->balance;
             $used = \App\Models\Leave::where('user_id', $userId)
@@ -72,7 +72,7 @@ class LeaveController extends Controller
             ];
             // Add entitlement (days allowed for this leave type and level)
             $entitlement = \App\Models\LeaveEntitlement::where('leave_type_id', $type->id)
-                ->where('employee_level', $levelName)
+                ->where('cdm_level_id', $levelName)
                 ->first();
             $entitlements[$type->id] = $entitlement ? $entitlement->days_allowed : 0;
         }
@@ -102,7 +102,7 @@ class LeaveController extends Controller
             $entitlementLevel = 'Parent/Spouse/Child';
         }
         $entitlement = \App\Models\LeaveEntitlement::where('leave_type_id', $validated['leave_type_id'])
-            ->where('employee_level', $entitlementLevel)
+            ->where('cdm_level_id', $entitlementLevel)
             ->first();
         if (!$entitlement) {
             return back()->withErrors(['You do not have an entitlement for this leave type/level.']);

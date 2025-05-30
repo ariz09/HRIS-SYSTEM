@@ -12,7 +12,7 @@ class LeaveEntitlement extends Model
 
     protected $fillable = [
         'leave_type_id',
-        'employee_level',
+        'cdm_level_id',
         'days_allowed',
     ];
 
@@ -37,7 +37,7 @@ class LeaveEntitlement extends Model
      */
     public static function getEntitlement(string $employeeLevel, int $leaveTypeId): ?self
     {
-        return self::where('employee_level', $employeeLevel)
+        return self::where('cdm_level_id', $employeeLevel)
             ->where('leave_type_id', $leaveTypeId)
             ->first();
     }

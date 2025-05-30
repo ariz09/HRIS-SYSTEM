@@ -1,6 +1,10 @@
 @extends('layouts.app')
 @section('content')
 <div class="container-fluid px-4">
+    @foreach ($leaveTypes as $type)
+        <p>{{ $type->name }}</p>
+    @endforeach
+
     <h1 class="mt-4">Submit Leave Request</h1>
     <ol class="breadcrumb mb-4">
         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>

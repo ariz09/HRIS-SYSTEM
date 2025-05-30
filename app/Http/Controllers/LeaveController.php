@@ -43,6 +43,7 @@ class LeaveController extends Controller
      */
     public function create()
     {
+        $user = Auth::user();
         $leaveTypes = LeaveType::all(); // get all leave types
         $employmentInfo = Auth::user()->employmentInfo; // get the employment info of the user
         $levelName = $employmentInfo && $employmentInfo->cdmLevel ? $employmentInfo->cdmLevel->name : null; // get the level name of the user
@@ -50,6 +51,10 @@ class LeaveController extends Controller
         $userId = Auth::id(); // get the user id
         $balances = [];
         $entitlements = [];
+
+        $position = $user->position->name ?? null;
+        $cdmLevel = $user->position->cdmLevel->name ?? 'N/A';
+
         foreach ($leaveTypes as $type) {
             // Initialize balance if not present
             $balance = \App\Models\LeaveBalance::firstOrCreate([
@@ -76,7 +81,7 @@ class LeaveController extends Controller
                 ->first();
             $entitlements[$type->id] = $entitlement ? $entitlement->days_allowed : 0;
         }
-        return view('leaves.create', compact('leaveTypes', 'balances', 'entitlements'));
+        return view('leaves.create', compact('leaveTypes', 'balances', 'entitlements', 'position', 'cdmLevel'));
     }
 
     /**

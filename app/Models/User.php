@@ -71,5 +71,8 @@ class User extends Authenticatable
         return $this->name;
     }
 
-
+    public function position()
+    {
+        return $this->hasOneThrough(Position::class, EmploymentInfo::class, 'user_id', 'id', 'id', 'position_id');
+    }
 }

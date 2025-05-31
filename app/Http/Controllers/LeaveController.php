@@ -96,6 +96,33 @@ class LeaveController extends Controller
     }
 
     /**
+     * Initialize or update all leave balances for a user for the current year.
+     */
+    public function initializeLeaveBalancesForUser($userId, $year)
+    {
+        $user = \App\Models\User::findOrFail($userId);
+        $employmentInfo = $user->employmentInfo;
+        $cdmLevelId = $employmentInfo && $employmentInfo->cdmLevel ? $employmentInfo->cdmLevel->id : null;
+        $leaveTypes = \App\Models\LeaveType::all();
+        foreach ($leaveTypes as $type) {
+            $entitlement = \App\Models\LeaveEntitlement::where('leave_type_id', $type->id)
+                ->where('cdm_level_id', $cdmLevelId)
+                ->first();
+            $allowedDays = $entitlement ? $entitlement->days_allowed : 0;
+            \App\Models\LeaveBalance::updateOrCreate(
+                [
+                    'user_id' => $userId,
+                    'leave_type_id' => $type->id,
+                    'year' => $year,
+                ],
+                [
+                    'balance' => $allowedDays
+                ]
+            );
+        }
+    }
+
+    /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
@@ -110,15 +137,19 @@ class LeaveController extends Controller
             'address_during_leave' => 'required|string',
         ]);
 
+        $userId = Auth::id();
+        $year = now()->year;
+        $this->initializeLeaveBalancesForUser($userId, $year);
+
         $employmentInfo = Auth::user()->employmentInfo;
-        $levelName = $employmentInfo && $employmentInfo->cdmLevel ? $employmentInfo->cdmLevel->name : null;
+        $cdmLevelId = $employmentInfo && $employmentInfo->cdmLevel ? $employmentInfo->cdmLevel->id : null;
         $leaveType = \App\Models\LeaveType::find($validated['leave_type_id']);
-        $entitlementLevel = $levelName;
+        $entitlementLevel = $cdmLevelId;
         if ($leaveType && $leaveType->name === 'Compassionate Leave') {
             $entitlementLevel = 'Parent/Spouse/Child';
         }
         $entitlement = \App\Models\LeaveEntitlement::where('leave_type_id', $validated['leave_type_id'])
-            // ->where('cdm_level_id', $entitlementLevel)
+            ->where('cdm_level_id', $cdmLevelId)
             ->first();
         if (!$entitlement) {
             return back()->withErrors(['You do not have an entitlement for this leave type/level.']);
@@ -127,21 +158,11 @@ class LeaveController extends Controller
         $start = new \Carbon\Carbon($validated['start_date']);
         $end = new \Carbon\Carbon($validated['end_date']);
         $requestedDays = $end->diffInDays($start) + 1;
-        $year = now()->year;
-        $userId = Auth::id();
-        $leaveBalance = LeaveBalance::firstOrCreate([
-            'user_id' => $userId,
-            'leave_type_id' => $validated['leave_type_id'],
-            'year' => $year,
-        ], [
-            'balance' => $allowedDays
-        ]);
-        $usedDays = \App\Models\Leave::where('user_id', $userId)
+        $leaveBalance = LeaveBalance::where('user_id', $userId)
             ->where('leave_type_id', $validated['leave_type_id'])
-            ->where('status', 'approved')
-            ->whereYear('start_date', $year)
-            ->sum(DB::raw('DATEDIFF(end_date, start_date) + 1'));
-        if (($usedDays + $requestedDays) > $leaveBalance->balance) {
+            ->where('year', $year)
+            ->first();
+        if (($leaveBalance->balance + $requestedDays) > $allowedDays) {
             return back()->withErrors(['You have exceeded your leave balance for this type.']);
         }
         $leave = new Leave();
@@ -215,5 +236,32 @@ class LeaveController extends Controller
 
         return redirect()->route('leaves.index')
             ->with('success', 'Leave request cancelled successfully.');
+    }
+
+    /**
+     * Approve a leave request and deduct from leave balance.
+     */
+    public function approve($leaveId)
+    {
+        $leave = Leave::findOrFail($leaveId);
+        if ($leave->status !== 'approved') {
+            $leave->status = 'approved';
+            $leave->save();
+
+            $year = \Carbon\Carbon::parse($leave->start_date)->year;
+            $days = \Carbon\Carbon::parse($leave->end_date)->diffInDays(\Carbon\Carbon::parse($leave->start_date)) + 1;
+
+            $leaveBalance = LeaveBalance::where('user_id', $leave->user_id)
+                ->where('leave_type_id', $leave->leave_type_id)
+                ->where('year', $year)
+                ->first();
+
+            if ($leaveBalance) {
+                $leaveBalance->balance = max(0, $leaveBalance->balance - $days);
+                $leaveBalance->save();
+            }
+        }
+        // Redirect or return response as needed
+        return redirect()->route('leaves.index')->with('success', 'Leave approved and balance updated.');
     }
 }

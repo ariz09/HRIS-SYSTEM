@@ -41,4 +41,10 @@ class LeaveEntitlement extends Model
             ->where('leave_type_id', $leaveTypeId)
             ->first();
     }
+
+    public function cdmLevel()
+    {
+        return $this->belongsTo(\App\Models\CdmLevel::class);
+    }
+
 }

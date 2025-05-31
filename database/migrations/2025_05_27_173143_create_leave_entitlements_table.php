@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('leave_entitlements', function (Blueprint $table) {
             $table->id();
             $table->foreignId('leave_type_id')->constrained();
-            $table->string('cdm_level_id'); // e.g., Learner, Advanced, Specialist, etc.
+            $table->foreignId('cdm_level_id')->constrained('cdm_levels');
+            $table->string('type')->nullable();
             $table->integer('days_allowed');
             $table->timestamps();
         });

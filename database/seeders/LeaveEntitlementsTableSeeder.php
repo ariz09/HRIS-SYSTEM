@@ -18,7 +18,7 @@ class LeaveEntitlementsTableSeeder extends Seeder
         // Map of leave type names to their entitlement data
         $entitlements = [
             // Vacation Leave
-            'Vacation Leave' => [
+            'VL' => [
                 ['level' => 'Learner', 'days' => 8],
                 ['level' => 'Advanced', 'days' => 8],
                 ['level' => 'Team Lead/Supervisor (Specialist)', 'days' => 12],
@@ -26,7 +26,7 @@ class LeaveEntitlementsTableSeeder extends Seeder
                 ['level' => 'Management (Execom)', 'days' => 20],
             ],
             // Sick Leave
-            'Sick Leave' => [
+            'SL' => [
                 ['level' => 'Learner', 'days' => 7],
                 ['level' => 'Advanced', 'days' => 7],
                 ['level' => 'Expanded Mancom (Specialist)', 'days' => 8],
@@ -34,50 +34,55 @@ class LeaveEntitlementsTableSeeder extends Seeder
                 ['level' => 'Management (Execom)', 'days' => 10],
             ],
             // Birthday Leave
-            'Birthday Leave' => [
+            'BL' => [
                 ['level' => 'All', 'days' => 1],
             ],
             // Expanded Maternity Leave
-            'Expanded Maternity Leave' => [
-                ['level' => 'All', 'days' => 105], // Live birth
-                ['level' => 'All', 'days' => 60], // Miscarriage
+            'EML' => [
+                ['level' => 'All', 'days' => 105, 'type' => 'Live birth'],
+                ['level' => 'All', 'days' => 60, 'type' => 'Miscarriage'],
             ],
             // Paternity Leave
-            'Paternity Leave' => [
+            'PL' => [
                 ['level' => 'All', 'days' => 7],
             ],
             // Marriage Leave
-            'Marriage Leave' => [
+            'ML' => [
                 ['level' => 'All', 'days' => 2],
             ],
             // Compassionate Leave
-            'Compassionate Leave' => [
-                ['level' => 'Parent/Spouse/Child', 'days' => 5],
-                ['level' => 'Sibling/Grand Parent/Grandchild', 'days' => 3],
-                ['level' => 'Cousin/Aunt/Uncle/In-law', 'days' => 2],
+            'CL' => [
+                ['level' => 'Parent/Spouse/Child', 'days' => 5, 'type' => 'family'],
+                ['level' => 'Sibling/Grand Parent/Grandchild', 'days' => 3, 'type' => 'family'],
+                ['level' => 'Cousin/Aunt/Uncle/In-law', 'days' => 2, 'type' => 'family'],
             ],
             // Solo Parent Leave
-            'Solo Parent Leave' => [
+            'SPL' => [
                 ['level' => 'All', 'days' => 7],
             ],
             // Magna Carta Leave
-            'Magna Carta Leave' => [
+            'MCL' => [
                 ['level' => 'Female Employee', 'days' => 60],
             ],
         ];
 
         foreach ($entitlements as $leaveTypeName => $levels) {
-            $leaveType = LeaveType::where('name', $leaveTypeName)->first();
+            $leaveType = \App\Models\LeaveType::where('code', $leaveTypeName)->first();
             if (!$leaveType) continue;
+
             foreach ($levels as $item) {
-                $cdmLevelId = CdmLevel::where('name', $item['level'])->value('id');
+                $cdmLevelId = \App\Models\CdmLevel::where('name', $item['level'])->value('id');
                 if ($cdmLevelId) {
-                    LeaveEntitlement::updateOrCreate([
-                        'leave_type_id' => $leaveType->id,
-                        'cdm_level_id' => $cdmLevelId,
-                    ], [
-                        'days_allowed' => $item['days'],
-                    ]);
+                    \App\Models\LeaveEntitlement::updateOrCreate(
+                        [
+                            'leave_type_id' => $leaveType->id,
+                            'cdm_level_id' => $cdmLevelId,
+                            'type' => $item['type'] ?? null,  // Use null if no type specified
+                        ],
+                        [
+                            'days_allowed' => $item['days'],
+                        ]
+                    );
                 }
             }
         }

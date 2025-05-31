@@ -43,7 +43,7 @@ class LeaveController extends Controller
      */
     public function create()
     {
-        $user = Auth::user();
+        $user = Auth::user(); // Get the authenticated user
         $leaveTypes = LeaveType::all(); // get all leave types
         $employmentInfo = Auth::user()->employmentInfo; // get the employment info of the user
         $levelName = $employmentInfo && $employmentInfo->cdmLevel ? $employmentInfo->cdmLevel->name : null; // get the level name of the user
@@ -57,13 +57,19 @@ class LeaveController extends Controller
 
         foreach ($leaveTypes as $type) {
             // Initialize balance if not present
-            $balance = \App\Models\LeaveBalance::firstOrCreate([
-                'user_id' => $userId,
-                'leave_type_id' => $type->id,
-                'year' => $year,
-            ], [
-                'balance' => optional(\App\Models\LeaveEntitlement::where('leave_type_id', $type->id)->where('cdm_level_id', $levelName)->first())->days_allowed ?? 0
-            ]);
+            $balance = \App\Models\LeaveBalance::updateOrCreate(
+                [
+                    'user_id' => $userId,
+                    'leave_type_id' => $type->id,
+                    'year' => $year
+                ],
+                [
+                    'balance' => optional(\App\Models\LeaveEntitlement::where('leave_type_id', $type->id)
+                        ->where('cdm_level_id', $cdmLevel)
+                        ->first())->days_allowed ?? '0'
+                ]
+            );
+
             $allowed = $balance->balance;
             $used = \App\Models\Leave::where('user_id', $userId)
                 ->where('leave_type_id', $type->id)
@@ -107,7 +113,7 @@ class LeaveController extends Controller
             $entitlementLevel = 'Parent/Spouse/Child';
         }
         $entitlement = \App\Models\LeaveEntitlement::where('leave_type_id', $validated['leave_type_id'])
-            ->where('cdm_level_id', $entitlementLevel)
+            // ->where('cdm_level_id', $entitlementLevel)
             ->first();
         if (!$entitlement) {
             return back()->withErrors(['You do not have an entitlement for this leave type/level.']);
@@ -145,7 +151,7 @@ class LeaveController extends Controller
         $leave->status = 'pending';
         $leave->save();
         // Deduct from balance only when approved (not here, but in approval logic)
-        return redirect()->route('leaves.index')
+        return redirect()->route('leaves.my')
             ->with('success', 'Leave request submitted successfully.');
     }
 

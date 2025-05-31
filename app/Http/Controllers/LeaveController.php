@@ -55,6 +55,11 @@ class LeaveController extends Controller
         $position = $user->position->name ?? null;
         $cdmLevel = $user->position->cdmLevel->name ?? 'N/A';
 
+        // Get all leave entitlements for a specific level
+        $entitlementModels = \App\Models\LeaveEntitlement::where('cdm_level_id', $user->position->cdmLevel->id)
+            ->with('leaveType')
+            ->get();
+
         foreach ($leaveTypes as $type) {
             // Initialize balance if not present
             $balance = \App\Models\LeaveBalance::updateOrCreate(
@@ -87,7 +92,7 @@ class LeaveController extends Controller
                 ->first();
             $entitlements[$type->id] = $entitlement ? $entitlement->days_allowed : 0;
         }
-        return view('leaves.create', compact('leaveTypes', 'balances', 'entitlements', 'position', 'cdmLevel'));
+        return view('leaves.create', compact('leaveTypes', 'balances', 'entitlements', 'position', 'cdmLevel', 'entitlementModels'));
     }
 
     /**

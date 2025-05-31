@@ -10,6 +10,9 @@
             <li class="list-group-item">
                 <strong>CDM Level:</strong> {{ $cdmLevel }}
             </li>
+            @foreach ($entitlementModels as $entitlement)
+                <p><strong>{{ $entitlement->leaveType->name }}</strong>: {{ $entitlement->days_allowed }} days</p>
+            @endforeach
         </ul>
     </div>
 
@@ -155,7 +158,7 @@ leaveTypeSelect.addEventListener('change', function() {
         balanceInfo.textContent = '';
     }
     if (entitlements[id]) {
-        allowedInfo.textContent = `Days Allowed for your level: ${entitlements[id]} day(s)`;
+        allowedInfo.textContent = `Days Allowed for your level: ${entitlements[id].days_allowed ?? 0} day(s)`;
     } else {
         allowedInfo.textContent = '';
     }

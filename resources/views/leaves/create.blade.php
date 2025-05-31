@@ -1,5 +1,11 @@
 @extends('layouts.app')
 @section('content')
+@php
+    $entitlementDays = [];
+    foreach ($entitlementModels as $ent) {
+        $entitlementDays[$ent->leave_type_id] = $ent->days_allowed;
+    }
+@endphp
 <div class="container-fluid px-4">
     <div class="mb-4">
         <h5>Your Information</h5>
@@ -140,27 +146,19 @@ document.getElementById('end_date').addEventListener('change', function() {
     document.getElementById('start_date').max = this.value;
 });
 const balances = @json($balances);
-const entitlements = @json($entitlements);
+const entitlementDays = @json($entitlementDays);
 const leaveTypeSelect = document.getElementById('leave_type');
 const balanceInfo = document.getElementById('leave-balance-info');
-let allowedInfo = document.getElementById('leave-allowed-info');
-if (!allowedInfo) {
-    allowedInfo = document.createElement('div');
-    allowedInfo.id = 'leave-allowed-info';
-    allowedInfo.className = 'mt-1 text-success small';
-    leaveTypeSelect.parentNode.appendChild(allowedInfo);
-}
 leaveTypeSelect.addEventListener('change', function() {
     const id = this.value;
     if (balances[id]) {
-        balanceInfo.textContent = `Remaining: ${balances[id].remaining} day(s) (Used: ${balances[id].used} / Allowed: ${balances[id].allowed})`;
+        let info = `Remaining: ${balances[id].remaining} day(s) (Used: ${balances[id].used} / Allowed: ${balances[id].allowed})`;
+        if (entitlementDays[id]) {
+            info += ` | Days Allowed for your level: ${entitlementDays[id]} day(s)`;
+        }
+        balanceInfo.textContent = info;
     } else {
         balanceInfo.textContent = '';
-    }
-    if (entitlements[id]) {
-        allowedInfo.textContent = `Days Allowed for your level: ${entitlements[id].days_allowed ?? 0} day(s)`;
-    } else {
-        allowedInfo.textContent = '';
     }
 });
 </script>

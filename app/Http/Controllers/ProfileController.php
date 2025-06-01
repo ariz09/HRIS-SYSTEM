@@ -8,6 +8,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\Rules;
 
 use App\Models\PersonalInfo;
 use App\Models\EmploymentInfo;
@@ -33,7 +35,7 @@ class ProfileController extends Controller
 
         $employeeNumber = optional($employmentInfo)->employee_number;
 
-        return view('profile.index', [ 
+        return view('profile.index', [
             'personalInfo' => PersonalInfo::where('user_id', $user->id)->first(),
             'employmentInfo' => $employmentInfo,
             'compensation' => $employeeNumber ? CompensationPackage::where('employee_number', $employeeNumber)->first() : null,
@@ -49,7 +51,7 @@ class ProfileController extends Controller
 
 
 
-    
+
         public function show()
         {
             $user = Auth::user();
@@ -66,7 +68,7 @@ class ProfileController extends Controller
                 //'governmentIds' => GovernmentId::where('employee_number', $employeeNumber)->first(),
             ]);
         }
-    
+
 
     public function edit(Request $request): View
     {
@@ -110,5 +112,30 @@ class ProfileController extends Controller
         $request->session()->regenerateToken();
 
         return Redirect::to('/');
+    }
+
+    /**
+     * Show the change password form.
+     */
+    public function changePassword(): View
+    {
+        return view('profile.change-password');
+    }
+
+    /**
+     * Update the user's password.
+     */
+    public function updatePassword(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'current_password' => ['required', 'current_password'],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+        ]);
+
+        $request->user()->update([
+            'password' => Hash::make($validated['password']),
+        ]);
+
+        return back()->with('status', 'password-updated');
     }
 }

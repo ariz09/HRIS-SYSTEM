@@ -13,7 +13,7 @@
     <ul class="navbar-nav ms-auto">
         <!-- Notifications -->
         <li class="nav-item dropdown me-2">
-            <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" 
+            <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button"
                data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fas fa-bell"></i>
                 <span class="badge bg-danger" id="inactiveUsersCount">
@@ -36,7 +36,7 @@
                 <li><a class="dropdown-item text-center" href="{{ route('inactive-users.index') }}">View All</a></li>
             </ul>
         </li>
-        
+
         <!-- User Menu -->
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
@@ -54,6 +54,7 @@
             </a>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                 <li><a class="dropdown-item" href="{{ route('profile.index') }}">Profile</a></li>
+                <li><a class="dropdown-item" href="{{ route('profile.change-password') }}">Change Password</a></li>
                 <li><hr class="dropdown-divider"></li>
                 <li>
                     <form method="POST" action="{{ route('logout') }}">
@@ -75,7 +76,7 @@
             .then(response => response.json())
             .then(data => {
                 document.getElementById('inactiveUsersCount').textContent = data.count;
-                
+
                 // Update dropdown content
                 let dropdownContent = '';
                 if (data.count > 0) {

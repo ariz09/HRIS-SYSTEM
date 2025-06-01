@@ -58,6 +58,8 @@ Route::middleware(['auth', \App\Http\Middleware\CheckActiveUser::class])->group(
     Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'index'])->name('profile.index');
         Route::get('/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::get('/change-password', [ProfileController::class, 'changePassword'])->name('profile.change-password');
+        Route::put('/update-password', [ProfileController::class, 'updatePassword'])->name('profile.update-password');
     });
 
     // Profile picture routes

@@ -248,25 +248,74 @@ class LeaveController extends Controller
     public function approve($leaveId)
     {
         $leave = Leave::findOrFail($leaveId);
+
         if ($leave->status !== 'approved') {
-            $leave->status = 'approved';
-            $leave->save();
+            // Calculate the number of days
+            $startDate = Carbon::parse($leave->start_date);
+            $endDate = Carbon::parse($leave->end_date);
+            $days = $startDate->diffInDays($endDate) + 1;
 
-            $year = \Carbon\Carbon::parse($leave->start_date)->year;
-            $days = \Carbon\Carbon::parse($leave->end_date)->diffInDays(\Carbon\Carbon::parse($leave->start_date)) + 1;
+            // Adjust for half-day leaves
+            if ($leave->duration !== 'full_day') {
+                $days = $days * 0.5;
+            }
 
+            // Get the year of the leave request
+            $year = $startDate->year;
+
+            // Find the leave balance
             $leaveBalance = LeaveBalance::where('user_id', $leave->user_id)
                 ->where('leave_type_id', $leave->leave_type_id)
                 ->where('year', $year)
                 ->first();
 
-            if ($leaveBalance) {
-                $leaveBalance->balance = max(0, $leaveBalance->balance - $days);
-                $leaveBalance->save();
+            if (!$leaveBalance) {
+                return back()->withErrors(['Leave balance not found for this period.']);
             }
+
+            // Check if there's enough balance
+            if ($leaveBalance->balance < $days) {
+                return back()->withErrors(['Insufficient leave balance.']);
+            }
+
+            // Calculate new balance
+            $currentBalance = (float)$leaveBalance->balance;
+            $daysToDeduct = (float)$days;
+            $newBalance = $currentBalance - $daysToDeduct;
+
+            // Update the leave balance
+            $leaveBalance->balance = $newBalance;
+            $leaveBalance->save();
+
+            // Verify the update
+            $updatedBalance = LeaveBalance::where('id', $leaveBalance->id)->first();
+
+            if ($updatedBalance->balance != $newBalance) {
+                // If the balance wasn't updated correctly, try to force it
+                DB::table('leave_balances')
+                    ->where('id', $leaveBalance->id)
+                    ->update(['balance' => $newBalance]);
+            }
+
+            // Update leave status
+            $leave->status = 'approved';
+            $leave->save();
+
+            // Log the final state
+            \Log::info('Leave Balance Update', [
+                'leave_id' => $leave->id,
+                'user_id' => $leave->user_id,
+                'leave_type_id' => $leave->leave_type_id,
+                'year' => $year,
+                'original_balance' => $currentBalance,
+                'days_deducted' => $daysToDeduct,
+                'expected_new_balance' => $newBalance,
+                'actual_new_balance' => $updatedBalance->balance
+            ]);
         }
-        // Redirect or return response as needed
-        return redirect()->route('leaves.index')->with('success', 'Leave approved and balance updated.');
+
+        return redirect()->route('leaves.index')
+            ->with('success', 'Leave request has been approved and balance updated.');
     }
 
     /**

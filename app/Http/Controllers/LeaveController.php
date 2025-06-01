@@ -129,6 +129,7 @@ class LeaveController extends Controller
         $employmentInfo = Auth::user()->employmentInfo;
         $cdmLevelId = $employmentInfo->position?->cdm_level_id;
         $leaveType = \App\Models\LeaveType::find($validated['leave_type_id']);
+
         $entitlementLevel = $cdmLevelId;
         if ($leaveType && $leaveType->name === 'Compassionate Leave') {
             $entitlementLevel = 'Parent/Spouse/Child';
@@ -141,9 +142,13 @@ class LeaveController extends Controller
             return back()->withErrors(['You do not have an entitlement for this leave type/level.']);
         }
         $allowedDays = $entitlement->days_allowed;
-        $start = new \Carbon\Carbon($validated['start_date']);
-        $end = new \Carbon\Carbon($validated['end_date']);
-        $requestedDays = $end->diffInDays($start) + 1;
+        $start = Carbon::parse($validated['start_date']);
+        $end = Carbon::parse($validated['end_date']);
+
+        $from = $start->lessThan($end) ? $start : $end;
+        $to = $start->greaterThan($end) ? $start : $end;
+
+        $requestedDays = $from->diffInDays($to) + 1;
 
         // Calculate actual days based on duration
         if ($validated['duration'] === 'half_day_morning' || $validated['duration'] === 'half_day_afternoon') {

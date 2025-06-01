@@ -60,8 +60,22 @@ class LeaveController extends Controller
             ->with('leaveType')
             ->get();
 
+        $leaveDays = [];
+        foreach ($entitlementModels as $entitlement) {
+            $leaveDays[$entitlement->leaveType->name] = $entitlement->days_allowed;
+        }
+
+        foreach ($entitlementModels as $entitlement) {
+            $leaveDaysMap[$entitlement->leave_type_id] = $entitlement->days_allowed;
+        }
+
+        $balances = [];
+        $entitlements = [];
+
         foreach ($leaveTypes as $type) {
-            // Initialize balance if not present
+            $daysAllowed = $leaveDaysMap[$type->id] ?? 0;
+
+            // Initialize or update leave balance
             $balance = \App\Models\LeaveBalance::updateOrCreate(
                 [
                     'user_id' => $userId,
@@ -69,28 +83,27 @@ class LeaveController extends Controller
                     'year' => $year
                 ],
                 [
-                    'balance' => optional(\App\Models\LeaveEntitlement::where('leave_type_id', $type->id)
-                        ->where('cdm_level_id', $cdmLevel)
-                        ->first())->days_allowed ?? '0'
+                    'balance' => $daysAllowed
                 ]
             );
 
             $allowed = $balance->balance;
+
+            // Calculate used leave days
             $used = \App\Models\Leave::where('user_id', $userId)
                 ->where('leave_type_id', $type->id)
                 ->where('status', 'approved')
                 ->whereYear('start_date', $year)
                 ->sum(DB::raw('DATEDIFF(end_date, start_date) + 1'));
+
             $balances[$type->id] = [
                 'allowed' => $allowed,
                 'used' => $used,
                 'remaining' => max($allowed - $used, 0),
             ];
-            // Add entitlement (days allowed for this leave type and level)
-            $entitlement = \App\Models\LeaveEntitlement::where('leave_type_id', $type->id)
-                ->where('cdm_level_id', $levelName)
-                ->first();
-            $entitlements[$type->id] = $entitlement ? $entitlement->days_allowed : 0;
+
+            // Store entitlement for reference
+            $entitlements[$type->id] = $daysAllowed;
         }
         return view('leaves.create', compact('leaveTypes', 'balances', 'entitlements', 'position', 'cdmLevel', 'entitlementModels'));
     }

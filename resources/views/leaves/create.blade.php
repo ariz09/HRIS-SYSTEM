@@ -45,34 +45,6 @@
         </div>
     @endif
 
-    @if($balances)
-        <div class="mb-4">
-            <h5>Leave Balances</h5>
-            <div class="table-responsive">
-                <table class="table table-bordered table-sm align-middle">
-                    <thead>
-                        <tr>
-                            <th>Leave Type</th>
-                            <th>Allowed</th>
-                            <th>Used</th>
-                            <th>Remaining</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach($leaveTypes as $type)
-                            <tr>
-                                <td>{{ $type->name }}</td>
-                                <td>{{ $balances[$type->id]['allowed'] }}</td>
-                                <td>{{ $balances[$type->id]['used'] }}</td>
-                                <td>{{ $balances[$type->id]['remaining'] }}</td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    @endif
-
     <div class="card mb-4">
         <div class="card-header">
             <i class="fas fa-calendar-plus me-1"></i>

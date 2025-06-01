@@ -18,6 +18,7 @@ use App\Models\EmployeeDependent;
 use App\Models\EmployeeEmergencyContact;
 use App\Models\EmployeeEducation;
 use App\Models\EmployeeEmploymentHistory;
+use App\Rules\StrongPassword;
 
 class ProfileController extends Controller
 {
@@ -129,7 +130,15 @@ class ProfileController extends Controller
     {
         $validated = $request->validate([
             'current_password' => ['required', 'current_password'],
-            'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'password' => [
+                'required',
+                'confirmed',
+                new StrongPassword([
+                    $request->user()->name,
+                    $request->user()->email,
+                    optional($request->user()->personalInfo)->birthday,
+                ]),
+            ],
         ]);
 
         $request->user()->update([

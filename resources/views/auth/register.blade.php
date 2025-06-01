@@ -33,6 +33,15 @@
                     <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
                     <input id="password" type="password" name="password" required
                         class="mt-1 block w-full px-4 py-2 rounded-lg border border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm">
+                    <ul class="text-xs text-gray-600 mt-2 mb-0 ps-4 list-decimal">
+                        <li><b>Minimum Length</b> – Usually at least 8 characters</li>
+                        <li><b>Uppercase Letters</b> – At least one uppercase letter (A–Z)</li>
+                        <li><b>Lowercase Letters</b> – At least one lowercase letter (a–z)</li>
+                        <li><b>Numbers</b> – At least one digit (0–9)</li>
+                        <li><b>Special Characters</b> – At least one symbol (e.g., @, #, !, %)</li>
+                        <li><b>No Common Words</b> – Avoid words like <code>password</code>, <code>123456</code>, or <code>admin</code></li>
+                        <li><b>No Username or Personal Info</b> – Should not include your name, email, or birthdate</li>
+                    </ul>
                 </div>
 
                 <!-- Confirm Password -->

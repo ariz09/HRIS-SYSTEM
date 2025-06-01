@@ -32,6 +32,15 @@
                         @error('password')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
+                        <ul class="text-muted small mt-2 mb-0 ps-4 list-decimal">
+                            <li><b>Minimum Length</b> – Usually at least 8 characters</li>
+                            <li><b>Uppercase Letters</b> – At least one uppercase letter (A–Z)</li>
+                            <li><b>Lowercase Letters</b> – At least one lowercase letter (a–z)</li>
+                            <li><b>Numbers</b> – At least one digit (0–9)</li>
+                            <li><b>Special Characters</b> – At least one symbol (e.g., @, #, !, %)</li>
+                            <li><b>No Common Words</b> – Avoid words like <code>password</code>, <code>123456</code>, or <code>admin</code></li>
+                            <li><b>No Username or Personal Info</b> – Should not include your name, email, or birthdate</li>
+                        </ul>
                     </div>
 
                     <div class="mb-3">

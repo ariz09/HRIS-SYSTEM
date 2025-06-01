@@ -36,6 +36,7 @@
             <div class="collapse" id="collapseLeave" data-bs-parent="#sidenavAccordion">
                 <nav class="sb-sidenav-menu-nested nav">
                     @role('admin|manager|supervisor')
+                        <a class="nav-link" href="{{ route('leaves.manage') }}">Manage Leave Requests</a>
                         <a class="nav-link" href="{{ route('leaves.index') }}">Leave Applications</a>
                         <a class="nav-link" href="{{ route('leave_types.index') }}">Leave Types</a>
                         <a class="nav-link" href="{{ route('assign_leaves.index') }}">Assign Leaves</a>

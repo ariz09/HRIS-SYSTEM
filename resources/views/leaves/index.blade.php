@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container-fluid px-4">
-    <h1 class="mt-4">My Leave Requests</h1>
+    <h1 class="mt-4">{{ auth()->user()->hasAnyRole(['admin', 'manager', 'supervisor']) ? 'All Leave Requests' : 'My Leave Requests' }}</h1>
     <ol class="breadcrumb mb-4">
         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>
         <li class="breadcrumb-item active">Leave Requests</li>
@@ -30,6 +30,9 @@
                 <table class="table table-bordered table-striped">
                     <thead>
                         <tr>
+                            @if(auth()->user()->hasAnyRole(['admin', 'manager', 'supervisor']))
+                                <th>Employee</th>
+                            @endif
                             <th>Leave Type</th>
                             <th>Duration</th>
                             <th>Start Date</th>
@@ -42,6 +45,9 @@
                     <tbody>
                         @forelse($leaves as $leave)
                             <tr>
+                                @if(auth()->user()->hasAnyRole(['admin', 'manager', 'supervisor']))
+                                    <td>{{ $leave->user->name }}</td>
+                                @endif
                                 <td>{{ $leave->leaveType->name }}</td>
                                 <td>
                                     @switch($leave->duration)
@@ -81,31 +87,46 @@
                                         </a>
 
                                         @if($leave->status === 'pending')
-                                            <a href="{{ route('leaves.edit', $leave->id) }}"
-                                               class="btn btn-warning btn-sm"
-                                               title="Edit Request">
-                                                <i class="fas fa-edit"></i>
-                                            </a>
+                                            @if(auth()->user()->hasAnyRole(['admin', 'manager', 'supervisor']))
+                                                <form action="{{ route('leaves.approve', $leave->id) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-success btn-sm" title="Approve Request" onclick="return confirm('Are you sure you want to approve this leave request?')">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                </form>
+                                                <form action="{{ route('leaves.reject', $leave->id) }}" method="POST" class="d-inline">
+                                                    @csrf
+                                                    <button type="submit" class="btn btn-danger btn-sm" title="Reject Request" onclick="return confirm('Are you sure you want to reject this leave request?')">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </form>
+                                            @else
+                                                <a href="{{ route('leaves.edit', $leave->id) }}"
+                                                   class="btn btn-warning btn-sm"
+                                                   title="Edit Request">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
 
-                                            <form action="{{ route('leaves.destroy', $leave->id) }}"
-                                                  method="POST"
-                                                  class="d-inline"
-                                                  onsubmit="return confirm('Are you sure you want to cancel this leave request?');">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit"
-                                                        class="btn btn-danger btn-sm"
-                                                        title="Cancel Request">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </form>
+                                                <form action="{{ route('leaves.destroy', $leave->id) }}"
+                                                      method="POST"
+                                                      class="d-inline"
+                                                      onsubmit="return confirm('Are you sure you want to cancel this leave request?');">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                    <button type="submit"
+                                                            class="btn btn-danger btn-sm"
+                                                            title="Cancel Request">
+                                                        <i class="fas fa-times"></i>
+                                                    </button>
+                                                </form>
+                                            @endif
                                         @endif
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center">No leave requests found.</td>
+                                <td colspan="{{ auth()->user()->hasAnyRole(['admin', 'manager', 'supervisor']) ? '8' : '7' }}" class="text-center">No leave requests found.</td>
                             </tr>
                         @endforelse
                     </tbody>

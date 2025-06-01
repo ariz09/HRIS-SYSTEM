@@ -17,10 +17,16 @@ class LeaveController extends Controller
      */
     public function index()
     {
-        $leaves = Leave::with(['user', 'leaveType'])
-            ->where('user_id', Auth::id())
-            ->latest()
-            ->get();
+        if (auth()->user()->hasAnyRole(['admin', 'manager', 'supervisor'])) {
+            $leaves = Leave::with(['user', 'leaveType'])
+                ->latest()
+                ->get();
+        } else {
+            $leaves = Leave::with(['user', 'leaveType'])
+                ->where('user_id', Auth::id())
+                ->latest()
+                ->get();
+        }
 
         return view('leaves.index', compact('leaves'));
     }
@@ -261,5 +267,37 @@ class LeaveController extends Controller
         }
         // Redirect or return response as needed
         return redirect()->route('leaves.index')->with('success', 'Leave approved and balance updated.');
+    }
+
+    /**
+     * Display all leave requests for management.
+     */
+    public function manage(Request $request)
+    {
+        $query = Leave::with(['user', 'leaveType'])
+            ->latest();
+
+        if ($request->has('status') && $request->status !== '') {
+            $query->where('status', $request->status);
+        }
+
+        $leaves = $query->get();
+
+        return view('leaves.manage', compact('leaves'));
+    }
+
+    /**
+     * Reject a leave request.
+     */
+    public function reject($leaveId)
+    {
+        $leave = Leave::findOrFail($leaveId);
+        if ($leave->status === 'pending') {
+            $leave->status = 'rejected';
+            $leave->save();
+        }
+
+        return redirect()->route('leaves.manage')
+            ->with('success', 'Leave request has been rejected.');
     }
 }

@@ -147,6 +147,12 @@ Route::middleware(['auth', \App\Http\Middleware\CheckActiveUser::class])->group(
 
     // Leave Management - accessible by admin, manager, and supervisor
     Route::middleware(['role:admin|manager|supervisor'])->group(function () {
+        // Custom routes first
+        Route::get('/leaves/manage', [LeaveController::class, 'manage'])->name('leaves.manage');
+        Route::post('/leaves/{leave}/reject', [LeaveController::class, 'reject'])->name('leaves.reject');
+        Route::post('/leaves/{leave}/approve', [LeaveController::class, 'approve'])->name('leaves.approve');
+
+        // Resource routes after
         Route::resource('leaves', LeaveController::class)->names('leaves');
         Route::resource('leave-types', LeaveTypeController::class)->parameters(['leave-types' => 'leave_type'])->names('leave_types');
         Route::resource('assign_leaves', AssignLeaveController::class)->parameters(['assign_leaves' => 'assignLeave'])->names('assign_leaves');

@@ -76,7 +76,7 @@ class LeaveController extends Controller
             $daysAllowed = $leaveDaysMap[$type->id] ?? 0;
 
             // Initialize or update leave balance
-            $balance = \App\Models\LeaveBalance::updateOrCreate(
+            $balance = \App\Models\LeaveBalance::firstOrCreate(
                 [
                     'user_id' => $userId,
                     'leave_type_id' => $type->id,

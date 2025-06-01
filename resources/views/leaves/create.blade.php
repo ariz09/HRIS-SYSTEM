@@ -7,21 +7,6 @@
     }
 @endphp
 <div class="container-fluid px-4">
-    <div class="mb-4">
-        <h5>Your Information</h5>
-        <ul class="list-group">
-            <li class="list-group-item">
-                <strong>Position:</strong> {{ $position }}
-            </li>
-            <li class="list-group-item">
-                <strong>CDM Level:</strong> {{ $cdmLevel }}
-            </li>
-            @foreach ($entitlementModels as $entitlement)
-                <p><strong>{{ $entitlement->leaveType->name }}</strong>: {{ $entitlement->days_allowed }} days</p>
-            @endforeach
-        </ul>
-    </div>
-
     <h1 class="mt-4">Submit Leave Request</h1>
     <ol class="breadcrumb mb-4">
         <li class="breadcrumb-item"><a href="{{ route('dashboard') }}">Dashboard</a></li>

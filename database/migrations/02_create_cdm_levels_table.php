@@ -60,7 +60,49 @@ return new class extends Migration {
                 'status' => true,
                 'created_at' => now(),
                 'updated_at' => now()
-            ]
+            ],
+            [
+                'name' => 'Expanded Mancom (Specialist)',
+                'description' => 'Expanded Mancom (Specialist) level',
+                'status' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'name' => 'All',
+                'description' => 'All levels',
+                'status' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'name' => 'Parent/Spouse/Child',
+                'description' => 'Parent/Spouse/Child level',
+                'status' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'name' => 'Sibling/Grand Parent/Grandchild',
+                'description' => 'Sibling/Grand Parent/Grandchild level',
+                'status' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'name' => 'Cousin/Aunt/Uncle/In-law',
+                'description' => 'Cousin/Aunt/Uncle/In-law level',
+                'status' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
+            [
+                'name' => 'Female Employee',
+                'description' => 'Female Employee level',
+                'status' => true,
+                'created_at' => now(),
+                'updated_at' => now()
+            ],
         ]);
     }
 

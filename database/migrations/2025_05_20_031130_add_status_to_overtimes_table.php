@@ -8,9 +8,9 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::table('overtimes', function (Blueprint $table) {
-            $table->enum('status', ['pending', 'approved', 'declined'])->default('pending')->after('reason');
-        });
+        // Schema::table('overtimes', function (Blueprint $table) {
+        //     $table->enum('status', ['pending', 'approved', 'declined'])->default('pending')->after('reason');
+        // });
     }
 
     public function down()

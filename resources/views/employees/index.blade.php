@@ -150,7 +150,7 @@
                     </div>
                     <div class="mb-3">
                         <a href="{{ route('employees.template.download') }}"
-                            class="btn btn-secondary text-white btn-sm" target="_blank"  download>
+                            class="btn btn-secondary text-white btn-sm" target="_blank">
                             Download Template
                         </a>
                     </div>

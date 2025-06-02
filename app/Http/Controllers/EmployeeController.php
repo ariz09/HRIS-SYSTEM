@@ -10,6 +10,7 @@ use App\Models\Department;
 use App\Models\EmploymentStatus;
 use App\Models\EmploymentType;
 use App\Models\CDMLevel;
+use App\Models\GovernmentId;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -83,6 +84,10 @@ class EmployeeController extends Controller
             'atm_account_number' => 'nullable|numeric',
             'address' => 'required|string|max:500', // Made address required
             'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'sss_number' => 'nullable|string|max:20',
+            'pag_ibig_number' => 'nullable|string|max:20',
+            'philhealth_number' => 'nullable|string|max:20',
+            'tin' => 'nullable|string|max:20',
         ], [
             'phone_number.regex' => 'The phone number must be a valid Philippine mobile number (e.g., 09171234567 or +639171234567)',
             'atm_account_number.numeric' => 'The ATM account number must contain only numbers',
@@ -166,6 +171,15 @@ class EmployeeController extends Controller
                 'bank_name' => $request->bank_name,
             ]);
 
+            // Create Government IDs
+            GovernmentId::create([
+                'employee_number' => $newEmployeeNumber,
+                'sss_number' => $request->sss_number,
+                'pag_ibig_number' => $request->pag_ibig_number,
+                'philhealth_number' => $request->philhealth_number,
+                'tin' => $request->tin,
+            ]);
+
             DB::commit();
             return redirect()->route('employees.index')->with('success', 'Employee created successfully.');
         } catch (\Exception $e) {
@@ -234,6 +248,11 @@ class EmployeeController extends Controller
             'clothing_allowance' => 'nullable|numeric|min:0',
             'atm_account_number' => 'nullable|numeric',
             'bank_name' => 'nullable|string|max:255',
+            //government ids
+            'sss_number' => 'nullable|string|max:20',
+            'pag_ibig_number' => 'nullable|string|max:20',
+            'philhealth_number' => 'nullable|string|max:20',
+            'tin' => 'nullable|string|max:20',
         ], [
             'phone_number.regex' => 'The phone number must be a valid Philippine mobile number (e.g., 09171234567 or +639171234567)',
             'atm_account_number.numeric' => 'The ATM account number must contain only numbers',
@@ -315,6 +334,24 @@ class EmployeeController extends Controller
                 ]);
             } 
 
+            // Update or Create Government IDs
+            if ($employee->governmentId) {
+                $employee->governmentId->update([
+                    'sss_number' => $request->sss_number,
+                    'pag_ibig_number' => $request->pag_ibig_number,
+                    'philhealth_number' => $request->philhealth_number,
+                    'tin' => $request->tin,
+                ]);
+            } else {
+                GovernmentId::create([
+                    'employee_number' => $employee->employee_number,
+                    'sss_number' => $request->sss_number,
+                    'pag_ibig_number' => $request->pag_ibig_number,
+                    'philhealth_number' => $request->philhealth_number,
+                    'tin' => $request->tin,
+                ]);
+            }
+
 
 
 
@@ -339,6 +376,10 @@ class EmployeeController extends Controller
 
             if ($employee->personalInfo) {
                 $employee->personalInfo()->delete();
+            }
+
+            if ($employee->governmentId) {
+                $employee->governmentId()->delete();
             }
 
             // Delete user account
@@ -435,6 +476,10 @@ class EmployeeController extends Controller
                         'basic_pay' => 'required|numeric',
                         'atm_account_number' => 'nullable|numeric',
                         'address' => 'required|string|max:500',
+                        'sss_number' => 'nullable|string|max:20',
+                        'pag_ibig_number' => 'nullable|string|max:20',
+                        'philhealth_number' => 'nullable|string|max:20',
+                        'tin' => 'nullable|string|max:20',
                     ]);
 
                     if ($validator->fails()) {
@@ -480,16 +525,25 @@ class EmployeeController extends Controller
 
                     // Create compensation package
                     CompensationPackage::create([
-                    'employee_number' => $newEmployeeNumber,
-                    'basic_pay' => $rowData['basic_pay'],
-                    'rata' => $rowData['rata'] ?? 0,
-                    'comm_allowance' => $rowData['comm_allowance'] ?? 0,
-                    'transpo_allowance' => $rowData['transpo_allowance'] ?? 0,
-                    'parking_toll_allowance' => $rowData['parking_toll_allowance'] ?? 0,
-                    'clothing_allowance' => $rowData['clothing_allowance'] ?? 0,
-                    'atm_account_number' => $rowData['atm_account_number'] ?? null,
-                    'bank_name' => $rowData['bank_name'] ?? null,
-                ]);
+                        'employee_number' => $newEmployeeNumber,
+                        'basic_pay' => $rowData['basic_pay'],
+                        'rata' => $rowData['rata'] ?? 0,
+                        'comm_allowance' => $rowData['comm_allowance'] ?? 0,
+                        'transpo_allowance' => $rowData['transpo_allowance'] ?? 0,
+                        'parking_toll_allowance' => $rowData['parking_toll_allowance'] ?? 0,
+                        'clothing_allowance' => $rowData['clothing_allowance'] ?? 0,
+                        'atm_account_number' => $rowData['atm_account_number'] ?? null,
+                        'bank_name' => $rowData['bank_name'] ?? null,
+                     ]);
+
+                     // Create government IDs
+                    GovernmentId::create([
+                        'employee_number' => $newEmployeeNumber,
+                        'sss_number' => $rowData['sss_number'] ?? null,
+                        'pag_ibig_number' => $rowData['pag_ibig_number'] ?? null,
+                        'philhealth_number' => $rowData['philhealth_number'] ?? null,
+                        'tin' => $rowData['tin'] ?? null,
+                    ]);
 
                 DB::commit();
                 $successCount++;

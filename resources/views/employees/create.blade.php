@@ -188,6 +188,64 @@
 
                 </div>
 
+                <!-- Government IDs -->
+                <div class="card mb-4 shadow-sm border-0">
+                    <div class="card-header bg-danger">
+                        <h6 class="mb-0 text-white fw-bold">Government IDs</h6>
+                    </div>
+                    <div class="card-body row g-3">
+                        <div class="col-md-6">
+                            <label for="sss_number" class="form-label">SSS Number</label>
+                            <input type="text" name="sss_number" id="sss_number" 
+                                class="form-control rounded-2 shadow-sm @error('sss_number') is-invalid @enderror" 
+                                value="{{ old('sss_number', $employee->governmentId->sss_number ?? '') }}" 
+                                placeholder="Enter SSS number">
+                            @error('sss_number')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="pag_ibig_number" class="form-label">Pag-IBIG Number</label>
+                            <input type="text" name="pag_ibig_number" id="pag_ibig_number" 
+                                class="form-control rounded-2 shadow-sm @error('pag_ibig_number') is-invalid @enderror" 
+                                value="{{ old('pag_ibig_number', $employee->governmentId->pag_ibig_number ?? '') }}" 
+                                placeholder="Enter Pag-IBIG number">
+                            @error('pag_ibig_number')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="philhealth_number" class="form-label">PhilHealth Number</label>
+                            <input type="text" name="philhealth_number" id="philhealth_number" 
+                                class="form-control rounded-2 shadow-sm @error('philhealth_number') is-invalid @enderror" 
+                                value="{{ old('philhealth_number', $employee->governmentId->philhealth_number ?? '') }}" 
+                                placeholder="Enter PhilHealth number">
+                            @error('philhealth_number')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+
+                        <div class="col-md-6">
+                            <label for="tin" class="form-label">TIN</label>
+                            <input type="text" name="tin" id="tin" 
+                                class="form-control rounded-2 shadow-sm @error('tin') is-invalid @enderror" 
+                                value="{{ old('tin', $employee->governmentId->tin ?? '') }}" 
+                                placeholder="Enter Tax Identification Number">
+                            @error('tin')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        
+                        <!-- Additional space if needed -->
+                        <div class="col-md-12">
+                            <!-- This empty col-md-12 maintains consistent spacing -->
+                        </div>
+                    </div>
+                </div>
+
+      
 
                 <!-- Employment Information and Compensation in one row -->
                 <div class="row">

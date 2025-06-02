@@ -104,4 +104,9 @@ class EmploymentInfo extends Model
     {
         return $this->hasMany(EmployeeEmploymentHistory::class, 'employee_number', 'employee_number');
     }
+
+    public function governmentId()
+    {
+        return $this->hasOne(GovernmentId::class, 'employee_number', 'employee_number');
+    }
 }

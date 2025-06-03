@@ -29,16 +29,22 @@
 
             <!-- Leave & Attendance -->
             <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLeave" aria-expanded="false" aria-controls="collapseLeave">
-                <div class="sb-nav-link-icon"><i class="fas fa-calendar-check"></i></div>
+                <div class="sb-nav-link-icon"><i class="fas fa-calendar-alt"></i></div>
                 Leave & Attendance
                 <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
             </a>
             <div class="collapse" id="collapseLeave" data-bs-parent="#sidenavAccordion">
                 <nav class="sb-sidenav-menu-nested nav">
-                    <a class="nav-link" href="{{ route('leaves.index') }}">Leave Applications</a>
-                    <a class="nav-link" href="{{ route('leave_types.index') }}">Leave Types</a>
-                    <a class="nav-link" href="{{ route('assign_leaves.index') }}">Assign Leaves</a>
-                    <a class="nav-link" href="{{ route('excess.index') }}">Excess Time Management</a>
+                    @role('admin|manager|supervisor')
+                        <a class="nav-link" href="{{ route('leaves.manage') }}">Manage Leave Requests</a>
+                        <a class="nav-link" href="{{ route('leaves.index') }}">Leave Applications</a>
+                        <a class="nav-link" href="{{ route('leave_types.index') }}">Leave Types</a>
+                        <a class="nav-link" href="{{ route('assign_leaves.index') }}">Assign Leaves</a>
+                    @endrole
+                    @role('employee')
+                        <a class="nav-link" href="{{ route('leaves.my') }}">My Leave Requests</a>
+                        <a class="nav-link" href="{{ route('leaves.create') }}">Submit Leave Request</a>
+                    @endrole
                 </nav>
             </div>
 

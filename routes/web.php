@@ -58,6 +58,8 @@ Route::middleware(['auth', \App\Http\Middleware\CheckActiveUser::class])->group(
     Route::prefix('profile')->group(function () {
         Route::get('/', [ProfileController::class, 'index'])->name('profile.index');
         Route::get('/edit', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::get('/change-password', [ProfileController::class, 'changePassword'])->name('profile.change-password');
+        Route::put('/update-password', [ProfileController::class, 'updatePassword'])->name('profile.update-password');
     });
 
     // Profile picture routes
@@ -150,9 +152,23 @@ Route::middleware(['auth', \App\Http\Middleware\CheckActiveUser::class])->group(
 
     // Leave Management - accessible by admin, manager, and supervisor
     Route::middleware(['role:admin|manager|supervisor'])->group(function () {
+        // Custom routes first
+        Route::get('/leaves/manage', [LeaveController::class, 'manage'])->name('leaves.manage');
+        Route::post('/leaves/{leave}/reject', [LeaveController::class, 'reject'])->name('leaves.reject');
+        Route::post('/leaves/{leave}/approve', [LeaveController::class, 'approve'])->name('leaves.approve');
+
+        // Resource routes after
         Route::resource('leaves', LeaveController::class)->names('leaves');
         Route::resource('leave-types', LeaveTypeController::class)->parameters(['leave-types' => 'leave_type'])->names('leave_types');
         Route::resource('assign_leaves', AssignLeaveController::class)->parameters(['assign_leaves' => 'assignLeave'])->names('assign_leaves');
+    });
+
+    // Employee Leave Requests - accessible by all employees
+    Route::middleware(['role:employee|admin|manager|supervisor'])->group(function () {
+        Route::get('/my-leaves', [LeaveController::class, 'myLeaves'])->name('leaves.my');
+        Route::get('/leaves/create', [LeaveController::class, 'create'])->name('leaves.create');
+        Route::post('/leaves', [LeaveController::class, 'store'])->name('leaves.store');
+        Route::get('/leaves/{leave}', [LeaveController::class, 'show'])->name('leaves.show');
     });
 
     // Holiday Management - accessible by admin only

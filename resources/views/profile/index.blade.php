@@ -283,7 +283,7 @@
                                     disabled>
                             </div>
 
-                            <div class="col-md-4 fw-bold mt-2">Comm Allowance:</div>
+                            <div class="col-md-4 fw-bold mt-2">Communication Allowance:</div>
                             <div class="col-md-8 mt-2">
                                 <input type="text" class="form-control"
                                     value="{{ number_format($compensation->comm_allowance, 2) }}"

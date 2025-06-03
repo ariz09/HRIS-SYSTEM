@@ -284,7 +284,7 @@
                                         value="{{ old('rata') }}" placeholder="Enter rata"> 
                                 </div>
                                 <div class="mb-3">
-                                    <label for="comm_allowance" class="form-label">Commission Allowance</label>
+                                    <label for="comm_allowance" class="form-label">Communication Allowance</label>
                                     <input type="text" name="comm_allowance" id="comm_allowance" 
                                        class="form-control rounded-2 shadow-sm"
                                         value="{{ old('comm_allowance') }}" placeholder="Enter commision allowance"> 

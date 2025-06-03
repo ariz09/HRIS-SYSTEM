@@ -359,7 +359,7 @@
                                           value="{{ optional($employee->compensationPackage)->rata ?? '' }}">
                                     </div>
                                     <div class="mb-3">
-                                        <label for="comm_allowance">Commission Allowance</label>
+                                        <label for="comm_allowance">Communication Allowance</label>
                                         <input type="number" name="comm_allowance" id="comm_allowance" class="form-control rounded-2 shadow-sm"
                                             value="{{ optional( $employee->compensationPackage)->comm_allowance ?? '' }}">
                                     </div>

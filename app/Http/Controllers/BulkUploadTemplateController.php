@@ -55,7 +55,7 @@ class BulkUploadTemplateController extends Controller
             
         } catch (\Exception $e) {
             Log::error('Template download failed: '.$e->getMessage()."\n".$e->getTraceAsString());
-            return back()->with('error', 'Failed to generate template. Please try again later.');
+            return redirect()->route('employees.index')->with('error', 'Failed to generate template. Please try again later.');
         }
     }
 

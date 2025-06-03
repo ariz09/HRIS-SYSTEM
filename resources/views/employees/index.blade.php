@@ -149,7 +149,7 @@
                         <input type="file" name="employee_csv" id="employee_csv" class="form-control" required accept=".csv">
                     </div>
                     <div class="mb-3">
-                        <a href="{{ route('employees.template.download') }}"
+                        <a href="{{ route('employees.download.template') }}"
                             class="btn btn-secondary text-white btn-sm" target="_blank">
                             Download Template
                         </a>

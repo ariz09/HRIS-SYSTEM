@@ -24,6 +24,7 @@ use Illuminate\Validation\Rule;
 class EmployeeController extends Controller
 {
 
+
     public static function generateEmployeeNumber()
     {
         $latestEmployee = EmploymentInfo::orderBy('employee_number', 'desc')->first();

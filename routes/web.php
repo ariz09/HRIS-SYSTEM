@@ -116,10 +116,13 @@ Route::middleware(['auth', \App\Http\Middleware\CheckActiveUser::class])->group(
             ->name('employees.employment-histories.destroy');
     });
 
+    Route::get('/employees/download-template', [BulkUploadTemplateController::class, 'downloadTemplate'])
+        ->name('employees.download.template');
+
     // Employee Management - accessible by admin, manager, and recruiter
     Route::prefix('employees')->middleware(['role:admin|manager|recruiter'])->name('employees.')->group(function () {
         Route::get('{employee}/edit', [EmployeeController::class, 'edit'])->name('edit');
-        Route::get('/template-download', [BulkUploadTemplateController::class, 'downloadTemplate'])->name('template.download');
+
         Route::post('/bulk-upload', [EmployeeController::class, 'bulkUpload'])->name('bulkUpload');
 
         // Nested Modules for Each Employee

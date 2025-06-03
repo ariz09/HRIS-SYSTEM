@@ -9,7 +9,7 @@ class Position extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'cdm_level_id', 'status']; 
+    protected $fillable = ['name', 'cdm_level_id', 'status'];
 
     public function cdmLevel()
     {

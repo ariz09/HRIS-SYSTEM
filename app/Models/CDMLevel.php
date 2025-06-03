@@ -19,7 +19,7 @@ class CDMLevel extends Model
 
     public function employees()
     {
-        return $this->hasMany(Employee::class, 'cdm_level_id');
+        return $this->hasMany(EmploymentInfo::class, 'cdm_level_id');
     }
 
     // Add this active scope method
